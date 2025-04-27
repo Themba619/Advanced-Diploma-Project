@@ -1,5 +1,66 @@
 [
   {
+    "id": 4,
+    "title": "Events",
+    "description": "Does anyone know where I can sign up for battle of the bands event happening next month at the APK campus?",
+    "user": "Randy",
+    "timeAgo": "2025-04-27T19:26:39.207Z",
+    "tags": [
+      "Social",
+      "General"
+    ],
+    "chatCount": 2,
+    "replies": [
+      {
+        "id": 1745782096523,
+        "user": "Anonymous",
+        "content": "Yeah on the UJ website under events the is a form you can fill out all you need is student number, name, and band name. GOOD LUCK! for the event",
+        "timeAgo": "2025-04-27T19:28:16.523Z",
+        "replies": [
+          {
+            "id": 1745782183624,
+            "user": "Anonymous",
+            "content": "Thank You I found it, Here is the link to our latest song: https://www.youtube.com/watch?v=v2AC41dglnM",
+            "timeAgo": "2025-04-27T19:29:43.624Z",
+            "replies": []
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "Submitting work",
+    "description": "I am having issues submitting work on Moodle is anyone else have the same problem.",
+    "user": "Anonymous",
+    "timeAgo": "2025-04-27T19:25:18.525Z",
+    "tags": [
+      "Academic Support"
+    ],
+    "chatCount": 0,
+    "replies": []
+  },
+  {
+    "id": 2,
+    "title": "Finance Department",
+    "description": "Where is the finance department",
+    "user": "Themba",
+    "timeAgo": "2025-04-27T19:23:11.782Z",
+    "tags": [
+      "General"
+    ],
+    "chatCount": 1,
+    "replies": [
+      {
+        "id": 1745781824783,
+        "user": "Anonymous",
+        "content": "Download the app it will give you directions based on current location at the apb campus",
+        "timeAgo": "2025-04-27T19:23:44.783Z",
+        "replies": []
+      }
+    ]
+  },
+  {
     "id": 1,
     "title": "Where do I get a student card at UJ?",
     "description": "I'm a first-year student at UJ and need to get my student card. Where do I go, and what documents do I need?",
