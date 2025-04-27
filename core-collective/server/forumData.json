@@ -1,33 +1,5 @@
 [
   {
-    "id": 6,
-    "title": "Student Finance",
-    "description": "Where is the student finance department",
-    "user": "Smith",
-    "timeAgo": "2025-04-27T16:48:24.475Z",
-    "tags": [
-      "General"
-    ],
-    "chatCount": 2,
-    "replies": [
-      {
-        "id": 1745772570486,
-        "user": "Anonymous",
-        "content": "Download the virtual assist app via play store/ apple store it will guide to your destination from anywhere on the APB campus",
-        "timeAgo": "2025-04-27T16:49:30.486Z",
-        "replies": [
-          {
-            "id": 1745772600781,
-            "user": "Anonymous",
-            "content": "Thank You",
-            "timeAgo": "2025-04-27T16:50:00.781Z",
-            "replies": []
-          }
-        ]
-      }
-    ]
-  },
-  {
     "id": 1,
     "title": "Where do I get a student card at UJ?",
     "description": "I'm a first-year student at UJ and need to get my student card. Where do I go, and what documents do I need?",
@@ -55,77 +27,5 @@
         ]
       }
     ]
-  },
-  {
-    "id": 2,
-    "title": "Where is the finance department at UJ?",
-    "description": "I need to sort out a payment issue with my fees. Can someone tell me where the finance department is located and their contact details?",
-    "user": "UJStudent23",
-    "timeAgo": "2025-04-24T14:00:00.000Z",
-    "tags": [
-      "General"
-    ],
-    "chatCount": 2,
-    "replies": [
-      {
-        "id": 2.1,
-        "user": "CampusGuide",
-        "content": "The finance department is at the Administration Building on the APK campus. You can also contact them at studentaccounts@uj.ac.za or call 011 559 4555.",
-        "timeAgo": "2025-04-24T15:30:00.000Z",
-        "replies": []
-      }
-    ]
-  },
-  {
-    "id": 3,
-    "title": "How to contact a lecturer about a sick note?",
-    "description": "I missed a test due to illness and need to submit a sick note. How do I contact my lecturer, and what’s the process at UJ?",
-    "user": "SickStudent",
-    "timeAgo": "2025-04-20T10:00:00.000Z",
-    "tags": [
-      "Academic Support"
-    ],
-    "chatCount": 4,
-    "replies": [
-      {
-        "id": 3.1,
-        "user": "SeniorUJ",
-        "content": "Check your lecturer’s contact details on the UJ Blackboard or module outline. Email them with your sick note attached and explain your situation. Follow up with the faculty office if needed.",
-        "timeAgo": "2025-04-20T12:00:00.000Z",
-        "replies": []
-      }
-    ]
-  },
-  {
-    "id": 4,
-    "title": "How to access the UJ library after hours?",
-    "description": "I heard the UJ library has extended hours during exams. How do I get access, and are there any restrictions?",
-    "user": "LibraryLad",
-    "timeAgo": "2025-04-22T08:00:00.000Z",
-    "tags": [
-      "Study Tips"
-    ],
-    "chatCount": 1,
-    "replies": [
-      {
-        "id": 4.1,
-        "user": "BookWorm",
-        "content": "The APK library is open 24/7 during exams for UJ students. Just swipe your student card at the entrance. No food or drinks allowed inside!",
-        "timeAgo": "2025-04-22T09:30:00.000Z",
-        "replies": []
-      }
-    ]
-  },
-  {
-    "id": 5,
-    "title": "Any tips for finding parking on UJ campus?",
-    "description": "Parking at UJ is a nightmare! Any tips for finding a spot, especially at the Soweto campus?",
-    "user": "CommuterUJ",
-    "timeAgo": "2025-04-26T11:00:00.000Z",
-    "tags": [
-      "General"
-    ],
-    "chatCount": 0,
-    "replies": []
   }
 ]
