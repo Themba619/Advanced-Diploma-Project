@@ -37,6 +37,10 @@ const DrawerNavigation = ({ children }) => {
               Home
             </Link>
 
+            <Link to="/chatforum" className="block hover:text-blue-600"onClick={() => setIsOpen(false)}>
+              Chat Forum
+            </Link>
+
             <Link to="/profile" className="block hover:text-blue-600" onClick={() => setIsOpen(false)}>
               Profile
             </Link>

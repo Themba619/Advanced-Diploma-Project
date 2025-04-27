@@ -1,7 +1,9 @@
+import React from "react";
+
 const Home = () => {
 
     return(
-      <h2 className="text-2xl font-bold">Welcome to the Home Page</h2>
+      <h2 className="text-2xl font-bold">This is the Home Page</h2>
     );
 
 }
