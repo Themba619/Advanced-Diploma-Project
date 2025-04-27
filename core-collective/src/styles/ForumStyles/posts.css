@@ -1,0 +1,134 @@
+.post-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .post-title {
+    font-size: 1.5em;
+    margin: 0 0 10px;
+  }
+  
+  .post-description {
+    margin: 0 0 15px;
+  }
+  
+  .post-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .post-tags {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .tag {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  
+  .tag.math { background: #e3f2fd; }
+  .tag.housing { background: #fce4ec; }
+  .tag.study-tips { background: #e8f5e9; }
+  .tag.social { background: #fff3e0; }
+  .tag.general { background: #f3e5f5; }
+  
+  .post-info {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9em;
+    color: #666;
+  }
+  
+  .replies-section {
+    margin-top: 15px;
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+  }
+  
+  .reply-button {
+    background: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+  
+  .reply-button:hover {
+    background: #e0e0e0;
+  }
+  
+  .reply-form {
+    margin: 10px 0;
+  }
+  
+  .reply-form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  .reply-form button {
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    margin-top: 5px;
+  }
+  
+  .reply-form button:hover {
+    background: #0056b3;
+  }
+  
+  .replies-list {
+    margin-top: 10px;
+  }
+  
+  .reply {
+    margin: 10px 0;
+    padding: 10px;
+    background: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .reply.level-1 {
+    margin-left: 20px;
+  }
+  
+  .reply.level-2 {
+    margin-left: 40px;
+  }
+  
+  .reply.level-3 {
+    margin-left: 60px;
+  }
+  
+  .reply-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .reply-user {
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .reply-time {
+    font-size: 0.8em;
+    color: #666;
+  }
+  
+  .nested-replies {
+    margin-top: 10px;
+  }

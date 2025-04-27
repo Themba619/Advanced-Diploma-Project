@@ -1,0 +1,63 @@
+.forum-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    gap: 1rem;
+  }
+  
+  .search-container {
+    display: flex;
+    flex: 1;
+    gap: 0.5rem;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  .search-button {
+    padding: 0.75rem 1.5rem;
+    background: #f3f4f6;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .search-button:hover {
+    background: #e5e7eb;
+  }
+  
+  .ask-button {
+    padding: 0.75rem 1.5rem;
+    background: #9b87f5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .ask-button:hover {
+    background: #7E69AB;
+  }
+  
+  @media (max-width: 768px) {
+    .forum-header {
+      flex-direction: column;
+    }
+  
+    .search-container {
+      width: 100%;
+    }
+  
+    .ask-button {
+      width: 100%;
+    }
+}
+  
