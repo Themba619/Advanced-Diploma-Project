@@ -1,0 +1,43 @@
+[
+  {
+    "id": 2,
+    "title": "Study Partner",
+    "description": "looking for a study partner",
+    "user": "Franklin",
+    "timeAgo": "2025-04-28T12:40:20.967Z",
+    "tags": [
+      "Social"
+    ],
+    "chatCount": 0,
+    "replies": []
+  },
+  {
+    "id": 1,
+    "title": "Where do I get a student card at UJ?",
+    "description": "I'm a first-year student at UJ and need to get my student card. Where do I go, and what documents do I need?",
+    "user": "NewbieUJ",
+    "timeAgo": "2025-04-25T09:00:00.000Z",
+    "tags": [
+      "Academic Support",
+      "General"
+    ],
+    "chatCount": 3,
+    "replies": [
+      {
+        "id": 1.1,
+        "user": "UJHelper",
+        "content": "You can get your student card at the Student Enrolment Centre (SEC) on the Auckland Park Kingsway (APK) campus. Bring your ID/passport and proof of registration.",
+        "timeAgo": "2025-04-25T10:30:00.000Z",
+        "replies": [
+          {
+            "id": 1.11,
+            "user": "NewbieUJ",
+            "content": "Thanks! Is there a specific time I should go?",
+            "timeAgo": "2025-04-25T11:00:00.000Z",
+            "replies": []
+          }
+        ]
+      }
+    ]
+  }
+]

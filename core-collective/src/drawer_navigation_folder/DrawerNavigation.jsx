@@ -48,7 +48,7 @@ const DrawerNavigation = ({ children }) => {
             Home
           </Link>
           <Link
-            to="/chatforum"
+            to="/forum"
             className="nav-link"
             onClick={() => setIsOpen(false)}
           >

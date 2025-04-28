@@ -1,0 +1,38 @@
+.topic-info {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .topic-info h2 {
+    font-size: 1.5em;
+    margin: 0 0 10px;
+    color: #333;
+  }
+  
+  .topic-info p {
+    margin: 0 0 10px;
+    color: #666;
+  }
+  
+  .topic-info ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0 0 10px;
+  }
+  
+  .topic-info li {
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .topic-info a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .topic-info a:hover {
+    text-decoration: underline;
+  }

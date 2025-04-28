@@ -1,0 +1,25 @@
+.tag {
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  
+  .tag.academic-support {
+    background: #e3f2fd;
+  }
+  
+  .tag.housing {
+    background: #fce4ec;
+  }
+  
+  .tag.study-tips {
+    background: #e8f5e9;
+  }
+  
+  .tag.social {
+    background: #fff3e0;
+  }
+  
+  .tag.general {
+    background: #f3e5f5;
+  }
