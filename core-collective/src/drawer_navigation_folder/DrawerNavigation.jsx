@@ -1,70 +1,88 @@
+
+
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import "../styles/drawerNavStyles/DrawerNavigation.css";
 
 const DrawerNavigation = ({ children }) => {
-    const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-    return (
-      <div className="min-h-screen bg-gray-100">
-
-        {/* Top Nav: div for Tab on the top of the screen */}
-        <div className="flex items-center bg-white px-4 py-3 shadow">
-          <button onClick={() => setIsOpen(true)} className="text-gray-800">
-            <Menu size={26} />
-          </button>
-          <h1 className="ml-4 text-xl font-semibold">Core Collective</h1>
-        </div>
-  
-        {/* Drawer: Content of opened left drawer*/}
-        <div
-          className={`fixed top-0 left-0 h-full w-70 bg-white z-50 shadow transform transition-transform duration-300 ${
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          }`} 
-          >
-
-          <div className="p-4 border-b flex justify-between items-center">
-            <span className="text-lg font-bold">Hey there, User!</span>
-            <button onClick={() => setIsOpen(false)} className="text-3xl text-gray-600">
-              ×
-            </button>
-          </div>
-
-          {/* Links to other pages */}
-          <nav className="p-4 space-y-4"> 
-
-            <Link to="/" className="block hover:text-blue-600"onClick={() => setIsOpen(false)}>
-              Home
-            </Link>
-
-            <Link to="/chatforum" className="block hover:text-blue-600"onClick={() => setIsOpen(false)}>
-              Chat Forum
-            </Link>
-
-            <Link to="/profile" className="block hover:text-blue-600" onClick={() => setIsOpen(false)}>
-              Profile
-            </Link>
-
-            <Link to="/settings" className="block hover:text-blue-600" onClick={() => setIsOpen(false)}>
-              Settings
-            </Link>
-            
-          </nav>
-
-        </div>
-  
-        {/* Overlay: Background of screen when drawer is open */}
-        {isOpen && (
-          <div
-            onClick={() => setIsOpen(false)}
-            className="fixed inset-0 bg-transparent z-40"
-          />
-        )}
-  
-        {/* Main content */}
-        <div className="">{children}</div>
+  return (
+    <div className="drawer-container">
+      {/* Top Nav */}
+      <div className="top-nav">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="menu-button"
+          aria-label="Open menu"
+          aria-expanded={isOpen}
+        >
+          <Menu size={26} />
+        </button>
+        <h1 className="top-nav-title">Core Collective</h1>
       </div>
-    );
-}
+
+      {/* Drawer */}
+      <div
+        className={`drawer ${isOpen ? "drawer-open" : "drawer-closed"}`}
+      >
+        <div className="drawer-header">
+          <span className="drawer-title">Hey there, User!</span>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="close-button"
+            aria-label="Close menu"
+          >
+            ×
+          </button>
+        </div>
+
+        {/* Links */}
+        <nav className="drawer-nav">
+          <Link
+            to="/"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Home
+          </Link>
+          <Link
+            to="/chatforum"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Chat Forum
+          </Link>
+          <Link
+            to="/profile"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Profile
+          </Link>
+          <Link
+            to="/settings"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Settings
+          </Link>
+        </nav>
+      </div>
+
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          className="overlay"
+        />
+      )}
+
+      {/* Main content */}
+      <div className="main-content">{children}</div>
+    </div>
+  );
+};
 
 export default DrawerNavigation;
