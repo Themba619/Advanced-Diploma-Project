@@ -41,7 +41,7 @@ const DrawerNavigation = ({ children }) => {
         {/* Links */}
         <nav className="drawer-nav">
           <Link
-            to="/"
+            to="/home"
             className="nav-link"
             onClick={() => setIsOpen(false)}
           >
@@ -67,6 +67,13 @@ const DrawerNavigation = ({ children }) => {
             onClick={() => setIsOpen(false)}
           >
             Settings
+          </Link>
+          <Link
+            to="/"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Logout
           </Link>
         </nav>
       </div>
