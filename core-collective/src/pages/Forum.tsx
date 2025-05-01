@@ -1,8 +1,10 @@
-import React, { useState, useEffect, JSX } from 'react';
+import React, { useState, JSX } from 'react';
+import { useQuery, useMutation, useQueryClient, QueryClient } from '@tanstack/react-query';
+import { toast } from '../components/ui/ForumUi/sonner';
 import ForumQuestion from '../components/ForumQuestion';
 import ReplyForm from '../components/ReplyForm';
-import {Filter} from 'bad-words';
-import profanityList from '../lib/profanityList'; // Import the profanity list (CommonJS compatible)
+import { Filter } from 'bad-words';
+import profanityList from '../lib/profanityList';
 import '../styles/ForumStyles/layout.css';
 import '../styles/ForumStyles/sidebar.css';
 import '../styles/ForumStyles/header.css';
@@ -10,10 +12,9 @@ import '../styles/ForumStyles/posts.css';
 import '../styles/ForumStyles/tags.css';
 import '../styles/ForumStyles/topicInfo.css';
 
-// Initialize the profanity filter with the imported list
+// Initialize the profanity filter
 const filter = new Filter();
 filter.addWords(...profanityList);
-// Whitelist words that might cause false positives
 filter.removeWords('class', 'pass', 'therapist', 'assistant');
 
 interface Reply {
@@ -79,7 +80,6 @@ const defaultPosts: Post[] = [
       }
     ]
   },
-  // Other default posts...
 ];
 
 const topicInfo: Record<string, { title: string; content: JSX.Element }> = {
@@ -164,66 +164,68 @@ const topicInfo: Record<string, { title: string; content: JSX.Element }> = {
   }
 };
 
+// Backend API functions
+const fetchPosts = async (): Promise<Post[]> => {
+  const res = await fetch('http://localhost:3001/posts');
+  if (!res.ok) throw new Error('Failed to fetch posts');
+  const data = await res.json();
+  if (!Array.isArray(data)) throw new Error('Invalid data from server');
+  return data.map((post: Post) => ({
+    ...post,
+    timeAgo: new Date(post.timeAgo),
+    replies: post.replies.map((reply: Reply) => ({
+      ...reply,
+      timeAgo: new Date(reply.timeAgo),
+      replies: reply.replies.map((nestedReply: Reply) => ({
+        ...nestedReply,
+        timeAgo: new Date(nestedReply.timeAgo),
+      }))
+    }))
+  }));
+};
+
+const addPost = async (newPost: Post) => {
+  const res = await fetch('http://localhost:3001/posts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(newPost)
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || 'Failed to add post');
+  }
+  return res.json();
+};
+
 const Forum: React.FC = () => {
   const topics = ["All Topics", "Academic Support", "Housing", "Study Tips", "Social", "General"];
-  const [posts, setPosts] = useState<Post[]>(defaultPosts);
   const [selectedTopic, setSelectedTopic] = useState<string>("All Topics");
   const [showQuestionForm, setShowQuestionForm] = useState<boolean>(false);
   const [expandedReplies, setExpandedReplies] = useState<Record<string, boolean>>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string>('');
 
-  useEffect(() => {
-    fetch('http://localhost:3001/posts')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data)) {
-          setPosts(data.map((post: Post) => ({
-            ...post,
-            timeAgo: new Date(post.timeAgo),
-            replies: post.replies.map((reply: Reply) => ({
-              ...reply,
-              timeAgo: new Date(reply.timeAgo),
-              replies: reply.replies.map((nestedReply: Reply) => ({
-                ...nestedReply,
-                timeAgo: new Date(nestedReply.timeAgo),
-              }))
-            }))
-          })));
-        } else {
-          setPosts(defaultPosts);
-          alert('Failed to load posts: Invalid data from server');
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching posts:', error);
-        setPosts(defaultPosts);
-        alert('Failed to load posts: Could not connect to server');
-      });
-  }, []);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    fetch('http://localhost:3001/posts', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(posts)
-    })
-      .then(res => {
-        if (!res.ok) {
-          return res.json().then(err => {
-            throw new Error(err.error || 'Failed to save posts');
-          });
-        }
-        return res.json();
-      })
-      .then(data => {
-        console.log(data.message);
-      })
-      .catch(error => {
-        console.error('Error saving posts:', error);
-        setErrorMessage(error.message);
-      });
-  }, [posts]);
+  // Fetch posts
+  const { data: posts = defaultPosts, isLoading, error } = useQuery<Post[], Error>({
+    queryKey: ['posts'],
+    queryFn: fetchPosts,
+    retry: 1,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+
+  // Add new post
+  const addPostMutation = useMutation({
+    mutationFn: addPost,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts'] });
+      toast.success('Post added successfully');
+      setShowQuestionForm(false);
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to add post');
+    },
+  });
 
   const handleTopicClick = (topic: string) => {
     setSelectedTopic(topic);
@@ -239,12 +241,10 @@ const Forum: React.FC = () => {
 
   const handleAskQuestion = () => {
     setShowQuestionForm(true);
-    setErrorMessage('');
   };
 
   const handleCloseForm = () => {
     setShowQuestionForm(false);
-    setErrorMessage('');
   };
 
   const handleSubmitQuestion = (newPost: { title: string; description: string; user?: string; tags: string[] }) => {
@@ -252,60 +252,62 @@ const Forum: React.FC = () => {
     const descriptionHasProfanity = filter.isProfane(newPost.description);
 
     if (titleHasProfanity || descriptionHasProfanity) {
-      setErrorMessage('Your post contains inappropriate language. Please revise and try again.');
+      toast.error('Your post contains inappropriate language. Please revise and try again.');
       return;
     }
 
-    setPosts([
-      {
-        id: posts.length + 1,
-        title: newPost.title,
-        description: newPost.description,
-        user: newPost.user || "Anonymous",
-        timeAgo: new Date(),
-        tags: newPost.tags,
-        chatCount: 0,
-        replies: []
-      },
-      ...posts
-    ]);
-    setShowQuestionForm(false);
-    setErrorMessage('');
+    const postToAdd: Post = {
+      id: Date.now(), // Temporary ID, backend can override
+      title: newPost.title,
+      description: newPost.description,
+      user: newPost.user || "Anonymous",
+      timeAgo: new Date(),
+      tags: newPost.tags,
+      chatCount: 0,
+      replies: []
+    };
+
+    addPostMutation.mutate(postToAdd);
   };
 
   const handleSubmitReply = (postId: number, replyContent: string, parentReplyId: number | null = null) => {
     if (filter.isProfane(replyContent)) {
-      setErrorMessage('Your reply contains inappropriate language. Please revise and try again.');
+      toast.error('Your reply contains inappropriate language. Please revise and try again.');
       return;
     }
 
-    const newReply: Reply = {
-      id: Date.now(),
-      user: "Anonymous",
-      content: replyContent,
-      timeAgo: new Date(),
-      replies: []
-    };
-
-    setPosts(posts.map(post => {
-      if (post.id === postId) {
-        if (parentReplyId === null) {
-          return { ...post, replies: [newReply, ...post.replies], chatCount: post.chatCount + 1 };
-        } else {
-          const addReplyToNested = (replies: Reply[]): Reply[] => {
-            return replies.map(reply => {
-              if (reply.id === parentReplyId) {
-                return { ...reply, replies: [newReply, ...reply.replies] };
-              }
-              return { ...reply, replies: addReplyToNested(reply.replies) };
-            });
-          };
-          return { ...post, replies: addReplyToNested(post.replies), chatCount: post.chatCount + 1 };
+    // Optimistic update
+    queryClient.setQueryData(['posts'], (oldPosts: Post[] | undefined) => {
+      if (!oldPosts) return oldPosts;
+      const newReply: Reply = {
+        id: Date.now(),
+        user: "Anonymous",
+        content: replyContent,
+        timeAgo: new Date(),
+        replies: []
+      };
+      return oldPosts.map(post => {
+        if (post.id === postId) {
+          if (parentReplyId === null) {
+            return { ...post, replies: [newReply, ...post.replies], chatCount: post.chatCount + 1 };
+          } else {
+            const addReplyToNested = (replies: Reply[]): Reply[] => {
+              return replies.map(reply => {
+                if (reply.id === parentReplyId) {
+                  return { ...reply, replies: [newReply, ...reply.replies] };
+                }
+                return { ...reply, replies: addReplyToNested(reply.replies) };
+              });
+            };
+            return { ...post, replies: addReplyToNested(post.replies), chatCount: post.chatCount + 1 };
+          }
         }
-      }
-      return post;
-    }));
-    setErrorMessage('');
+        return post;
+      });
+    });
+
+    // Note: Replies are not saved to backend.
+    toast.success('Reply added successfully');
   };
 
   const toggleReplies = (id: string) => {
@@ -365,6 +367,9 @@ const Forum: React.FC = () => {
     ));
   };
 
+  if (isLoading) return <div>Loading posts...</div>;
+  if (error) return <div>Error loading posts: {error.message}</div>;
+
   return (
     <div className="forum-container">
       <div className="topics-sidebar">
@@ -405,12 +410,6 @@ const Forum: React.FC = () => {
           <h2>{topicInfo[selectedTopic].title}</h2>
           {topicInfo[selectedTopic].content}
         </div>
-
-        {errorMessage && (
-          <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>
-            {errorMessage}
-          </div>
-        )}
 
         {showQuestionForm && (
           <ForumQuestion

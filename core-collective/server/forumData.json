@@ -1,17 +1,5 @@
 [
   {
-    "id": 2,
-    "title": "Study Partner",
-    "description": "looking for a study partner",
-    "user": "Franklin",
-    "timeAgo": "2025-04-28T12:40:20.967Z",
-    "tags": [
-      "Social"
-    ],
-    "chatCount": 0,
-    "replies": []
-  },
-  {
     "id": 1,
     "title": "Where do I get a student card at UJ?",
     "description": "I'm a first-year student at UJ and need to get my student card. Where do I go, and what documents do I need?",
@@ -39,5 +27,17 @@
         ]
       }
     ]
+  },
+  {
+    "id": 1746091597155,
+    "title": "How to study",
+    "description": "I have a test and dont know how to study",
+    "user": "June Bug",
+    "timeAgo": "2025-05-01T09:26:37.155Z",
+    "tags": [
+      "Study Tips"
+    ],
+    "chatCount": 0,
+    "replies": []
   }
 ]
