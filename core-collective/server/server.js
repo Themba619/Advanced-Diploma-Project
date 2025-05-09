@@ -58,9 +58,13 @@ const app = express();
 const PORT = 3001;
 const FILE_PATH = path.join(__dirname, 'forumData.json');
 
+const profanityRoute = require('./routes/profanityRoute');
+
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+app.use('/api/profanityRoute', profanityRoute);
 
 // Initialize forumData.json with empty array if it doesn't exist
 async function initializeFile() {
@@ -103,6 +107,94 @@ app.post('/posts', async (req, res) => {
   } catch (error) {
     console.error('Error saving post:', error);
     res.status(500).json({ error: 'Failed to save post' });
+  }
+});
+
+// app.post('/posts/:postId/replies', (req, res) => {
+//   const postId = parseInt(req.params.postId);
+//   const { content, parentReplyId } = req.body;
+
+//   const newReply = {
+//     id: Date.now(),
+//     user: "Anonymous",
+//     content,
+//     timeAgo: new Date(),
+//     replies: []
+//   };
+
+//   const addNestedReply = (replies) => {
+//     return replies.map(reply => {
+//       if (reply.id === parentReplyId) {
+//         return { ...reply, replies: [newReply, ...reply.replies] };
+//       }
+//       return { ...reply, replies: addNestedReply(reply.replies) };
+//     });
+//   };
+
+//   posts = posts.map(post => {
+//     if (post.id === postId) {
+//       if (!parentReplyId) {
+//         post.replies.unshift(newReply);
+//       } else {
+//         post.replies = addNestedReply(post.replies);
+//       }
+//       post.chatCount++;
+//     }
+//     return post;
+//   });
+
+//   fs.writeFileSync(FILE_PATH, JSON.stringify(posts, null, 2));
+//   res.status(201).json({ message: "Reply added successfully" });
+// });
+
+
+app.post('/posts/:postId/replies', async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const { content, parentReplyId } = req.body;
+
+  const newReply = {
+    id: Date.now(),
+    user: "Anonymous",
+    content,
+    timeAgo: new Date(),
+    replies: []
+  };
+
+  try {
+    // Read existing posts
+    const data = await fs.readFile(FILE_PATH, 'utf8');
+    let posts = JSON.parse(data);
+
+    // Function to add nested replies
+    const addNestedReply = (replies) => {
+      return replies.map(reply => {
+        if (reply.id === parentReplyId) {
+          return { ...reply, replies: [newReply, ...reply.replies] };
+        }
+        return { ...reply, replies: addNestedReply(reply.replies) };
+      });
+    };
+
+    // Update the posts
+    posts = posts.map(post => {
+      if (post.id === postId) {
+        if (!parentReplyId) {
+          post.replies.unshift(newReply);  // Add to main replies if no parentReplyId
+        } else {
+          post.replies = addNestedReply(post.replies);  // Add nested reply
+        }
+        post.chatCount++;
+      }
+      return post;
+    });
+
+    // Save updated posts to file
+    await fs.writeFile(FILE_PATH, JSON.stringify(posts, null, 2));
+
+    res.status(201).json({ message: "Reply added successfully" });
+  } catch (error) {
+    console.error('Error saving reply:', error);
+    res.status(500).json({ error: 'Failed to save reply' });
   }
 });
 

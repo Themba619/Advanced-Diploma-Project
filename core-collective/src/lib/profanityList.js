@@ -31,5 +31,6 @@ const profanityList = [
   'p0rn', 'ni99er', 'nigg4', 'f4g', 'fagg0t', 'k1ll', 'r4pe', 'dr0gs', 'w33d'
 ];
 
+
 // Export using CommonJS
 export default profanityList;
