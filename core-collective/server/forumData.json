@@ -37,8 +37,24 @@
     "tags": [
       "Study Tips"
     ],
-    "chatCount": 0,
-    "replies": []
+    "chatCount": 2,
+    "replies": [
+      {
+        "id": 1746980857703,
+        "user": "Anonymous",
+        "content": "Testing Download the app",
+        "timeAgo": "2025-05-11T16:27:37.703Z",
+        "replies": [
+          {
+            "id": 1746981121017,
+            "user": "Anonymous",
+            "content": "Testing part it",
+            "timeAgo": "2025-05-11T16:32:01.017Z",
+            "replies": []
+          }
+        ]
+      }
+    ]
   },
   {
     "id": 1746091726813,
@@ -94,6 +110,18 @@
     "description": "better",
     "user": "Anonymous",
     "timeAgo": "2025-05-09T12:05:12.750Z",
+    "tags": [
+      "General"
+    ],
+    "chatCount": 0,
+    "replies": []
+  },
+  {
+    "id": 1746974590151,
+    "title": "New Post Test 4",
+    "description": "Test 4",
+    "user": "Anonymous",
+    "timeAgo": "2025-05-11T14:43:10.151Z",
     "tags": [
       "General"
     ],

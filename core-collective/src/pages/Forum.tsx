@@ -274,7 +274,10 @@ const topicInfo: Record<string, { title: string; content: JSX.Element }> = {
 // Backend API functions
 const fetchPosts = async (): Promise<Post[]> => {
   const res = await fetch("http://localhost:3001/posts");
-  if (!res.ok) throw new Error("Failed to fetch posts");
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || `Failed to fetch posts: ${res.status}`);
+  }
   const data = await res.json();
   if (!Array.isArray(data)) throw new Error("Invalid data from server");
   return data.map((post: Post) => ({
@@ -304,6 +307,27 @@ const addPost = async (newPost: Post) => {
   return res.json();
 };
 
+const addReply = async ({
+  postId,
+  content,
+  parentReplyId,
+}: {
+  postId: number;
+  content: string;
+  parentReplyId: number | null;
+}) => {
+  const res = await fetch(`http://localhost:3001/posts/${postId}/replies`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ content, parentReplyId }),
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to add reply");
+  }
+  return res.json();
+};
+
 const Forum: React.FC = () => {
   const topics = [
     "All Topics",
@@ -327,7 +351,7 @@ const Forum: React.FC = () => {
     data: posts = defaultPosts,
     isLoading,
     error,
-  } = useQuery<Post[], Error>({
+  } = useQuery<Post[], { message: string }>({
     queryKey: ["posts"],
     queryFn: fetchPosts,
     retry: 1,
@@ -344,6 +368,18 @@ const Forum: React.FC = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to add post");
+    },
+  });
+
+  // Add new reply
+  const addReplyMutation = useMutation({
+    mutationFn: addReply,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      toast.success("Reply added successfully");
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to add reply");
     },
   });
 
@@ -412,46 +448,7 @@ const Forum: React.FC = () => {
       return;
     }
 
-    // Optimistic update
-    queryClient.setQueryData(["posts"], (oldPosts: Post[] | undefined) => {
-      if (!oldPosts) return oldPosts;
-      const newReply: Reply = {
-        id: Date.now(),
-        user: "Anonymous",
-        content: replyContent,
-        timeAgo: new Date(),
-        replies: [],
-      };
-      return oldPosts.map((post) => {
-        if (post.id === postId) {
-          if (parentReplyId === null) {
-            return {
-              ...post,
-              replies: [newReply, ...post.replies],
-              chatCount: post.chatCount + 1,
-            };
-          } else {
-            const addReplyToNested = (replies: Reply[]): Reply[] => {
-              return replies.map((reply) => {
-                if (reply.id === parentReplyId) {
-                  return { ...reply, replies: [newReply, ...reply.replies] };
-                }
-                return { ...reply, replies: addReplyToNested(reply.replies) };
-              });
-            };
-            return {
-              ...post,
-              replies: addReplyToNested(post.replies),
-              chatCount: post.chatCount + 1,
-            };
-          }
-        }
-        return post;
-      });
-    });
-
-    // Note: Replies are not saved to backend.
-    toast.success("Reply added successfully");
+    addReplyMutation.mutate({ postId, content: replyContent, parentReplyId });
   };
 
   const toggleReplies = (id: string) => {
@@ -461,21 +458,23 @@ const Forum: React.FC = () => {
     }));
   };
 
-  const filteredPosts = posts
-    .filter((post) => {
-      if (selectedTopic !== "All Topics") {
-        return post.tags.includes(selectedTopic);
-      }
-      return true;
-    })
-    .filter((post) => {
-      if (!searchQuery.trim()) return true;
-      const query = searchQuery.toLowerCase();
-      return (
-        post.title.toLowerCase().includes(query) ||
-        post.description.toLowerCase().includes(query)
-      );
-    });
+  const filteredPosts = React.useMemo(() => {
+    return posts
+      .filter((post) => {
+        if (selectedTopic !== "All Topics") {
+          return post.tags.includes(selectedTopic);
+        }
+        return true;
+      })
+      .filter((post) => {
+        if (!searchQuery.trim()) return true;
+        const query = searchQuery.toLowerCase();
+        return (
+          post.title.toLowerCase().includes(query) ||
+          post.description.toLowerCase().includes(query)
+        );
+      });
+  }, [posts, selectedTopic, searchQuery]);
 
   const renderReplies = (
     replies: Reply[],
@@ -491,6 +490,8 @@ const Forum: React.FC = () => {
           <button
             className="reply-button"
             onClick={() => toggleReplies(reply.id.toString())}
+            aria-expanded={expandedReplies[reply.id] ? "true" : "false"}
+            aria-controls={`replies-${reply.id}`}
           >
             {expandedReplies[reply.id]
               ? "Hide Replies"
@@ -552,13 +553,18 @@ const Forum: React.FC = () => {
               className="search-input"
               value={searchQuery}
               onChange={handleSearchChange}
+              aria-label="Search forum questions"
             />
             <button className="search-button" onClick={handleSearch}>
               Search
             </button>
           </div>
-          <button className="ask-button" onClick={handleAskQuestion}>
-            Ask Question
+          <button
+            className="ask-button"
+            onClick={handleAskQuestion}
+            disabled={addPostMutation.isPending}
+          >
+            {addPostMutation.isPending ? "Posting..." : "Ask Question"}
           </button>
         </div>
 
@@ -608,6 +614,10 @@ const Forum: React.FC = () => {
                 <button
                   className="reply-button"
                   onClick={() => toggleReplies(`post-${post.id}`)}
+                  aria-expanded={
+                    expandedReplies[`post-${post.id}`] ? "true" : "false"
+                  }
+                  aria-controls={`replies-post-${post.id}`}
                 >
                   {expandedReplies[`post-${post.id}`]
                     ? "Hide Replies"
