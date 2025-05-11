@@ -423,7 +423,7 @@ const Forum: React.FC = () => {
     }
 
     const postToAdd: Post = {
-      id: Date.now(), // Temporary ID, backend can override
+      id: Date.now(), // temp ID, backend can override
       title: newPost.title,
       description: newPost.description,
       user: newPost.user || "Anonymous",
@@ -447,7 +447,6 @@ const Forum: React.FC = () => {
       );
       return;
     }
-
     addReplyMutation.mutate({ postId, content: replyContent, parentReplyId });
   };
 
