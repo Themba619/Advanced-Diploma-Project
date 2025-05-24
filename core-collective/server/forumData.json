@@ -9,8 +9,15 @@
       "Academic Support",
       "General"
     ],
-    "chatCount": 3,
+    "chatCount": 4,
     "replies": [
+      {
+        "id": 1747060938012,
+        "user": "Anonymous",
+        "content": "Second reply test",
+        "timeAgo": "2025-05-12T14:42:18.012Z",
+        "replies": []
+      },
       {
         "id": 1.1,
         "user": "UJHelper",
@@ -127,5 +134,26 @@
     ],
     "chatCount": 0,
     "replies": []
+  },
+  {
+    "id": 1747938435921,
+    "title": "Now just to prove that it works as normal",
+    "description": "Hello World",
+    "user": "Anonymous",
+    "timeAgo": "2025-05-22T18:27:15.921Z",
+    "tags": [
+      "General",
+      "Academic Support"
+    ],
+    "chatCount": 1,
+    "replies": [
+      {
+        "id": 1747938458748,
+        "user": "Anonymous",
+        "content": "Goodbye and Thankyou!!!!",
+        "timeAgo": "2025-05-22T18:27:38.748Z",
+        "replies": []
+      }
+    ]
   }
 ]

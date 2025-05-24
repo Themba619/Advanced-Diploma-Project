@@ -93,6 +93,7 @@ import LoginPage from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPwd from "./pages/ForgotPwd";
 import NotFound from "./pages/NotFound";
+import ContactUs from "./pages/ContactUs";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -121,6 +122,7 @@ function App() {
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/forum" element={<ForumChat />} />
+                  <Route path="/contactUs" element={<ContactUs />}/>
                   {/* Catch-all for undefined authenticated routes */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

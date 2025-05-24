@@ -69,6 +69,13 @@ const DrawerNavigation = ({ children }) => {
             Settings
           </Link>
           <Link
+            to="/contactUs"
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Contact-us
+          </Link>
+          <Link
             to="/"
             className="nav-link"
             onClick={() => setIsOpen(false)}

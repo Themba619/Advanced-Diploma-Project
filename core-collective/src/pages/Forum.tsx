@@ -15,6 +15,7 @@ import "../styles/ForumStyles/header.css";
 import "../styles/ForumStyles/posts.css";
 import "../styles/ForumStyles/tags.css";
 import "../styles/ForumStyles/topicInfo.css";
+import ForumLikes from "../components/ForumLikes";
 
 interface Reply {
   id: number;
@@ -504,6 +505,7 @@ const Forum: React.FC = () => {
           >
             {expandedReplies[`form-${reply.id}`] ? "Cancel Reply" : "Reply"}
           </button>
+          <ForumLikes />
         </div>
         {expandedReplies[`form-${reply.id}`] && (
           <ReplyForm
