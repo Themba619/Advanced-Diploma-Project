@@ -5,6 +5,16 @@ exports.sendEmail = async (req, res) => {
     // Accept frontend fields
     const { name, email, message } = req.body;
 
+    if(!name || !email) {
+        return res.status(400).json({ error: "Name and email are required"});
+    }
+
+    const attachments = (req.files || []).map(file => ({
+      filename: file.originalname,
+      content: file.buffer,
+      contentType: file.mimetype,
+    }));
+
     const transporter = nodemailer.createTransport({
       host: "smtp.ethereal.email",
       port: 587,
@@ -21,6 +31,7 @@ exports.sendEmail = async (req, res) => {
       subject: `Contact Form Submission from ${name}`,
       text: message,
       html: `<p>${message}</p>`,
+      attachments,
     });
 
     res.status(200).json({ message: "Email sent", messageId: info.messageId });

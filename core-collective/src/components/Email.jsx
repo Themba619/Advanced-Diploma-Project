@@ -10,19 +10,16 @@ const Email = () => {
 
     // Extracting form data
     const formData = new FormData(event.target);
-    const name = formData.get('name').toString();
-    const email = formData.get('email').toString();
-    const message = formData.get('message').toString();
+    // const name = formData.get('name').toString();
+    // const email = formData.get('email').toString();
+    // const message = formData.get('message').toString();
 
     setLoading(true);
 
     try{
       const response = await fetch("/api/email/send-email", {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name, email, message }),
+        body: formData,
       });
 
       const data = await response.json();
@@ -111,6 +108,8 @@ const Email = () => {
               <input
                 type="file"
                 id="attachments"
+                name="attachments"
+                accept=".jpg,.jpeg,.png,.pdf,.docx,.txt" 
                 multiple
                 onChange={handleFileChange}
                 className="inputField fileInput"
