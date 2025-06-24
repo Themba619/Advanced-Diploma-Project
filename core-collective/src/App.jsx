@@ -92,8 +92,8 @@ import ForumChat from "./pages/Forum";
 import LoginPage from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPwd from "./pages/ForgotPwd";
-import NotFound from "./pages/NotFound";
 import ContactUs from "./pages/ContactUs";
+import DownloadApp from "./pages/DownloadApp";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -109,26 +109,17 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotPwd" element={<ForgotPwd />} />
-          {/* Default route to Login */}
           <Route path="/" element={<LoginPage />} />
           {/* Authenticated routes (with DrawerNavigation) */}
-          <Route
-            path="/*"
-            element={
-              <DrawerNavigation>
-                <Routes>
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/chatforum" element={<ChatForum />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/forum" element={<ForumChat />} />
-                  <Route path="/contactUs" element={<ContactUs />}/>
-                  {/* Catch-all for undefined authenticated routes */}
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </DrawerNavigation>
-            }
-          />
+          <Route element={<DrawerNavigation />}>
+            <Route path="/home" element={<Home />} />
+            <Route path="/chatforum" element={<ChatForum />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/forum" element={<ForumChat />} />
+            <Route path="/contactUs" element={<ContactUs />} />
+            <Route path="*" element={<DownloadApp />} />
+          </Route>
         </Routes>
       </TooltipProvider>
     </QueryClientProvider>

@@ -4,8 +4,15 @@ import '../styles/ContactUsStyles/contactUs.css';
 import Email from '../components/Email';
 import DirectMessage from '../components/DirectMessage';
 
+// Fake user data for testing
+const fakeUserId = 'thembabiyela20';
+const fakeNickname = 'themba Biyela';
+const fakeAdminId = 'admin';
+
 const ContactUs = () => {
   const [activeTab, setActiveTab] = useState('email');
+
+
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
@@ -39,7 +46,11 @@ const ContactUs = () => {
         <div
           className={`content-section ${activeTab === 'dm' ? 'active' : 'hidden'}`}
         >
-          <DirectMessage />
+          <DirectMessage 
+            userId={fakeUserId}
+            nickname={fakeNickname}
+            targetUserId={fakeAdminId}
+          />
         </div>
       </div>
     </div>

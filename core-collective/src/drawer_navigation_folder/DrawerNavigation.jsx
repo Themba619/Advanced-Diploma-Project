@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Menu } from "lucide-react";
+import { Outlet } from "react-router-dom";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 
 const DrawerNavigation = ({ children }) => {
@@ -94,7 +95,7 @@ const DrawerNavigation = ({ children }) => {
       )}
 
       {/* Main content */}
-      <div className="main-content">{children}</div>
+      <div className="main-content"><Outlet /></div>
     </div>
   );
 };
