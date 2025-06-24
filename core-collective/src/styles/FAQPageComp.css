@@ -1,0 +1,183 @@
+/* Main FAQ container */
+/* .min-h-screen {
+  min-height: 100vh;
+  background: #fff;
+  font-family: 'Roboto', Arial, sans-serif;
+} */
+
+/* Header styles */
+.bg-uj-blue {
+  background-color: #002147;
+  height: 150px
+}
+.text-white {
+  color: #fff;
+}
+.text-blue-100 {
+  color: #e6f0fa;
+}
+.text-4xl {
+  font-size: 2.25rem;
+}
+.md\:text-5xl {
+  font-size: 3rem;
+}
+.font-bold {
+  font-weight: bold;
+}
+.text-center {
+  text-align: center;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Main content */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.pb-20 {
+  padding-bottom: 5rem;
+}
+.max-w-4xl {
+  max-width: 56rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+.text-2xl {
+  font-size: 1.5rem;
+}
+.font-semibold {
+  font-weight: 600;
+}
+.text-uj-blue {
+  color: #002147;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.text-gray-600 {
+  color: #4b5563;
+}
+.text-lg {
+  font-size: 1.125rem;
+}
+.mb-12 {
+  margin-bottom: 3rem;
+}
+
+/* FAQ Items spacing */
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+/* Help section */
+.mt-16 {
+  margin-top: 4rem;
+}
+.text-center {
+  text-align: center;
+}
+.bg-gray-50 {
+  background: #f8f9fa;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.p-8 {
+  padding: 2rem;
+}
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.sm\:flex-row {
+  flex-direction: row;
+}
+.gap-4 {
+  gap: 1rem;
+}
+.justify-center {
+  justify-content: center;
+}
+
+/* Button styles */
+.bg-uj-red {
+  background: #d71920;
+}
+.bg-uj-blue {
+  background: #002147;
+}
+.hover\:bg-uj-blue:hover {
+  background: #002147;
+}
+.hover\:bg-uj-red:hover {
+  background: #d71920;
+}
+.text-white {
+  color: #fff;
+}
+.px-6 {
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+.font-medium {
+  font-weight: 500;
+}
+.transition-colors {
+  transition: background 0.2s;
+}
+.duration-200 {
+  transition-duration: 0.2s;
+}
+.inline-flex {
+  display: inline-flex;
+}
+.items-center {
+  align-items: center;
+}
+.justify-center {
+  justify-content: center;
+}
+.border {
+  border: 1px solid #e5e7eb;      /* Light gray border */
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+.border:hover,
+.border:focus-within {
+  border-color: #3b82f6;          /* Optional: blue border on hover/focus */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.rounded-lg {
+  border-radius: 8px;
+}
+
+.faq-question,
+.border > button {
+    cursor: pointer;
+}
+
+.faq-support-btn {
+  height: 50px
+}

@@ -134,6 +134,7 @@ const Email = () => {
             <button 
               type="submit" 
               className="submitButton"
+              style={{ width: '100%', padding: '12px 0', fontSize: '1.1rem' }}
             >
               Send Message
             </button>
