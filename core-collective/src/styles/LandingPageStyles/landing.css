@@ -1,0 +1,140 @@
+.downloadapp-bg {
+  min-height: 100vh;
+  background: #f7fafd;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2.5rem 1rem 3rem 1rem;
+}
+
+.downloadapp-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #16213e;
+  margin-bottom: 0.5rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.downloadapp-subtitle {
+  color: #6c7a89;
+  font-size: 1.25rem;
+  text-align: center;
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+}
+
+.downloadapp-phone-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+
+.downloadapp-phone {
+  position: relative;
+  background: #fff;
+  border-radius: 2rem;
+  border: 7px solid #232d3f;
+  width: 260px;
+  height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 32px rgba(44,62,80,0.10);
+}
+
+.downloadapp-phone-img {
+  width: 90%;
+  height: auto;
+  border-radius: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+.downloadapp-badge {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.badge-top {
+  top: -18px;
+  right: -18px;
+}
+.badge-bottom {
+  bottom: -18px;
+  left: -18px;
+}
+
+.downloadapp-card {
+  margin-top: 2.5rem;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 32px rgba(44,62,80,0.10);
+  padding: 2rem 2.5rem 2rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  min-width: 340px;
+  max-width: 420px;
+}
+
+.downloadapp-card-icon img {
+  width: 54px;
+  height: 54px;
+  border-radius: 12px;
+  background: #f7fafd;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.07);
+}
+
+.downloadapp-card-content {
+  flex: 1;
+}
+
+.downloadapp-card-title {
+  font-size: 1.18rem;
+  font-weight: 700;
+  color: #232d3f;
+  margin-bottom: 0.2rem;
+}
+
+.downloadapp-card-desc {
+  color: #6c7a89;
+  font-size: 1.05rem;
+  margin-bottom: 1.1rem;
+}
+
+.downloadapp-btn {
+  background: linear-gradient(90deg, #1976d2 0%, #7f7fd5 100%);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.85rem 2.2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(44,62,80,0.10);
+  cursor: pointer;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.downloadapp-btn:hover {
+  background: linear-gradient(90deg, #7f7fd5 0%, #1976d2 100%);
+}
+
+@media (max-width: 600px) {
+  .downloadapp-title {
+    font-size: 2rem;
+  }
+  .downloadapp-card {
+    padding: 1.2rem 0.7rem 1rem 0.7rem;
+    min-width: unset;
+    max-width: 98vw;
+  }
+  .downloadapp-phone {
+    width: 180px;
+    height: 300px;
+  }
+}

@@ -1,0 +1,267 @@
+/* VirtualAssist UI Demo Styles */
+.virtualassist-bg {
+  min-height: 90vh;
+  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #f7971e 100%);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.virtualassist-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 2rem 0.5rem 2rem;
+  background: transparent;
+}
+
+.virtualassist-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.virtualassist-history-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.virtualassist-history-btn:hover {
+  color: #ffd600;
+}
+
+.virtualassist-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+}
+
+.virtualassist-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 2.5rem 1.5rem 1rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.virtualassist-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.7rem;
+}
+
+.virtualassist-msg-bot {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.virtualassist-msg-user {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.virtualassist-user-icon {
+  color: #f8f8f8;
+  font-size: 2rem;
+  align-self: flex-end;
+  margin-left: 0.1rem;
+}
+.virtualassist-bot-icon {
+  color: #f4f4f4;
+  font-size: 2rem;
+  align-self: flex-end;
+  margin-right: 0.1rem;
+}
+
+.virtualassist-msg-bubble {
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  border-radius: 16px;
+  padding: 1rem 1.3rem;
+  max-width: 60vw;
+  min-width: 120px;
+  font-size: 1.08rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  position: relative;
+  word-break: break-word;
+  align-self: flex-start;
+}
+
+.virtualassist-msg-user .virtualassist-msg-bubble {
+  background: #1976d2;
+  color: #fff;
+  align-self: flex-end;
+  margin-left: auto;
+}
+
+.virtualassist-msg-bot .virtualassist-msg-bubble {
+  margin-right: auto;
+}
+
+.virtualassist-msg-time {
+  font-size: 0.85rem;
+  color: #e0e0e0;
+  margin-top: 0.3rem;
+  text-align: right;
+}
+
+.virtualassist-input-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1.2rem 2rem 2rem 2rem;
+  background: transparent;
+}
+
+.virtualassist-input {
+  flex: 1;
+  border: none;
+  border-radius: 24px;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  background: rgba(255,255,255,0.18);
+  color: #fff;
+  outline: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  transition: background 0.2s;
+}
+.virtualassist-input:focus {
+  background: rgba(255,255,255,0.28);
+}
+
+.virtualassist-send-btn {
+  background: #1976d2;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.virtualassist-send-btn:hover {
+  background: #ffd600;
+  color: #222;
+}
+
+/* Chat history sidebar */
+.virtualassist-history-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 370px;
+  height: 100vh;
+  background: rgba(40,40,80,0.97);
+  color: #fff;
+  z-index: 200;
+  box-shadow: -2px 0 16px rgba(0,0,0,0.13);
+  display: flex;
+  flex-direction: column;
+  animation: slideInRight 0.3s;
+}
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.virtualassist-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.virtualassist-history-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.virtualassist-history-close:hover {
+  color: #ffd600;
+}
+
+.virtualassist-new-chat-btn {
+  margin: 1rem 1.5rem 0.5rem 1.5rem;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.virtualassist-new-chat-btn:hover {
+  background: #ffd600;
+  color: #222;
+}
+
+.virtualassist-history-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1.5rem 1.5rem 1.5rem;
+}
+
+.virtualassist-history-item {
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.virtualassist-history-item.active, .virtualassist-history-item:hover {
+  background: #1976d2;
+  color: #fff;
+}
+
+.virtualassist-history-name {
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+.virtualassist-history-date {
+  font-size: 0.95rem;
+  color: #ffd600;
+}
+
+/* Blurry background when sidebar is open */
+.virtualassist-blur {
+  filter: blur(7px) brightness(0.92);
+  transition: filter 0.3s;
+  pointer-events: none;
+  user-select: none;
+}
+
+@media (max-width: 900px) {
+  .virtualassist-main {
+    max-width: 100vw;
+  }
+  .virtualassist-history-sidebar {
+    width: 100vw;
+    min-width: 0;
+  }
+}
