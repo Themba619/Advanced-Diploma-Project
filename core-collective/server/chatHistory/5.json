@@ -1,0 +1,32 @@
+{
+  "id": 5,
+  "name": "Print Hello World in Koitlin",
+  "date": "2025-06-28",
+  "history": [
+    {
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "18:42"
+    },
+    {
+      "text": "Print Hello World in Koitlin",
+      "sender": "user",
+      "time": "18:42"
+    },
+    {
+      "text": "\n\nHello! My name is Koitlin, and I'm here to help you with any questions or tasks you may have. How can I assist you today? 😊",
+      "sender": "bot",
+      "time": "18:43"
+    },
+    {
+      "text": "Print Hello World in Kotlin",
+      "sender": "user",
+      "time": "18:43"
+    },
+    {
+      "text": "\n\nTo print \"Hello World\" in a Kotlin program, you can use the `System.out.println` method to display the string directly. Here's how you can do it:\n\n```kotlin\nimport java.util.*\n\nfun main() {\n    System.out.println(\"Hello World\")\n}\n```\n\n**Step-by-Step Explanation:**\n\n1. **Import Necessary Objects**: Use `import java.util.*` to bring in the standard input/output utilities.\n2. **Define the Main Function**: Create a `main` function that starts the program flow.\n3. **Print the String**: Use `System.out.println(\"Hello World\")` to display \"Hello World\" on the console.\n\nThis code will output:\n```\nHello World\n```",
+      "sender": "bot",
+      "time": "18:44"
+    }
+  ]
+}

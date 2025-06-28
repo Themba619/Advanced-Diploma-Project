@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "Welcome Chat",
+  "date": "2025-06-28",
+  "history": [
+    {
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "19:39"
+    }
+  ]
+}

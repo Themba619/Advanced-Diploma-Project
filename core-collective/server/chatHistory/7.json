@@ -1,0 +1,17 @@
+{
+  "id": 7,
+  "name": "Tell me about Leonal Messi",
+  "date": "2025-06-28",
+  "history": [
+    {
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "18:58"
+    },
+    {
+      "text": "Tell me about Leonal Messi",
+      "sender": "user",
+      "time": "18:59"
+    }
+  ]
+}
