@@ -47,22 +47,164 @@ const Home = () => {
   const [chatToDelete, setChatToDelete] = useState(null);
   const chatEndRef = useRef(null);
 
+  // const handleSend = async (e) => {
+  //   e.preventDefault();
+  //   if (!input.trim()) return;
+  //   const userMsg = {
+  //     text: input,
+  //     sender: "user",
+  //     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  //   };
+  //   setChats((prev) =>
+  //     prev.map((chat) =>
+  //       chat.id === activeChat
+  //         ? { ...chat, history: [...chat.history, userMsg] }
+  //         : chat
+  //     )
+  //   );
+  //   setMessages((prev) => [...prev, userMsg]);
+  //   setInput("");
+  //   setIsTyping(true);
+  //   setWaitingForBot(true);
+  //   setDisplayedBotMsg("");
+
+  //   try {
+  //     const response = await fetch('http://localhost:3001/api/ollama', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({ prompt: input })
+  //     });
+  //     let data = '';
+  //     if (response.body && response.body.getReader) {
+  //       const reader = response.body.getReader();
+  //       const decoder = new TextDecoder();
+  //       let done = false;
+  //       let buffer = '';
+  //       while (!done) {
+  //         const { value, done: doneReading } = await reader.read();
+  //         done = doneReading;
+  //         if (value) {
+  //           buffer += decoder.decode(value, { stream: !done });
+  //           let lines = buffer.split('\n');
+  //           buffer = lines.pop(); // last line may be incomplete
+  //           for (let line of lines) {
+  //             line = line.trim();
+  //             if (!line) continue;
+  //             try {
+  //               const json = JSON.parse(line);
+  //               if (json.response) data += json.response;
+  //             } catch {}
+  //           }
+  //         }
+  //       }
+  //       // handle any remaining buffer
+  //       if (buffer) {
+  //         try {
+  //           const json = JSON.parse(buffer);
+  //           if (json.response) data += json.response;
+  //         } catch {}
+  //       }
+  //     } else {
+  //       // fallback for non-streaming
+  //       const text = await response.text();
+  //       try {
+  //         const json = JSON.parse(text);
+  //         if (json.response) data = json.response;
+  //         else data = text;
+  //       } catch {
+  //         data = text;
+  //       }
+  //     }
+  //     setWaitingForBot(false); // Hide waiting indicator, start typing
+  //     // Remove <think>...</think> tags from response
+  //     data = data.replace(/<think>(.|\n|\r)*?<\/think>/gi, "");
+  //     // Typing effect for bot message
+  //     let i = 0;
+  //     setDisplayedBotMsg("");
+  //     const typeInterval = setInterval(() => {
+  //       setDisplayedBotMsg((prev) => prev + data[i]);
+  //       i++;
+  //       if (i >= data.length) {
+  //         clearInterval(typeInterval);
+  //         const botMsg = {
+  //           text: data,
+  //           sender: "bot",
+  //           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  //         };
+  //         setChats((prev) =>
+  //           prev.map((chat) =>
+  //             chat.id === activeChat
+  //               ? { ...chat, history: [...chat.history, botMsg] }
+  //               : chat
+  //           )
+  //         );
+  //         setMessages((prev) => [...prev, botMsg]);
+  //         setDisplayedBotMsg("");
+  //         setIsTyping(false);
+  //       }
+  //     }, 25); // Adjust speed as desired
+  //   } catch (err) {
+  //     setWaitingForBot(false);
+  //     setMessages((prev) => [...prev, {
+  //       text: "Sorry, there was an error connecting to the AI.",
+  //       sender: "bot",
+  //       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  //     }]);
+  //     setIsTyping(false);
+  //   }
+  //   setTimeout(() => chatEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
+  // };
+
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
-    const userMsg = {
+
+    // Check if this is the first user message in the default chat
+    const isDefaultChat =
+      activeChat === 1 &&
+      chats.length === 1 &&
+      chats[0].id === 1 &&
+      chats[0].history.length === 1 &&
+      chats[0].history[0].sender === "bot";
+
+    let targetChatId = activeChat;
+    let userMsg = {
       text: input,
       sender: "user",
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
-    setChats((prev) =>
-      prev.map((chat) =>
-        chat.id === activeChat
+
+    let newChats = chats;
+    let newMessages = messages;
+
+    if (isDefaultChat) {
+      // Find the next available chat ID
+      const maxId = chats.length > 0 ? Math.max(...chats.map(c => c.id)) : 1;
+      const newId = maxId + 1;
+      const today = new Date().toISOString().slice(0, 10);
+      const newChat = {
+        id: newId,
+        name: "New Chat",
+        date: today,
+        history: [userMsg], // Add the user message directly
+      };
+      newChats = [newChat, ...chats];
+      newMessages = [userMsg];
+      setChats(newChats);
+      setActiveChat(newId);
+      setMessages(newMessages);
+      targetChatId = newId;
+    } else {
+      newChats = chats.map((chat) =>
+        chat.id === targetChatId
           ? { ...chat, history: [...chat.history, userMsg] }
           : chat
-      )
-    );
-    setMessages((prev) => [...prev, userMsg]);
+      );
+      newMessages = [...messages, userMsg];
+      setChats(newChats);
+      setMessages(newMessages);
+    }
+
     setInput("");
     setIsTyping(true);
     setWaitingForBot(true);
@@ -133,7 +275,7 @@ const Home = () => {
           };
           setChats((prev) =>
             prev.map((chat) =>
-              chat.id === activeChat
+              chat.id === targetChatId
                 ? { ...chat, history: [...chat.history, botMsg] }
                 : chat
             )

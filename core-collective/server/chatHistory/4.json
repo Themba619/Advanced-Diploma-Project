@@ -1,37 +1,17 @@
 {
-  "id": 4,
-  "name": "How are you AI",
+  "id": "4",
+  "name": "Testing",
   "date": "2025-06-28",
   "history": [
     {
-      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
-      "sender": "bot",
-      "time": "18:21"
-    },
-    {
-      "text": "How are you AI?",
+      "text": "Testing",
       "sender": "user",
-      "time": "18:21"
+      "time": "23:49"
     },
     {
-      "text": "Print Hello World in GoLang",
-      "sender": "user",
-      "time": "18:38"
-    },
-    {
-      "text": "Sorry, there was an error connecting to the AI.",
+      "text": "\n\nSure! Could you clarify or provide more details about what you're testing? Are you looking for information on a specific topic, function, or service? Let me know how I can assist.",
       "sender": "bot",
-      "time": "18:38"
-    },
-    {
-      "text": "Print Hello World in GoLang",
-      "sender": "user",
-      "time": "19:20"
-    },
-    {
-      "text": "\n\nTo print \"Hello World\" using GoLang, you can use the `Print` function. Here's how:\n\n```go\nprint := Print(\"Hello World\")\nprint\n```\n\nWhen you run this code, it will output:\n```\nHello World\n```\n\nIf you want to add context or a message alongside \"Hello World\", you can concatenate strings. For example:\n\n```go\ncontext := \"Hello and I am done.\"\nmessage := Print(context)\n// Use the message variable for further processing\nPrint(message)\n```\n\nBut since the task is just to print \"Hello World\", the basic usage is sufficient.",
-      "sender": "bot",
-      "time": "19:21"
+      "time": "23:49"
     }
   ]
 }

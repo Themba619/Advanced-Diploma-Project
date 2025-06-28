@@ -1,0 +1,17 @@
+{
+  "id": 2,
+  "name": "Hello How Are you",
+  "date": "2025-06-28",
+  "history": [
+    {
+      "text": "Hello How Are you?",
+      "sender": "user",
+      "time": "23:51"
+    },
+    {
+      "text": "\n\nHello! I'm just a virtual assistant, so I don't have feelings, but I'm here and ready to help you with whatever you need. How are *you* doing today? 😊",
+      "sender": "bot",
+      "time": "23:51"
+    }
+  ]
+}
