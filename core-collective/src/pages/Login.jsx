@@ -1,10 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
 import Logo from '../assets/Logo.png';
 
 const Login = () => {
   const navigate = useNavigate();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+
+  const handleLogin = async () => {
+    try {
+      const response = await axios.post('http://localhost:3001/api/auth/login', {
+        email,
+        password
+      });
+
+      console.log('Login success:', response.data);
+
+      // Store token locally (optional but common)
+      localStorage.setItem('token', response.data.token);
+
+      // Redirect to home/dashboard or wherever you want
+      navigate('/home');
+    } catch (err) {
+      console.error('Login error:', err.response?.data);
+      setError(err.response?.data?.error || 'Login failed');
+    }
+  };
 
   return (
     <div className="login-container slide-in">
@@ -12,14 +37,18 @@ const Login = () => {
       <div className="image-placeholder">
         <img src={Logo} alt="Logo image" className="logo-image" />
       </div>
+
       {/* Right half - Login Form */}
       <div className="login-form-container">
         <div className="login-form">
           <h2>Sign in to Virtual Assist</h2>
+          {error && <p style={{ color: 'red' }}>{error}</p>}
           <div>
             <input
               type="email"
               placeholder="Email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
               required
             />
           </div>
@@ -27,6 +56,8 @@ const Login = () => {
             <input
               type="password"
               placeholder="Password"
+              value={password}
+              onChange={e => setPassword(e.target.value)}
               required
             />
           </div>
@@ -42,9 +73,7 @@ const Login = () => {
             </div>
             <a href="/forgotPwd">Forgot Password?</a>
           </div>
-          <button type="button" className="sign-in-btn"
-            onClick={() => navigate('/*')}
-          >
+          <button type="button" className="sign-in-btn" onClick={handleLogin}>
             Sign in
           </button>
           <p className="or-login-with">or login with</p>
