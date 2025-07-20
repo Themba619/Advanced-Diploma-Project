@@ -19,6 +19,7 @@ const pool = new Pool({
 // Routes
 const profanityRoute = require('./routes/profanityRoute');
 const emailRoute = require('./routes/emailRoute');
+const ollamaRoute = require("./routes/ollamaRoute");
 
 // Middleware
 app.use(cors());
@@ -26,6 +27,8 @@ app.use(express.json());
 
 app.use('/api/profanityRoute', profanityRoute);
 app.use('/api/email', emailRoute);
+app.use("/api/ollama", ollamaRoute);
+
 
 // Initialize forumData.json with empty array if it doesn't exist
 async function initializeFile() {

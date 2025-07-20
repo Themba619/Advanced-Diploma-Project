@@ -1,0 +1,22 @@
+{
+  "id": 6,
+  "name": "1 + 1",
+  "date": "2025-07-20",
+  "history": [
+    {
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "15:44"
+    },
+    {
+      "text": "1 + 1",
+      "sender": "user",
+      "time": "15:45"
+    },
+    {
+      "text": "\n\n1 + 1 equals **2**.",
+      "sender": "bot",
+      "time": "15:45"
+    }
+  ]
+}

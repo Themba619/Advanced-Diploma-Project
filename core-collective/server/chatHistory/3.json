@@ -1,0 +1,17 @@
+{
+  "id": "3",
+  "name": "Checking in",
+  "date": "2025-06-28",
+  "history": [
+    {
+      "text": "Checking in",
+      "sender": "user",
+      "time": "23:49"
+    },
+    {
+      "text": "\n\nIt seems like you might be checking something, but your message is a bit unclear. Could you clarify what you're referring to? Are you checking for information, verification, or something else? Let me know how I can assist! 😊",
+      "sender": "bot",
+      "time": "23:49"
+    }
+  ]
+}
