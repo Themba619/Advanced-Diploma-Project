@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, Outlet } from "react-router-dom";
 import { Menu } from "lucide-react";
-import { Outlet } from "react-router-dom";
-import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun } from "react-icons/fa";
+import {
+  FaEnvelope,
+  FaGift,
+  FaQuestionCircle,
+  FaUserCircle,
+  FaExternalLinkAlt
+} from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
-
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 
-const DrawerNavigation = ({ children }) => {
+const DrawerNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [userName, setUserName] = useState("User"); // Default fallback name
+  const [userName, setUserName] = useState("User");
 
   const navigate = useNavigate();
-
-  const handleThemeToggle = () => {
-    setDarkMode((prev) => !prev);
-  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -56,28 +55,28 @@ const DrawerNavigation = ({ children }) => {
             title="Contact Us"
             onClick={() => navigate("/contactUs")}
           >
-            <FaEnvelope size={24} />
+            <FaEnvelope size={20} />
           </button>
           <button
             className="icon-btn"
             title="Announcements"
             onClick={() => setShowAnnouncements(true)}
           >
-            <FaGift size={24} />
+            <FaGift size={20} />
           </button>
           <button
             className="icon-btn"
             title="Help"
             onClick={() => setShowHelp(true)}
           >
-            <FaQuestionCircle size={24} />
+            <FaQuestionCircle size={20} />
           </button>
           <button
             className="icon-btn"
             title="Profile"
             onClick={() => setShowProfile(true)}
           >
-            <FaUserCircle size={28} />
+            <FaUserCircle size={22} />
           </button>
         </div>
       </div>
@@ -85,7 +84,7 @@ const DrawerNavigation = ({ children }) => {
       {/* Drawer */}
       <div className={`drawer ${isOpen ? "drawer-open" : "drawer-closed"}`}>
         <div className="drawer-header">
-          <span className="drawer-title">Hey there, {userName}!</span> {/* ✅ Dynamic user name */}
+          <span className="drawer-title">Hey there, {userName}!</span>
           <button
             onClick={() => setIsOpen(false)}
             className="close-button"
@@ -95,20 +94,61 @@ const DrawerNavigation = ({ children }) => {
           </button>
         </div>
 
-        {/* Links */}
+        {/* Navigation Links */}
         <nav className="drawer-nav">
-          <Link to="/home" className="nav-link" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/forum" className="nav-link" onClick={() => setIsOpen(false)}>Chat Forum</Link>
-          <Link to="/profile" className="nav-link" onClick={() => setIsOpen(false)}>Profile</Link>
-          <Link to="/settings" className="nav-link" onClick={() => setIsOpen(false)}>Settings</Link>
-          <Link to="/contactUs" className="nav-link" onClick={() => setIsOpen(false)}>Contact-us</Link>
+          <Link 
+            to="/home" 
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Home
+          </Link>
+          <Link 
+            to="/forum" 
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Virtual Chat
+          </Link>
+          <Link 
+            to="/profile" 
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Profile
+          </Link>
+          <Link 
+            to="/settings" 
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Settings
+          </Link>
+          <Link 
+            to="/contactUs" 
+            className="nav-link"
+            onClick={() => setIsOpen(false)}
+          >
+            Contact-us
+          </Link>
+
+          <div className="drawer-nav-bottom">
+            <button
+              className="logout-btn"
+              onClick={() => {
+                localStorage.removeItem("token");
+                setIsOpen(false);
+                navigate("/login");
+              }}
+            >
+              Logout <FaExternalLinkAlt size={14} />
+            </button>
+          </div>
         </nav>
       </div>
 
       {/* Overlay */}
       {isOpen && <div onClick={() => setIsOpen(false)} className="overlay" />}
-
-      {/* Right sidebars, profile sidebar etc. — leave unchanged for now */}
 
       <div className="main-content">
         <Outlet />

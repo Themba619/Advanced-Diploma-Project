@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
 import Logo from '../assets/Logo.png';
+import PersonIcon from '@mui/icons-material/Person';
+import EmailIcon from '@mui/icons-material/Email';
+import LockIcon from '@mui/icons-material/Lock';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -19,72 +22,76 @@ const Signup = () => {
         email,
         password
       });
-      console.log('Registration success:', response.data);
-      // Navigate to login page or home on success
+
       navigate('/login');
     } catch (err) {
-      console.error('Registration error:', err.response?.data);
       setError(err.response?.data?.error || 'Registration failed');
     }
   };
 
   return (
-    <div className="login-container slide-in">
-      {/* Left half - Signup Form */}
-      <div className="login-form-container">
-        <div className="login-form">
-          <h2>Sign up for Virtual Assist</h2>
-          {error && <p style={{ color: 'red' }}>{error}</p>}
-          <div>
-            <input
-              type="text"
-              placeholder="Full Name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div>
-            <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <button type="button" className="sign-in-btn" onClick={handleSignup}>
-            Sign up
-          </button>
-          <p className="or-login-with">or sign up with</p>
-          <div className="social-login">
-            <button className="social-btn">
-              <i className="fab fa-google"></i> Google
-            </button>
-            <button className="social-btn">
-              <i className="fab fa-apple"></i> Apple
-            </button>
-          </div>
-          <p className="signup-link">
-            Already have an account?{' '}
-            <a href="/login" className="signup-link-text">
-              Sign in
-            </a>
-          </p>
+    <div className="login-bg">
+      <div className="login-card">
+        <div className="login-left">
+          <h1>Welcome!</h1>
+          <p>Join us today and explore Virtual Assist</p>
         </div>
-      </div>
-      {/* Right half - Image Placeholder */}
-      <div className="image-placeholder">
-        <img src={Logo} alt="Logo image" className="logo-image" />
+
+        <div className="login-right">
+          <div className="login-right-header">
+            <h2>Sign Up</h2>
+            <p className="subtitle">Create your account</p>
+          </div>
+
+          {error && <p className="error-message">{error}</p>}
+
+          <div className="form-container">
+            <div className="input-wrapper">
+              <PersonIcon className="input-icon" />
+              <input
+                type="text"
+                placeholder="Full Name"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="input-wrapper">
+              <EmailIcon className="input-icon" />
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="input-wrapper">
+              <LockIcon className="input-icon" />
+              <input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+
+            <button className="sign-in-btn" onClick={handleSignup}>SIGN UP</button>
+
+            <p className="or-login-with">or sign up with</p>
+            {/* <div className="social-login">
+              <button className="social-btn">Google</button>
+              <button className="social-btn">Apple</button>
+            </div> */}
+
+            <p className="signup-link">
+              Already have an account? <a href="/login">Sign In</a>
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

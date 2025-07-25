@@ -1,10 +1,20 @@
 /* VirtualAssist UI Demo Styles */
 .virtualassist-bg {
   min-height: 90vh;
-  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #f7971e 100%);
+  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #96897a 100%);
   display: flex;
   flex-direction: column;
   position: relative;
+  right: 16px;
+  bottom: 16px;
+  width: 100vw;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  overflow: hidden;
+}
+
+.virtualassist-bg::-webkit-scrollbar {
+  display: none;
 }
 
 .virtualassist-header {
@@ -122,6 +132,8 @@
   gap: 0.7rem;
   padding: 1.2rem 2rem 2rem 2rem;
   background: transparent;
+  color: white;
+  font-weight: 600;
 }
 
 .virtualassist-input {
