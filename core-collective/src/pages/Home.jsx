@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import "../styles/HomeStyles/Home.css";
 import { FaHistory, FaUserCircle, FaRobot } from "react-icons/fa";
+import TextType from "../react_bits/src/blocks/TextAnimations/TextType/TextType";
 
 const dummyResponse = (msg) =>
   msg.toLowerCase().includes("hello")
@@ -107,7 +108,16 @@ const Home = () => {
     <div className="virtualassist-bg">
       {/* Chat header */}
       <div className="virtualassist-header">
-        <span className="virtualassist-title">VirtualAssist</span>
+
+        <TextType 
+          text={["VirtualAssist", "I'm here to help!!"]}
+          typingSpeed={75}
+          pauseDuration={1500}
+          showCursor={true}
+          cursorCharacter="_"
+          className="virtualassist-title"
+        />
+
         <button className="virtualassist-history-btn" onClick={() => setShowHistory(true)}>
           <FaHistory size={22} />
         </button>

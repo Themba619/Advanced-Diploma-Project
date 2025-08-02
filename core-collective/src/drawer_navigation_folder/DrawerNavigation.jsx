@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
+import SplitText from "../react_bits/src/blocks/TextAnimations/SplitText/SplitText";
 
 const DrawerNavigation = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,21 @@ const DrawerNavigation = () => {
         >
           <Menu size={26} />
         </button>
-        <h1 className="top-nav-title">Core Collective</h1>
+
+        <SplitText
+          text="Core Collective"
+          className="top-nav-title"
+          delay={100}
+          duration={0.6}
+          ease="power3.out"
+          splitType="chars"
+          from={{ opacity: 0, y: 40 }}
+          to={{ opacity: 1, y: 0 }}
+          threshold={0.1}
+          rootMargin="-100px"
+          textAlign="center"
+        />
+
         <div className="top-nav-right">
           <button
             className="icon-btn"
