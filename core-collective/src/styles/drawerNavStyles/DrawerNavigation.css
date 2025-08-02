@@ -1,7 +1,7 @@
 /* Container for the entire layout */
 .drawer-container {
   min-height: 100vh;
-  background-color: #f3f4f6;
+  background: transparent;
   position: relative;
 }
 
@@ -13,7 +13,8 @@
   right: 0;
   display: flex;
   align-items: center;
-  background-color: #020c12;
+  background: rgba(2, 12, 18, 0.3); /* Semi-transparent glass effect */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
   padding: 0.75rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 50;
@@ -47,6 +48,11 @@
   cursor: pointer;
   color: white;
   padding: 4px;
+  transition: background 0.2s ease;
+}
+
+.icon-btn:hover {
+  background: rgba(255, 255, 255, 0.2); /* Slightly more opaque hover effect */
 }
 
 /* Drawer */
@@ -56,9 +62,10 @@
   left: 0;
   height: 100vh;
   width: 280px;
-  background: #020c12;
+  background: rgba(2, 12, 18, 0.3); /* Semi-transparent glass effect */
+  backdrop-filter: blur(10px); /* Frosted glass effect */
   color: white;
-  box-shadow: 2px 0 12px rgba(0,0,0,0.08);
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.08);
   z-index: 1001;
   transform: translateX(-100%);
   transition: transform 0.3s ease;
@@ -81,7 +88,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 1.5rem 1rem 1.5rem;
-  border-bottom: 1px solid #1a2a40;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Slightly more opaque border */
   margin-bottom: 1rem;
 }
 
@@ -98,6 +105,11 @@
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0;
+  transition: background 0.2s ease;
+}
+
+.close-button:hover {
+  background: rgba(255, 255, 255, 0.2); /* Slightly more opaque hover effect */
 }
 
 .drawer-nav {
@@ -112,25 +124,25 @@
   font-size: 0.95rem;
   padding: 0.75rem 1rem;
   border-radius: 6px;
-  transition: background 0.2s;
+  transition: background 0.2s ease;
   font-weight: 500;
   display: flex;
   align-items: center;
 }
 
 .nav-link:hover, .nav-link:focus {
-  background: #1a2a40;
+  background: rgba(255, 255, 255, 0.2); /* Slightly more opaque hover effect */
 }
 
 .nav-link.active {
-  background: #1a2a40;
+  background: rgba(255, 255, 255, 0.2);
   font-weight: 600;
 }
 
 .drawer-nav-bottom {
   margin-top: auto;
   padding: 1rem;
-  border-top: 1px solid #1a2a40;
+  border-top: 1px solid rgba(255, 255, 255, 0.3); /* Slightly more opaque border */
 }
 
 .logout-btn {
@@ -145,10 +157,11 @@
   padding: 0.5rem;
   width: 100%;
   border-radius: 6px;
+  transition: background 0.2s ease;
 }
 
 .logout-btn:hover {
-  background: #1a2a40;
+  background: rgba(255, 255, 255, 0.2); /* Matching hover effect */
 }
 
 /* Overlay */
@@ -158,24 +171,19 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.2); /* More transparent overlay */
   z-index: 1000;
 }
 
 /* Main Content */
 .main-content {
-  padding-top: 5rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  transition: margin-left 0.3s;
+  width: 100vw;
+  height: 100vh;
+  transition: none; /* Remove margin transition to prevent shifting */
 }
 
 @media (max-width: 768px) {
   .drawer {
     width: 85vw;
-  }
-  
-  .main-content {
-    padding-top: 4rem;
   }
 }

@@ -1,15 +1,15 @@
 /* VirtualAssist UI Demo Styles */
 .virtualassist-bg {
-  min-height: 90vh;
+  height: 100vh; /* Full viewport height */
+  width: 100vw; /* Full viewport width */
+  position: fixed; /* Ensure it covers the entire viewport */
+  top: 0;
+  left: 0;
   background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #96897a 100%);
   display: flex;
   flex-direction: column;
-  position: relative;
-  right: 16px;
-  bottom: 16px;
-  width: 100vw;
   scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none;  /* IE and Edge */
+  -ms-overflow-style: none; /* IE and Edge */
   overflow: hidden;
 }
 
@@ -30,6 +30,7 @@
   font-weight: 700;
   color: #fff;
   letter-spacing: 0.02em;
+  margin-top: 60px;
 }
 
 .virtualassist-history-btn {
@@ -39,6 +40,7 @@
   font-size: 1.3rem;
   cursor: pointer;
   transition: color 0.2s;
+  margin-top: 60px;
 }
 .virtualassist-history-btn:hover {
   color: #ffd600;
@@ -198,6 +200,7 @@
   padding: 1.5rem 1.5rem 0.5rem 1.5rem;
   font-size: 1.2rem;
   font-weight: 600;
+  margin-top: 30px;
 }
 
 .virtualassist-history-close {
