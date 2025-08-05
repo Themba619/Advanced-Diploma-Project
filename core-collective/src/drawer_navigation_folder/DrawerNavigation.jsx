@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Outlet } from "react-router-dom";
-import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun } from "react-icons/fa";
+import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaMoon, FaSun } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 
 import "../styles/drawerNavStyles/DrawerNavigation.css";
@@ -13,9 +13,9 @@ const DrawerNavigation = ({ children }) => {
   const [showHelp, setShowHelp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [userName, setUserName] = useState("User"); // Default fallback name
-
+  const [userName, setUserName] = useState("User");
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleThemeToggle = () => {
     setDarkMode((prev) => !prev);
@@ -38,7 +38,7 @@ const DrawerNavigation = ({ children }) => {
   }, []);
 
   return (
-    <div className="drawer-container">
+    <div className={`drawer-container ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       {/* Top Nav */}
       <div className="top-nav">
         <button
@@ -85,7 +85,7 @@ const DrawerNavigation = ({ children }) => {
       {/* Drawer */}
       <div className={`drawer ${isOpen ? "drawer-open" : "drawer-closed"}`}>
         <div className="drawer-header">
-          <span className="drawer-title">Hey there, {userName}!</span> {/* ✅ Dynamic user name */}
+          <span className="drawer-title">Hey there, {userName}!</span>
           <button
             onClick={() => setIsOpen(false)}
             className="close-button"
@@ -97,18 +97,27 @@ const DrawerNavigation = ({ children }) => {
 
         {/* Links */}
         <nav className="drawer-nav">
-          <Link to="/home" className="nav-link" onClick={() => setIsOpen(false)}>Home</Link>
-          <Link to="/forum" className="nav-link" onClick={() => setIsOpen(false)}>Chat Forum</Link>
-          <Link to="/profile" className="nav-link" onClick={() => setIsOpen(false)}>Profile</Link>
-          <Link to="/settings" className="nav-link" onClick={() => setIsOpen(false)}>Settings</Link>
-          <Link to="/contactUs" className="nav-link" onClick={() => setIsOpen(false)}>Contact-us</Link>
+          <Link to="/home" className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>Home</Link>
+          <Link to="/forum" className={`nav-link ${location.pathname === '/forum' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>Chat Forum</Link>
+          <Link to="/profile" className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>Profile</Link>
+          <Link to="/settings" className={`nav-link ${location.pathname === '/settings' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>Settings</Link>
+          <Link to="/contactUs" className={`nav-link ${location.pathname === '/contactUs' ? 'active' : ''}`} onClick={() => setIsOpen(false)}>Contact-us</Link>
         </nav>
+
+        {/* Theme Toggle */}
+        <div className="drawer-theme-toggle">
+          <button
+            onClick={handleThemeToggle}
+            className="theme-button"
+            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {darkMode ? <FaSun size={24} className="theme-icon" /> : <FaMoon size={24} className="theme-icon" />}
+          </button>
+        </div>
       </div>
 
       {/* Overlay */}
       {isOpen && <div onClick={() => setIsOpen(false)} className="overlay" />}
-
-      {/* Right sidebars, profile sidebar etc. — leave unchanged for now */}
 
       <div className="main-content">
         <Outlet />
