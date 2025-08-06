@@ -9,6 +9,9 @@ router.get("/getChatSession/:id", privateController.getChatSessionById);
 router.post("/sendMessage", privateController.sendMessage);
 router.put("/renameChatSession", privateController.renameChatSession);
 router.post("/summarizeMessage", privateController.summarizeMessage);
-
+router.delete(
+  "/deleteChatSession/:sessionId",
+  privateController.deleteChatSession
+);
 
 module.exports = router;
