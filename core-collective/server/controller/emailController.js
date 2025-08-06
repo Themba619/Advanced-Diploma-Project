@@ -71,7 +71,7 @@ exports.sendEmail = async (req, res) => {
       to: process.env.GMAIL_USER, // You receive the message here
       subject: `Contact Form Submission from ${name}`,
       text: message,
-      html: `<p>${message}</p>`,
+      html: `<p>From: ${email} Message: ${message}</p>`,
       attachments,
     });
 

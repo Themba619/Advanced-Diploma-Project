@@ -1,17 +1,22 @@
 {
-  "id": "3",
-  "name": "Checking in",
-  "date": "2025-06-28",
+  "id": 3,
+  "name": "New Chat",
+  "date": "2025-08-05",
   "history": [
     {
-      "text": "Checking in",
-      "sender": "user",
-      "time": "23:49"
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "18:58"
     },
     {
-      "text": "\n\nIt seems like you might be checking something, but your message is a bit unclear. Could you clarify what you're referring to? Are you checking for information, verification, or something else? Let me know how I can assist! 😊",
+      "text": "Testing",
+      "sender": "user",
+      "time": "18:58"
+    },
+    {
+      "text": "It seems like you're testing. How can I assist you today?",
       "sender": "bot",
-      "time": "23:49"
+      "time": "18:58"
     }
   ]
 }

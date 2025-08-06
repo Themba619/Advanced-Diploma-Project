@@ -1,0 +1,875 @@
+{
+  "id": 7,
+  "name": "2 + 1",
+  "date": "2025-07-20",
+  "history": [
+    {
+      "text": "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+      "sender": "bot",
+      "time": "15:45"
+    },
+    {
+      "text": "2 + 1",
+      "sender": "user",
+      "time": "15:46"
+    },
+    {
+      "text": "Sorry, there was an error connecting to the AI.",
+      "sender": "bot",
+      "time": "15:46"
+    }
+  ],
+  "uj_context": {
+    "established": 2005,
+    "student_count": 51000,
+    "international_students": 4200,
+    "campuses": [
+      "Kingsway (APK)",
+      "Bunting Road (APB)",
+      "Doornfontein (DFC)",
+      "Soweto"
+    ],
+    "faculties": [
+      "Business & Economics",
+      "Health Sciences",
+      "Art, Design & Architecture",
+      "Engineering & Built Environment",
+      "Humanities",
+      "Law",
+      "Education",
+      "Science",
+      "Johannesburg Business School"
+    ],
+    "stats": {
+      "gender_ratio": "56F:44M",
+      "success_rate_overall": 83,
+      "undergrad_success": 86
+    },
+    "infrastructure": {
+      "lecture_halls": "Smart lecture halls with hybrid learning tech",
+      "sports_facilities": [
+        "UJ Stadium (APK)",
+        "Gym/stadia on APK, DFC, Soweto",
+        "Olympic-size swimming pool (APK)"
+      ],
+      "libraries": true,
+      "research_labs": [
+        "Nanotechnology Lab",
+        "4IR Innovation Hub",
+        "Biokinetics Center"
+      ]
+    },
+    "societies": {
+      "academic": [
+        "IEEE",
+        "Debating",
+        "Actuarial Society",
+        "Engineering Students Council"
+      ],
+      "religious": [
+        "MSA",
+        "Christian fellowships",
+        "Jewish Student Association"
+      ],
+      "cultural": [
+        "Afro-Caribbean Society",
+        "Indian Cultural Group",
+        "Drama Club"
+      ]
+    },
+    "recent_events": [
+      "THE Impact #1 in Africa 2025",
+      "Silent GBV Walk",
+      "CALTSTEAM finalist",
+      "UJ Hackathon 2025"
+    ],
+    "sports": {
+      "varsity_football": "finalists",
+      "netball": "silver 2023–24",
+      "rugby": "Varsity Cup semi-finalists 2025",
+      "athletics": "3 gold medals at USSA 2025"
+    },
+    "module_registration": {
+      "portal": "uLink (ulink.uj.ac.za)",
+      "flow": [
+        "Login/Create password",
+        "ITS iEnabler → Registration / Change Registration",
+        "Select modules → Save & Continue",
+        "Pay via e‑payment",
+        "Accept terms → Submit",
+        "Download/email proof",
+        "Access Blackboard/Moodle"
+      ],
+      "orientation": {
+        "first_year": "Mandatory blended FYE/O seminars",
+        "moodle_enrolment": "≈24 hrs post-registration"
+      },
+      "international_requirements": {
+        "visa_upload": true,
+        "conditional_registration": true,
+        "postgrad_upfront_pay": "40%"
+      },
+      "fees": {
+        "undergrad_day": 3870,
+        "undergrad_residence": 6470,
+        "postgrad_day": 5560,
+        "postgrad_residence": 9270,
+        "payment_methods": [
+          "EFT",
+          "Credit Card",
+          "NSFAS"
+        ]
+      },
+      "timeline": {
+        "registration_start": "January",
+        "lectures_begin": "February",
+        "exams": "May/June (Semester 1), October/November (Semester 2)"
+      },
+      "campus_services": [
+        "Timetable",
+        "Bus schedules",
+        "E‑resources",
+        "Library",
+        "Finance",
+        "Results",
+        "Health Clinic"
+      ]
+    },
+    "lms": [
+      "Blackboard",
+      "Moodle"
+    ],
+    "recent_news": [
+      "UJ ranked #1 in Africa for THE Impact Rankings 2025",
+      "UJ hosts Silent GBV Walk to raise awareness",
+      "UJ's CALTSTEAM project named a finalist in national competition",
+      "UJ Sport Clubs celebrate 20th anniversary with 9-medal dominance at USSA 2025",
+      "Faculty of Education reflects on UJ's impact on the youth of South Africa"
+    ],
+    "additional_data": {
+      "research_highlights": {
+        "4IR": "UJ leads in AI, blockchain, and IoT research",
+        "health": "Partnerships with WHO on TB/HIV interventions",
+        "sustainability": "Solar energy projects funded by DSI"
+      },
+      "student_support": {
+        "career_services": [
+          "CV workshops",
+          "LinkedIn training",
+          "Career fairs"
+        ],
+        "mental_health": "24/7 counseling via UJ Student Wellness",
+        "financial_aid": [
+          "NSFAS",
+          "Merit bursaries",
+          "Postgrad scholarships"
+        ]
+      },
+      "global_rankings": {
+        "QS": 434,
+        "THE": "Top 600",
+        "ARWU": "Top 800",
+        "THE Impact": "#1 in Africa (2025)"
+      },
+      "contact": {
+        "admissions": "myfuture@uj.ac.za",
+        "emergency": "+27 11 559 1234 (24/7 Campus Control)"
+      }
+    },
+    "campus_life": {
+      "first_week_checklist": [
+        "Collect student card (APK Student Centre)",
+        "Activate UJ WiFi (credentials in registration email)",
+        "Download UJ Mobile App (timetables, bus tracking)",
+        "Attend faculty welcome session",
+        "Register with campus clinic (free primary healthcare)"
+      ],
+      "essential_contacts": {
+        "emergency": "011 559 1234 (24/7 equipment Campus Control)",
+        "academic_advising": "advising@uj.ac.za",
+        "IT_support": "helpdesk@uj.ac.za / 011 559 2888",
+        "student_wellness": "counseling@uj.ac.za"
+      },
+      "transport_options": [
+        {
+          "type": "UJ Shuttle",
+          "routes": "Between campuses + nearby suburbs",
+          "cost": "Free with student card",
+          "schedule_link": "https://uj.ac.za/transport"
+        },
+        {
+          "type": "Gautrain Bus",
+          "nearest_station": "Park Station (APK campus)",
+          "student_discount": "20% with GoCard"
+        }
+      ]
+    },
+    "key_dates_2025": {
+      "semester_1": {
+        "registration": "13–31 January",
+        "lectures_start": "3 February",
+        "midterm_break": "17–21 March",
+        "exams": "12–30 May"
+      },
+      "semester_2": {
+        "registration": "7–18 July",
+        "lectures_start": "21 July",
+        "midterm_break": "22–26 September",
+        "exams": "27 October–15 November"
+      },
+      "graduation": [
+        "April (Autumn)",
+        "September (Spring)"
+      ]
+    },
+    "student_onboarding": {
+      "pre_arrival": [
+        {
+          "task": "Submit medical records",
+          "required_for": "Health Sciences students",
+          "portal": "https://uj.ac.za/healthclearance"
+        },
+        {
+          "task": "Register for orientation",
+          "deadline": "15 January 2025",
+          "link": "https://uj.ac.za/fye"
+        }
+      ],
+      "day_1_checklist": [
+        "Collect biometric student card (8:00-16:00 at APK Student Centre)",
+        "Attend campus safety briefing (mandatory)",
+        "Verify banking details for NSFAS/refunds"
+      ]
+    },
+    "faculty_specific_requirements": {
+      "Health_Sciences": {
+        "vaccinations": ["Hepatitis B", "TB screening"],
+        "equipment": ["Stethoscope (MBChB)", "Lab coat (BSc students)"],
+        "additional_steps": [
+          "Complete HIPAA training",
+          "Upload CPR certification"
+        ]
+      },
+      "Engineering": {
+        "software": ["AutoCAD", "MATLAB (free via UJ license)"],
+        "orientation": "Mandatory lab safety workshop"
+      }
+    },
+    "digital_resources": {
+      "must_have_apps": [
+        {
+          "name": "UJ Mobile",
+          "purpose": "Timetables, shuttle tracking, emergency alerts",
+          "download": "App Store/Play Store"
+        },
+        {
+          "name": "Turnitin",
+          "purpose": "Submission of assignments",
+          "access": "Via Moodle"
+        }
+      ],
+      "free_software": [
+        "Microsoft 365 (email @student.uj.ac.za)",
+        "SPSS (Statistics Lab computers)",
+        "SolidWorks (Engineering labs)"
+      ]
+    },
+    "financial_support": {
+      "bursaries": [
+        {
+          "name": "Vice-Chancellor's Merit Bursary",
+          "amount": "R15,000/year",
+          "requirements": "90%+ matric average"
+        },
+        {
+          "name": "Sports Excellence Bursary",
+          "coverage": "50% fees",
+          "application": "Tryouts + portfolio submission"
+        }
+      ],
+      "work_study": {
+        "available_jobs": ["Library assistant", "Lab monitor", "Tour guide"],
+        "hours_limit": "15/week during term"
+      }
+    },
+    "health_services": {
+      "clinic_services": [
+        "Free primary healthcare",
+        "STI testing (confidential)",
+        "Mental health screenings"
+      ],
+      "emergency_protocols": {
+        "after_hours": "Call 011 559 1234 → select 3 for EMS",
+        "nearest_hospital": "Charlotte Maxeke (3km from APK)"
+      }
+    },
+    "postgrad_resources": {
+      "thesis_submission": {
+        "steps": [
+          "Submit draft to supervisor (6 months before deadline)",
+          "Format check (Library Level 5)",
+          "Turnitin similarity <15%",
+          "Final submission via UJ ETD Portal"
+        ],
+        "deadlines": ["31 March (Autumn graduation)", "31 August (Spring)"]
+      },
+      "research_tools": {
+        "databases": ["JSTOR", "IEEE Xplore (free access)"],
+        "workshops": ["EndNote training", "Research methodology"]
+      }
+    },
+    "student_leadership": {
+      "SRC_elections": {
+        "timeline": {
+          "nominations": "1-5 August",
+          "campaigning": "12-16 August",
+          "voting": "19 August (online)"
+        },
+        "positions": [
+          "President",
+          "Academic Officer",
+          "International Students Rep"
+        ]
+      },
+      "petition_process": "100+ signatures → submit to Dean of Students"
+    },
+    "graduation_eligibility": {
+      "undergrad": {
+        "credits_required": 360,
+        "minimum_gpa": 2.0,
+        "community_service": "20 hours (optional but recommended)"
+      },
+      "honours": {
+        "research_component": "50-page mini-dissertation",
+        "coursework": "4 modules + colloquium"
+      }
+    },
+    "alumni_perks": {
+      "lifetime_access": [
+        "Career services",
+        "Library e-resources (5 article downloads/month)"
+      ],
+      "discounts": {
+        "postgrad_studies": "15% fee reduction",
+        "gym_membership": "R200/month (vs R450 public rate)"
+      }
+    },
+    "emergency_support": {
+      "gbv_response": {
+        "hotline": "0800 428 428 (24/7)",
+        "on_campus": "Visit Student Wellness Centre (APK Level 1)"
+      },
+      "financial_hardship": {
+        "food_vouchers": "Apply via Dean of Students Office",
+        "textbook_loan": "2-week renewable period"
+      }
+    },
+    "international_support": {
+      "visa_renewal": {
+        "documents": [
+          "Academic progress report",
+          "Bank statements (R60,000/year proof)"
+        ],
+        "processing_time": "4-6 weeks"
+      },
+      "cultural_adjustment": {
+        "programs": [
+          "Buddy System (pairing with local students)",
+          "Monthly 'Taste of Home' potlucks"
+        ]
+      }
+    },
+    "admission": {
+      "undergraduate": {
+        "application_period": "1 April - 30 September 2025",
+        "requirements": "National Senior Certificate with Bachelor's pass, specific subject requirements per faculty",
+        "application_fee": "R200",
+        "how_to_apply": "Online via UJ website or Central Applications Office (CAO)"
+      },
+      "postgraduate": {
+        "application_period": "1 April - 31 October 2025",
+        "requirements": "Relevant undergraduate degree, minimum 60% average, possible entrance exam or portfolio",
+        "application_fee": "R200",
+        "how_to_apply": "Online via UJ website"
+      },
+      "international_students": {
+        "application_period": "1 April - 30 September 2025",
+        "additional_requirements": "Study visa, English proficiency test (TOEFL/IELTS), certified translations of documents",
+        "support_services": "International Office assists with visa applications, orientation, and cultural adjustment"
+      }
+    },
+    "accommodation": {
+      "on_campus": {
+        "residences": [
+          {
+            "name": "Kingsway Residence",
+            "location": "APK Campus",
+            "capacity": 500,
+            "room_types": ["Single", "Double"],
+            "facilities": ["WiFi", "Laundry", "Study areas", "Gym"],
+            "cost": "R35,000 per year"
+          },
+          {
+            "name": "Soweto Residence",
+            "location": "Soweto Campus",
+            "capacity": 300,
+            "room_types": ["Double", "Triple"],
+            "facilities": ["Cafeteria", "Computer lab", "Recreation room"],
+            "cost": "R28,000 per year"
+          },
+          {
+            "name": "Doornfontein Residence",
+            "location": "DFC Campus",
+            "capacity": 400,
+            "room_types": ["Single", "Double"],
+            "facilities": ["Kitchenettes", "Lounge areas", "24/7 security"],
+            "cost": "R32,000 per year"
+          }
+        ],
+        "application_process": "Apply online through uLink after accepting offer of study. Priority given to first-year and international students."
+      },
+      "off_campus": {
+        "options": "Private apartments, shared houses, homestays",
+        "average_cost": "R4,500 - R7,000 per month",
+        "resources": "UJ Accommodation Office provides listings of accredited off-campus housing",
+        "transportation": "Many off-campus options are within walking distance or on shuttle routes"
+      }
+    },
+    "student_life": {
+      "clubs_and_societies": {
+        "categories": ["Academic", "Cultural", "Sports", "Special Interest", "Religious", "Political"],
+        "number_of_societies": "Over 100",
+        "examples": [
+          "IEEE Student Branch (Engineering)",
+          "Afro-Caribbean Society",
+          "UJ Rugby Club",
+          "Photography Club",
+          "Debating Society",
+          "Model United Nations"
+        ],
+        "joining_process": "Sign up during Orientation Week or contact society directly. Some societies may have membership fees."
+      },
+      "events": {
+        "annual_highlights": [
+          "Cultural Day (celebrating diversity)",
+          "Sports Festival (inter-faculty competitions)",
+          "Graduation Ceremonies (April and September)",
+          "UJ Arts Festival (showcasing student talent)",
+          "Research Symposium (for postgraduate students)"
+        ],
+        "student_organized": [
+          "Charity drives (e.g., food and clothing collections)",
+          "Hackathons and coding competitions",
+          "Talent shows and open mic nights",
+          "Environmental awareness campaigns"
+        ]
+      },
+      "support_services": {
+        "counseling": "Free confidential counseling at Student Wellness Centre. Services include individual therapy, group sessions, and workshops.",
+        "career_guidance": "Career Development Services offers CV writing workshops, interview preparation, job search assistance, and annual career fairs.",
+        "disability_support": "Disability Unit provides academic accommodations, accessible transportation, and assistive technology. Register with the unit upon admission.",
+        "academic_support": "Writing centres, tutoring programs, and study skills workshops available for all students."
+      },
+      "student_governance": {
+        "SRC": "Student Representative Council elected annually. Represents student interests to university management.",
+        "faculty_councils": "Each faculty has a student council organizing faculty-specific events and addressing academic concerns."
+      }
+    },
+    "practical_information": {
+      "transportation": {
+        "UJ_Shuttle": {
+          "description": "Free shuttle service between all UJ campuses and nearby student accommodation areas.",
+          "schedule": "Operates Monday to Friday, 6am - 8pm. Reduced service on weekends.",
+          "tracking": "Real-time tracking available on UJ Mobile App"
+        },
+        "public_transport": {
+          "options": ["Gautrain (nearest station: Park Station)", "Metrobus", "Minibus taxis"],
+          "student_discounts": "20% discount on Gautrain with student card"
+        },
+        "parking": {
+          "availability": "Limited on-campus parking. Permits required.",
+          "application": "Apply through uLink. Cost: R500 per semester"
+        }
+      },
+      "dining": {
+        "on_campus": [
+          {"type": "Cafeterias", "locations": "All campuses", "options": "Hot meals, sandwiches, salads"},
+          {"type": "Food courts", "locations": "APK and DFC", "options": "Various fast food outlets"},
+          {"type": "Coffee shops", "locations": "Libraries and student centres", "options": "Coffee, pastries, light snacks"}
+        ],
+        "meal_plans": {
+          "availability": "For residence students only",
+          "cost": "R15,000 per year (3 meals/day)",
+          "payment": "Included in residence fees or pay separately"
+        },
+        "off_campus": "Numerous restaurants and takeaways within walking distance of campuses"
+      },
+      "health_services": {
+        "clinic": {
+          "location": "APK Campus, Student Centre Level 2",
+          "services": ["General consultations", "Vaccinations", "STI testing", "Mental health screenings", "Referrals to specialists"],
+          "cost": "Free for registered students",
+          "hours": "8am - 4pm weekdays",
+          "appointments": "Book via uLink or walk-in for emergencies"
+        },
+        "pharmacy": {
+          "location": "Next to clinic",
+          "services": "Prescription dispensing, over-the-counter medications",
+          "student_discount": "10% on non-prescription items"
+        },
+        "emergency": {
+          "on_campus": "Call 011 559 1234 (24/7 Campus Control)",
+          "off_campus": "Nearest hospital: Charlotte Maxeke Johannesburg Academic Hospital (3km from APK)"
+        }
+      },
+      "IT_services": {
+        "WiFi": {
+          "network": "UJ-Student",
+          "login": "Use student number and password",
+          "coverage": "All campuses, including residences"
+        },
+        "computer_labs": {
+          "locations": ["Libraries", "Faculty buildings", "24-hour lab at APK Student Centre"],
+          "software": ["Microsoft Office", "SPSS", "MATLAB", "Adobe Creative Suite (Art & Design lab)"],
+          "printing": "R0.50 per page, pay with student card"
+        },
+        "technical_support": {
+          "helpdesk": "011 559 2888 or helpdesk@uj.ac.za",
+          "hours": "8am - 5pm weekdays",
+          "self_service": "Password reset and common issues via uLink"
+        },
+        "software_licenses": {
+          "free": ["Microsoft 365", "EndNote (for postgrads)", "Turnitin"],
+          "discounted": "Adobe Creative Cloud (50% off for Art & Design students)"
+        }
+      }
+    },
+    "academic_structure": {
+      "undergraduate_degrees": {
+        "duration": "3-4 years full-time",
+        "credit_system": "360 credits minimum for bachelor's degree",
+        "degree_types": [
+          "Bachelor of Arts (BA)",
+          "Bachelor of Science (BSc)",
+          "Bachelor of Commerce (BCom)",
+          "Bachelor of Engineering (BEng)",
+          "Bachelor of Education (BEd)",
+          "Bachelor of Laws (LLB)"
+        ]
+      },
+      "postgraduate_degrees": {
+        "honours": {
+          "duration": "1 year full-time",
+          "requirements": "Bachelor's degree with 60% average"
+        },
+        "masters": {
+          "duration": "1-2 years",
+          "types": ["Coursework", "Research", "Professional"]
+        },
+        "phd": {
+          "duration": "2-4 years",
+          "requirements": "Master's degree with 65% average"
+        }
+      },
+      "academic_calendar": {
+        "semester_system": true,
+        "terms": [
+          {
+            "name": "Semester 1",
+            "start": "February",
+            "end": "June",
+            "breaks": [
+              {
+                "name": "Autumn break",
+                "duration": "1 week in April"
+              }
+            ]
+          },
+          {
+            "name": "Semester 2",
+            "start": "July",
+            "end": "November",
+            "breaks": [
+              {
+                "name": "Spring break",
+                "duration": "1 week in September"
+              }
+            ]
+          }
+        ],
+        "examination_periods": [
+          "May-June (Semester 1)",
+          "October-November (Semester 2)"
+        ]
+      }
+    },
+    "faculty_details": {
+      "Business_Economics": {
+        "departments": [
+          "Accounting",
+          "Finance",
+          "Marketing",
+          "HR Management",
+          "Economics",
+          "Entrepreneurship"
+        ],
+        "research_centers": [
+          "Centre for Entrepreneurship",
+          "African Institute of Financial Markets"
+        ]
+      },
+      "Health_Sciences": {
+        "teaching_hospitals": [
+          "Charlotte Maxeke Johannesburg Academic Hospital",
+          "Chris Hani Baragwanath Hospital"
+        ],
+        "simulation_labs": [
+          "Nursing Simulation Lab",
+          "Anatomy Lab with 3D visualization"
+        ]
+      }
+    },
+    "student_support_services": {
+      "academic_support": {
+        "writing_centers": {
+          "locations": ["APK Library", "DFC Student Centre"],
+          "services": ["Essay reviews", "Citation help", "Thesis formatting"]
+        },
+        "tutoring_programs": {
+          "peer_tutoring": "Available for 1st year courses",
+          "subject_specific": "Maths, Physics, Accounting"
+        }
+      },
+      "disability_services": {
+        "assistive_tech": [
+          "Screen readers",
+          "Braille printers",
+          "FM hearing systems"
+        ],
+        "accessibility": [
+          "Elevators in all buildings",
+          "Accessible restrooms",
+          "Priority seating"
+        ]
+      }
+    },
+    "international_office": {
+      "pre_arrival": {
+        "checklist": [
+          "Visa application",
+          "Medical insurance",
+          "Accommodation booking"
+        ],
+        "webinars": [
+          "Living in South Africa",
+          "Academic Culture at UJ"
+        ]
+      },
+      "arrival_services": {
+        "airport_pickup": "Available from OR Tambo",
+        "orientation": "Mandatory 3-day program"
+      },
+      "ongoing_support": {
+        "visa_renewals": "Assistance with documentation",
+        "cultural_events": [
+          "International Food Fair",
+          "Language Exchange Program"
+        ]
+      }
+    },
+    "career_development": {
+      "services": [
+        {
+          "name": "Career Counseling",
+          "details": "One-on-one sessions with career advisors"
+        },
+        {
+          "name": "Job Portal",
+          "platform": "UJ CareerGate",
+          "listings": "500+ internships and graduate jobs"
+        }
+      ],
+      "employer_relations": {
+        "career_fairs": [
+          {
+            "name": "Annual Graduate Recruitment Fair",
+            "employers": "100+ companies"
+          }
+        ],
+        "employer_partners": [
+          "Deloitte",
+          "Standard Bank",
+          "Sasol"
+        ]
+      }
+    },
+    "research_ecosystem": {
+      "funding_opportunities": {
+        "internal": [
+          "Vice-Chancellor's Research Grant",
+          "Faculty Research Committee Grants"
+        ],
+        "external": [
+          "NRF Funding",
+          "DSI Grants"
+        ]
+      },
+      "research_output": {
+        "publications": "1,200+ per year",
+        "postgrad_researchers": "3,500+"
+      },
+      "innovation_support": {
+        "tech_transfer": "UJ Technology Transfer Office",
+        "startup_incubator": "UJ LaunchLab"
+      }
+    },
+    "digital_infrastructure": {
+      "network": {
+        "wifi_coverage": "All campuses + residences",
+        "bandwidth": "10Gbps backbone"
+      },
+      "learning_tech": {
+        "virtual_classrooms": "Zoom + Blackboard Collaborate",
+        "proctoring": "Respondus Monitor for online exams"
+      },
+      "cybersecurity": {
+        "training": "Annual cybersecurity awareness program",
+        "incident_response": "24/7 SOC monitoring"
+      }
+    },
+    "sustainability": {
+      "energy": {
+        "solar_panels": "1.2MW installed capacity",
+        "energy_efficiency": "LED lighting across campuses"
+      },
+      "waste": {
+        "recycling_program": "Paper, plastic, e-waste",
+        "food_waste": "Composting in cafeterias"
+      },
+      "biodiversity": {
+        "green_spaces": "Native plant gardens",
+        "bird_sanctuaries": "On APK and APB campuses"
+      }
+    },
+    "alumni_network": {
+      "global_chapters": [
+        "UJ Alumni UK",
+        "UJ Alumni USA",
+        "UJ Alumni UAE"
+      ],
+      "benefits": {
+        "career": [
+          "Lifetime career counseling",
+          "Access to job portal"
+        ],
+        "learning": [
+          "Audit courses at 50% discount",
+          "Free library access"
+        ]
+      },
+      "engagement": {
+        "mentorship_program": "Alumni-student mentoring",
+        "giving_back": [
+          "Scholarship funds",
+          "Research endowments"
+        ]
+      }
+    },
+    "university_governance": {
+      "council": {
+        "composition": [
+          "External members",
+          "Academic staff",
+          "Student representatives"
+        ],
+        "functions": [
+          "Financial oversight",
+          "Strategic direction"
+        ]
+      },
+      "senate": {
+        "role": "Academic governance",
+        "committees": [
+          "Teaching and Learning",
+          "Research and Innovation"
+        ]
+      }
+    },
+    "quality_assurance": {
+      "accreditation": {
+        "bodies": [
+          "Council on Higher Education (CHE)",
+          "Engineering Council of SA (ECSA)",
+          "Health Professions Council (HPCSA)"
+        ]
+      },
+      "program_review": {
+        "cycle": "5 years",
+        "process": [
+          "Self-evaluation",
+          "External peer review",
+          "Improvement plan"
+        ]
+      }
+    },
+    "community_engagement": {
+      "outreach_programs": [
+        {
+          "name": "UJ Reading Clinic",
+          "beneficiaries": "Primary school learners"
+        },
+        {
+          "name": "Engineering Outreach",
+          "activities": [
+            "Bridge-building workshops",
+            "Science fairs"
+          ]
+        }
+      ],
+      "service_learning": {
+        "courses": [
+          "Community Psychology",
+          "Social Work Field Practice"
+        ],
+        "partners": "50+ NGOs and schools"
+      }
+    },
+    "crisis_management": {
+      "emergency_procedures": {
+        "evacuation": [
+          "Tested twice yearly",
+          "Designated assembly points"
+        ],
+        "communication": [
+          "SMS alerts",
+          "UJ Mobile App notifications"
+        ]
+      },
+      "support_services": {
+        "trauma_counseling": "Available within 24 hours",
+        "academic_concessions": [
+          "Exam deferrals",
+          "Assignment extensions"
+        ]
+      }
+    },
+    "future_developments": {
+      "infrastructure": [
+        {
+          "project": "New Engineering Building",
+          "completion": "2026",
+          "features": [
+            "Advanced robotics lab",
+            "Industry collaboration spaces"
+          ]
+        }
+      ],
+      "strategic_plans": {
+        "vision_2030": [
+          "Increase research output by 30%",
+          "Expand online learning offerings"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,731 @@
+{
+  "Admissions Information": {
+    "Application Period": {
+      "Undergraduate and Postgraduate": {
+        "Open": "2025-04-01",
+        "Close": "2025-10-31T12:00:00",
+        "Note": "Certain postgraduate programs (e.g., specific Honours and Master’s degrees) may have different closing dates; consult faculty-specific requirements on the UJ website (https://www.uj.ac.za)."
+      }
+    },
+    "How to Apply": {
+      "Online Application": {
+        "Portal": "https://www.uj.ac.za/admissions-aid/",
+        "Steps": [
+          "Create an account on the UJ application portal with a valid email address (preferably Gmail or Yahoo).",
+          "Select up to two study choices (undergraduate or postgraduate).",
+          "Upload required documents (certified copies of ID, academic transcripts, and school-leaving results).",
+          "Pay the application fee (if applicable for paper-based applications).",
+          "Submit the application and track status via the UJ student portal (https://student.uj.ac.za/status.aspx).",
+          "Note No application fee is charged for online applications."
+        ]
+      },
+      "Hardcopy Application": {
+        "Submission": "Paper-based applications can be submitted at any of UJ’s four campuses (Auckland Park Kingsway, Auckland Park Bunting Road, Doornfontein, or Soweto) or sent to the university’s postal address.",
+        "Fee": "R200 (non-refundable) for both South African and international applicants",
+        "Payment Details": {
+          "Bank": "First National Bank",
+          "Account": "626 158 73199",
+          "Branch Code": "632005",
+          "SWIFT Code": "FIRNZAJJ",
+          "Reference": "Student Number or ID Number"
+        }
+      },
+      "International Applicants": {
+        "Requirements": [
+          "Apply for a study visa upon receiving an admission/conditional admission letter.",
+          "Submit a certified copy of a valid passport, school-leaving results, and proof of English proficiency (if applicable).",
+          "Contact the Division for Internationalisation at headinternat@uj.ac.za for assistance."
+        ]
+      }
+    },
+    "Requirements": {
+      "Undergraduate": [
+        "National Senior Certificate (NSC) or equivalent (e.g., IEB, SACAI) with a degree or diploma endorsement.",
+        {
+          "Admission Point Score (APS)": {
+            "Description": "Calculated based on the six best subjects (excluding Life Orientation). Minimum APS requirements vary by faculty and program (e.g., 27 for Humanities, 30 for Engineering).",
+            "Reference": "Check the 2026 Undergraduate Prospectus at https://www.uj.ac.za for specific APS and subject requirements."
+          }
+        },
+        "Certified copy of ID or passport (for international applicants).",
+        "Certified copy of final Grade 11 results (for current Grade 12 applicants) or final school-leaving results.",
+        "Academic transcript and degree/diploma certificate (if transferring from another institution).",
+        "International applicants with non-South African qualifications require a certificate of exemption from Universities South Africa (USAf) for degree programs (https://mb.usaf.ac.za)."
+      ],
+      "Postgraduate": [
+        "A completed undergraduate degree or equivalent qualification.",
+        "Certified academic transcript covering the period of study.",
+        "International applicants must submit qualifications to the South African Qualifications Authority (SAQA) for evaluation (www.saqa.org.za).",
+        "Additional faculty-specific requirements (e.g., CV, motivation letter, portfolio, or departmental application form) may apply. Check the relevant faculty website for details."
+      ],
+      "English Proficiency (International Applicants)": {
+        "Requirement": "Required if English was not the medium of instruction.",
+        "Accepted Tests": [
+          {
+            "IELTS": {
+              "Undergraduate": "Overall score of 6",
+              "Postgraduate": "Overall score of 7"
+            }
+          },
+          {
+            "TOEFL": {
+              "Undergraduate": "80–104",
+              "Postgraduate": "105–120"
+            }
+          },
+          {
+            "UJ English Language Programme Test (UJELP)": {
+              "Undergraduate": "Overall score of 6",
+              "Postgraduate": "Overall score of 7",
+              "Contact": "ujelp1@uj.ac.za"
+            }
+          }
+        ]
+      },
+      "Residence Application": {
+        "Process": "Submit a residence application form simultaneously with the academic application if on-campus accommodation is needed.",
+        "Deposit": "R1,220 (subject to change; confirm with UJ in November 2025 for 2026 fees)."
+      }
+    },
+    "Application Fee": {
+      "Online": "Free",
+      "Paper-based": "R200 (non-refundable) for both South African and international applicants",
+      "International Levies": {
+        "SADC and African Applicants": "Approximately R2,000 (2025 rate; 2026 rates to be confirmed in November 2025)",
+        "Payment Details": {
+          "Bank": "First National Bank",
+          "Account": "626 158 73199",
+          "Branch Code": "632005",
+          "SWIFT Code": "FIRNZAJJ",
+          "Reference": "Student Number"
+        }
+      }
+    },
+    "Faculty-Specific Criteria": {
+      "Faculties": [
+        "Art, Design and Architecture",
+        "Business and Economics",
+        "Education",
+        "Engineering and the Built Environment",
+        "Health Sciences",
+        "Humanities",
+        "Law",
+        "Science",
+        "College of Business and Economics (for diplomas and certificates)"
+      ],
+      "Examples": [
+        {
+          "Faculty of Engineering": "Requires Mathematics and Physical Sciences with minimum achievement levels (e.g., 5 or 60–69%)."
+        },
+        {
+          "Faculty of Health Sciences": "May require additional selection criteria like interviews or portfolios for programs like Nursing or Emergency Medical Care."
+        },
+        {
+          "Faculty of Humanities": "Requires specific APS (e.g., 27–30) and subjects like English or History for programs like Psychology or Sociology."
+        }
+      ],
+      "Reference": "Consult the 2026 Undergraduate and Postgraduate Prospectuses for detailed criteria."
+    },
+    "Admissions Office Contact Details": {
+      "Phone": "+27 (0)11 559 4555 (UJ Call Centre)",
+      "Email": {
+        "General Inquiries": "mylife@uj.ac.za",
+        "International Document Submission": "intappsdocs@listsrv.uj.ac.za",
+        "Supporting Documents": "ujappdocs@listsrv.uj.ac.za",
+        "International Applicants": "headinternat@uj.ac.za or +27 (0)11 559 4399 (Division for Internationalisation)"
+      },
+      "Physical Address": "University of Johannesburg, Corner Kingsway and University Road, Auckland Park, Johannesburg, 2092, South Africa",
+      "Ethics Hotline": "uj@thehotline.co.za (report suspicious activities, e.g., scams promising admission)"
+    },
+    "Recent Updates": [
+      "UJ has warned applicants about scams promising admission for a fee. Admissions are based solely on academic merit. Report fraud to uj@thehotline.co.za.",
+      "A 2025 Non-Compliance letter was sent in error and should be disregarded. Check application status at https://student.uj.ac.za/status.aspx.",
+      "The American General Education Development (GED) test is not accepted for undergraduate admission. Applicants with GED must obtain an NSC/IEB/SACAI equivalent.",
+      "National Benchmark Tests (NBTs) are not required for admission to UJ."
+    ],
+    "Additional Notes": [
+      "Processing time: Online applicants receive a status update (final or deferred) within 48 hours; hardcopy applicants may take up to 15 working days.",
+      "Financial aid options include NSFAS, Eduloan, merit bursaries, and the Orange Carpet rewards program for top-performing matriculants (minimum APS of 37 and 70%+ in six best subjects). Visit https://www.uj.ac.za/studyatUJ/Student-Finance for details.",
+      "Fees increase by 5–10% annually. Confirm 2026 fees in November 2025 via the UJ website.",
+      "International applicants must provide proof of medical aid cover and comply with South African immigration regulations (e.g., study visa, negative COVID-19 test if arriving from abroad)."
+    ],
+    "More Information": "Consult the UJ admissions portal (https://www.uj.ac.za/admissions-aid/), the 2026 Undergraduate and Postgraduate Prospectuses, or contact the admissions office directly."
+  },
+  "Application Process": {
+    "How to Apply": [
+      {
+        "Online Application": {
+          "Portal": "https://www.uj.ac.za/admissions-aid/",
+          "Steps": [
+            "Create an account using a valid email address (preferably Gmail or Yahoo).",
+            "Select up to two study choices (undergraduate or postgraduate programs).",
+            "Upload certified copies of required documents (e.g., ID, academic transcripts, school-leaving results).",
+            "Submit the application and track its status via the UJ student portal (https://student.uj.ac.za/status.aspx)."
+          ],
+          "Note": "No application fee is charged for online submissions."
+        }
+      },
+      {
+        "Hardcopy Application": {
+          "Submission": "Submit paper-based applications at any of UJ’s four campuses (Auckland Park Kingsway, Auckland Park Bunting Road, Doornfontein, or Soweto) or mail to the Student Enrolment Centre (University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa).",
+          "Fee": "R200 (non-refundable) for both South African and international applicants",
+          "Payment Details": {
+            "Bank": "First National Bank",
+            "Account": "626 158 73199",
+            "Branch Code": "632005",
+            "SWIFT Code": "FIRNZAJJ",
+            "Reference": "Student Number or ID Number"
+          }
+        }
+      },
+      {
+        "International Applicants": {
+          "Requirements": [
+            "Apply online or via hardcopy.",
+            "Submit a certified copy of a valid passport, school-leaving results, proof of English proficiency (if applicable).",
+            "Obtain a certificate of exemption from Universities South Africa (USAf) for undergraduate degree programs (https://mb.usaf.ac.za).",
+            "Postgraduate applicants must submit qualifications for evaluation by the South African Qualifications Authority (SAQA) (www.saqa.org.za).",
+            "Apply for a study visa through the Division for Internationalisation (headinternat@uj.ac.za) upon receiving an admission/conditional admission letter."
+          ]
+        }
+      }
+    ],
+    "Required Documents": {
+      "South African Applicants": [
+        "Certified copy of ID or birth certificate.",
+        "Certified copy of final Grade 11 results (for current Grade 12 applicants) or final school-leaving results (NSC, IEB, SACAI, or equivalent).",
+        "Academic transcripts and degree/diploma certificates (if transferring from another institution)."
+      ],
+      "International Applicants": [
+        "Certified copy of a valid passport.",
+        "Certified copy of school-leaving results or academic transcripts, evaluated by SAQA for postgraduate applicants.",
+        {
+          "Proof of English Proficiency": {
+            "Condition": "Required if English was not the medium of instruction.",
+            "Accepted Tests": [
+              {
+                "IELTS": {
+                  "Undergraduate": "Overall score of 6",
+                  "Postgraduate": "Overall score of 7"
+                }
+              },
+              {
+                "TOEFL": {
+                  "Undergraduate": "80–104",
+                  "Postgraduate": "105–120"
+                }
+              },
+              {
+                "UJELP": {
+                  "Undergraduate": "Overall score of 6",
+                  "Postgraduate": "Overall score of 7",
+                  "Contact": "ujelp1@uj.ac.za"
+                }
+              }
+            ]
+          }
+        }
+      ],
+      "Additional Documents (if applicable)": [
+        "Faculty-specific requirements (e.g., CV, motivation letter, portfolio for programs like Art, Design and Architecture, or Health Sciences).",
+        "Proof of residence application (if applying for on-campus accommodation).",
+        "Proof of payment for paper-based application fee (R200)."
+      ],
+      "Submission": "Upload documents via the online portal or email to ujappdocs@listsrv.uj.ac.za (South African applicants) or intappsdocs@listsrv.uj.ac.za (international applicants)."
+    },
+    "Key Notes": [
+      "Online applications are processed within 48 hours; hardcopy applications may take up to 15 working days.",
+      "Applicants can select up to two study choices, ranked in order of preference. If not accepted for the first choice, the second choice is automatically considered.",
+      "UJ does not require National Benchmark Tests (NBTs) for admission.",
+      "The American General Education Development (GED) test is not accepted; applicants must have an NSC/IEB/SACAI equivalent.",
+      "Track application status using your student number at https://student.uj.ac.za/status.aspx.",
+      "Beware of scams promising admission for a fee. Report suspicious activities to uj@thehotline.co.za.",
+      "For detailed guidance, refer to the UJ Application Guide (https://www.uj.ac.za/wp-content/uploads/2021/09/the-basics-of-applications.mp3) or the 2026 Undergraduate and Postgraduate Prospectuses (https://www.uj.ac.za/studyatUJ)."
+    ]
+  },
+  "Application Dates": {
+    "Undergraduate Applications": {
+      "Open": "2025-04-01",
+      "Close": "2025-10-31T12:00:00",
+      "Note": "Some programs, such as those in the Faculty of Health Sciences or competitive courses like Engineering, may have earlier deadlines or additional selection processes (e.g., interviews or portfolios). Always verify specific program deadlines on the UJ website (https://www.uj.ac.za/admissions-aid/)."
+    },
+    "Postgraduate Applications": {
+      "Open": "2025-04-01",
+      "Close": "2025-10-31T12:00:00",
+      "Exceptions": [
+        {
+          "College of Business and Economics": "2025-09-30"
+        },
+        {
+          "Postgraduate Certificate in Education (PGCE)": "2025-08-31"
+        },
+        {
+          "MEd Educational Psychology": "2025-06-24"
+        },
+        {
+          "Other Programs": [
+            "AdvDip in Business Management",
+            "BA Hons in Human Resource Management",
+            "BA Hons in Industrial Psychology",
+            "BCom Hons in Financial Planning, Human Resource Management, Industrial Psychology, Information Systems, Investment Management, Marketing Management, Strategic Management, Property Valuation and Management, Quantitative Finance",
+            "MCom in Accounting, Auditing, Computer Auditing, Finance, Financial Management, International Accounting, SA & International Taxation, Quantitative Finance",
+            "MPhil in Industrial Psychology",
+            "PhD in Accounting, Auditing, Finance, Industrial Psychology, Taxation"
+          ]
+        }
+      ],
+      "Reference": "Always consult the faculty-specific pages or the UJ Postgraduate Prospectus for exact deadlines (https://www.uj.ac.za/studyatUJ/Postgraduate)."
+    },
+    "Residence Applications": {
+      "Open": "2025-04-01",
+      "Close": "2025-09-30",
+      "Note": "On-campus accommodation is limited, and early application is recommended. A residence deposit of R1,220 is required (subject to change; confirm 2026 rates in November 2025). Apply simultaneously with your academic application via the UJ application portal."
+    },
+    "International Applicants": {
+      "Open": "2025-04-01",
+      "Close": "2025-10-31T12:00:00",
+      "Note": "International applicants are advised to apply 3–4 months earlier to allow time for study visa processing and South African Qualifications Authority (SAQA) evaluation of non-South African qualifications (www.saqa.org.za). Supporting documents must be emailed to intappsdocs@listsrv.uj.ac.za."
+    },
+    "Key Notes": [
+      "Applications must be submitted online via the UJ application portal (https://www.uj.ac.za/admissions-aid/). Online applications are free, while paper-based applications incur a non-refundable R200 fee.",
+      "Late applications are rarely accepted and depend on program availability. Check the UJ website for updates on late application opportunities.",
+      "Applicants can track their application status at https://student.uj.ac.za/status.aspx using their student number.",
+      "UJ has warned against scams promising admission for a fee. Report suspicious activities to uj@thehotline.co.za.",
+      "A 2025 Non-Compliance letter was sent in error and should be disregarded. Verify your application status online.",
+      "For specific program deadlines, download the 2026 Undergraduate and Postgraduate Prospectuses from the UJ website or contact the Student Enrolment Centre at +27 (0)11 559 4555 or mylife@uj.ac.za."
+    ],
+    "More Information": "Visit the UJ Admissions Portal (https://www.uj.ac.za/admissions-aid/)."
+  },
+  "Contacts": [
+    {
+      "Department": "Student Enrolment Centre",
+      "Purpose": "General admissions and student finance inquiries",
+      "Phone": "+27 (0)11 559 4555",
+      "Email": "mylife@uj.ac.za",
+      "Physical Address": "Corner Kingsway and University Road, Auckland Park, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    },
+    {
+      "Department": "Division for Internationalisation",
+      "Purpose": "International student admissions and visa inquiries",
+      "Phone": "+27 (0)11 559 4399",
+      "Email": "headinternat@uj.ac.za",
+      "Document Submission Email": "intappsdocs@listsrv.uj.ac.za",
+      "Physical Address": "Corner Kingsway and University Road, Auckland Park, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    },
+    {
+      "Department": "UJ English Language Programme (UJELP)",
+      "Purpose": "English proficiency test inquiries for international applicants",
+      "Phone": "Not listed; contact via email",
+      "Email": "ujelp1@uj.ac.za",
+      "Physical Address": "Not specified; contact via email for details",
+      "Postal Address": "Not specified; contact via email for details"
+    },
+    {
+      "Department": "Ethics Hotline",
+      "Purpose": "Report suspicious activities or scams related to admissions",
+      "Phone": "Not listed; contact via email",
+      "Email": "uj@thehotline.co.za",
+      "Physical Address": "Not applicable",
+      "Postal Address": "Not applicable"
+    },
+    {
+      "Department": "Student Finance",
+      "Purpose": "Financial aid and fee inquiries",
+      "Contact Name": "Marutha Peggy",
+      "Phone": "+27 (0)11 559 1552",
+      "Email": "Not specified; use mylife@uj.ac.za for general inquiries",
+      "Physical Address": "Corner Kingsway and University Road, Auckland Park, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    },
+    {
+      "Department": "Centre for Academic Technologies (CAT)",
+      "Purpose": "Assistance with uLink and Moodle for online learning",
+      "Phone": "+27 (0)11 559 4555",
+      "Email": "cathelpdesk@uj.ac.za",
+      "Physical Address": "D Ring 3, Auckland Park Kingsway Campus, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    },
+    {
+      "Department": "Faculty of Science",
+      "Purpose": "Faculty-specific inquiries",
+      "Contact Name": "Mrs KC Govender",
+      "Phone": "+27 (0)11 559 6340",
+      "Email": "cagneyg@uj.ac.za",
+      "Additional Contact": {
+        "Name": "Ms NC Nhlapo",
+        "Phone": "+27 (0)11 559 3572",
+        "Email": "cnhlapo@uj.ac.za"
+      },
+      "Physical Address": "8th Floor, 41 Stanley Ave, Braamfontein Werf, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    },
+    {
+      "Department": "UJ Library",
+      "Purpose": "Library services and events",
+      "Phone": ["+27 (0)11 559 3791", "+27 (0)11 559 2264"],
+      "Email": "licevents@uj.ac.za",
+      "Physical Address": "Corner Kingsway and University Road, Auckland Park, Johannesburg, 2092, South Africa",
+      "Postal Address": "University of Johannesburg, PO Box 524, Auckland Park, 2006, South Africa"
+    }
+  ],
+  "Financial Aid Information": [
+    {
+      "Topic": "National Student Financial Aid Scheme (NSFAS)",
+      "Description": "Provides financial assistance to eligible South African students and permanent residents from low-income households (gross household income not exceeding R350,000 per annum for students without disabilities, or R600,000 for students with disabilities). Funding covers tuition fees, registration fees, prescribed textbooks, accommodation (capped at university residence rates or private accommodation up to the same limit), transport allowances (for non-residents), living allowances, and personal care allowances (for students in catered residences).",
+      "Application": {
+        "Portal": "https://www.nsfas.org.za",
+        "Period": "Typically open on 2025-09-01 and close on 2025-11-30",
+        "Requirements": [
+          "Proof of acceptance or provisional acceptance at UJ for first-year students.",
+          "Certified copies of ID, parents’/guardians’ IDs, proof of income (payslips, affidavits if unemployed, or SASSA grant proof), and academic records.",
+          "Students must reapply annually and meet academic progression requirements."
+        ],
+        "Note": "NSFAS does not fund postgraduate qualifications (e.g., Honours, Master’s, or PhD) as of 2021; explore options like the National Research Foundation (NRF)."
+      },
+      "Contact": {
+        "UJ NSFAS Office": {
+          "Email": "nsfas@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "NSFAS Toll-Free": "0800 006 327",
+        "NSFAS Email": "info@nsfas.org.za"
+      },
+      "Website": [
+        "https://www.uj.ac.za/admissions-aid/student-finance/nsfas/",
+        "https://www.nsfas.org.za"
+      ]
+    },
+    {
+      "Topic": "UJ Merit Bursaries",
+      "Description": "Awarded to academically outstanding students based on final Grade 12 results or prior academic performance at UJ. Available for undergraduate students pursuing a degree or formal diploma, automatically evaluated for qualifying registered students.",
+      "Eligibility": [
+        "First-year students: APS of 37 or higher and at least 70% in six best subjects (excluding Life Orientation).",
+        "Returning students: Overall average of 75% or higher in the previous academic year.",
+        "Covers up to 100% of tuition fees, varying by faculty and academic performance.",
+        "Orange Carpet Rewards Programme offers additional benefits for top-performing matriculants (APS ≥ 37 and 70%+ in six best subjects), including stipends or book allowances."
+      ],
+      "Note": "Students receiving NSFAS funding may not receive additional UJ merit bursaries to avoid overfunding, but the award is recorded on their transcript.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/bursaries/internal-bursaries/"
+    },
+    {
+      "Topic": "Faculty-Specific Bursaries",
+      "Description": "Offered by UJ’s nine faculties, particularly for Honours, Master’s, and Doctoral programs, based on academic merit, financial need, or specific criteria (e.g., research focus or leadership qualities).",
+      "Examples": [
+        {
+          "Faculty of Science Honours Bursary": {
+            "Coverage": "Full tuition fees for students accepted into an Honours program, subject to availability of funds.",
+            "Application Deadline": "2026-01-10",
+            "Contact": {
+              "Name": "Mrs Marungwane Mampa",
+              "Phone": "+27 (0)11 559 2459/4562",
+              "Email": "science-bursaries@uj.ac.za"
+            }
+          }
+        },
+        {
+          "Faculty of Science Master’s and Doctoral Bursaries": "Funding for postgraduate research, with varying amounts based on budget and project requirements."
+        },
+        {
+          "College of Business and Economics Bursaries": {
+            "Programs": "BCom Honours in Financial Planning or MCom in Quantitative Finance",
+            "Application Deadline": "2025-09-30 for some programs"
+          }
+        }
+      ],
+      "Application": "Submit faculty-specific forms (available on the UJ website or from faculty offices) with additional documents like CV, motivation letter, or research proposal.",
+      "Contact": {
+        "Faculty of Science": {
+          "Email": "science-bursaries@uj.ac.za",
+          "Contacts": [
+            {
+              "Name": "Mrs Marungwane Mampa",
+              "Phone": "+27 (0)11 559 2459/4562"
+            },
+            {
+              "Name": "Mrs KC Govender",
+              "Phone": "+27 (0)11 559 6340",
+              "Email": "cagneyg@uj.ac.za"
+            },
+            {
+              "Name": "Ms NC Nhlapo",
+              "Phone": "+27 (0)11 559 3572",
+              "Email": "cnhlapo@uj.ac.za"
+            }
+          ]
+        },
+        "General Faculty Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/bursaries/"
+    },
+    {
+      "Topic": "External Bursaries and Sponsorships",
+      "Description": "Facilitated by UJ, offered by private companies, municipalities, government departments, and other organizations based on academic merit, financial need, or specific criteria like geographic location or field of study.",
+      "Examples": [
+        "Bursaries for specific fields: Engineering, IT, or Health Sciences (e.g., Johannesburg City Power Bursaries for Undergraduate Studies 2025).",
+        "Government-funded bursaries: Funza Lushaka for Education students or Department of Labour bursaries for students with disabilities."
+      ],
+      "Application": "Apply directly to the sponsoring organization, adhering to their deadlines and requirements. Supporting documents include certified ID copies, academic records, and proof of financial need.",
+      "Note": "UJ limits multiple awards to ensure equitable distribution of funds. Avoid scams promising bursaries for a fee and report suspicious activities to uj@thehotline.co.za.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "Ethics Hotline": "uj@thehotline.co.za"
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/bursaries/external-bursaries/"
+    },
+    {
+      "Topic": "SRC Trust Fund",
+      "Description": "Provides financial assistance to financially needy and academically deserving students. Students with no historical debt are automatically unblocked for registration upon approval. Those with outstanding debt must follow the Acknowledgement of Debt (AOD) process.",
+      "Application": "Submit online via the UJ Student Life and Governance portal (https://apps.uj.ac.za/StudentLifeAndGovernance).",
+      "Note": "Specific application dates for 2026 will be announced on the UJ website, typically aligning with the academic year.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/"
+    },
+    {
+      "Topic": "Work-Study and Internship Programmes",
+      "Description": "UJ offers work-study opportunities for students to earn income while studying, including on-campus roles like tutoring, library assistance, or administrative support. External internship programs provide additional funding and professional experience.",
+      "Eligibility": "Available to undergraduate and postgraduate students; must balance work hours with academic requirements.",
+      "Application": "Details and application processes available through the UJ Student Finance office or faculty coordinators.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/bursaries/"
+    },
+    {
+      "Topic": "Educational Loans (Eduloan and Others)",
+      "Description": "UJ partners with Eduloan (now Fundi) to provide study loans for students who do not qualify for NSFAS or bursaries, covering tuition, accommodation, and study materials with flexible repayment options. Other private financial institutions may also offer student loans.",
+      "Application": "Apply directly through the provider (e.g., https://www.fundi.co.za). Supporting documents include proof of registration, ID, and financial details of the applicant or sponsor.",
+      "Note": "Students with outstanding debt from prior years must follow the Acknowledgement of Debt (AOD) process before registering.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "Fundi": "https://www.fundi.co.za/contact-us"
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/"
+    }
+  ],
+  "Accommodation Information": [
+    {
+      "Topic": "Residence Application",
+      "Description": "Residence applications for the 2026 academic year open on 2025-04-01 and close on 2025-09-30, aligning with the undergraduate and postgraduate academic application period. On-campus accommodation is available at UJ’s four campuses: Auckland Park Kingsway (APK), Auckland Park Bunting Road (APB), Doornfontein (DFC), and Soweto (SWC).",
+      "Application": "Apply simultaneously with academic application via the UJ online application portal (https://www.uj.ac.za/admissions-aid/accommodation/).",
+      "Deposit": "R1,220 (non-refundable, subject to change; confirm 2026 rates in November 2025).",
+      "Note": "Spaces are limited, and allocation is based on academic merit, financial need, and application date. First-year students are prioritized. Applicants must upload certified copies of their ID, academic records, and proof of academic application. Successful applicants receive confirmation via the UJ student portal (https://student.uj.ac.za/status.aspx). Late applications may be considered subject to availability.",
+      "Disability Support": "Contact the Disability Unit at disabilityunit@uj.ac.za or +27 (0)11 559 3745 for disability-friendly accommodation (e.g., wheelchair-accessible rooms).",
+      "Contact": {
+        "Residence Office": {
+          "Email": "residence@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "General Inquiries": "mylife@uj.ac.za",
+        "Disability Unit": {
+          "Email": "disabilityunit@uj.ac.za",
+          "Phone": "+27 (0)11 559 3745"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/accommodation/"
+    },
+    {
+      "Topic": "Campus Residence Managers",
+      "Description": "Each UJ campus has dedicated residence managers to assist with accommodation queries and student support.",
+      "Contacts": [
+        {
+          "Campus": "Auckland Park Kingsway (APK)",
+          "Ladies’ Residences": {
+            "Name": "Ms. Maryka Kirstein",
+            "Phone": "+27 (0)11 559 2092",
+            "Email": "marykak@uj.ac.za"
+          },
+          "Men’s Residences": {
+            "Name": "Mr. Thabang Nkoana",
+            "Phone": "+27 (0)11 559 2863",
+            "Email": "thabangn@uj.ac.za"
+          }
+        },
+        {
+          "Campus": "Auckland Park Bunting Road (APB)",
+          "Ladies’ Residences": {
+            "Name": "Ms. Nomawethu Mathebula",
+            "Phone": "+27 (0)11 559 1566",
+            "Email": "nomawethum@uj.ac.za"
+          },
+          "Men’s Residences": {
+            "Name": "Mr. Dumisani Ngobese",
+            "Phone": "+27 (0)11 559 1566",
+            "Email": "dumisanin@uj.ac.za"
+          }
+        },
+        {
+          "Campus": "Doornfontein (DFC)",
+          "Residences": {
+            "Name": "Ms. Magdeline Molapo",
+            "Phone": "+27 (0)11 559 6048",
+            "Email": "magdelines@uj.ac.za"
+          }
+        },
+        {
+          "Campus": "Soweto (SWC)",
+          "Residences": {
+            "Name": "Mr. Thabo Ramabina",
+            "Phone": "+27 (0)11 559 5015",
+            "Email": "thabor@uj.ac.za"
+          }
+        }
+      ],
+      "Note": "Residence managers handle room allocations, maintenance requests, and student welfare.",
+      "Contact": {
+        "Central Residence Office": {
+          "Email": "residence@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "General Inquiries": "mylife@uj.ac.za"
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/accommodation/residence-life/"
+    },
+    {
+      "Topic": "Privately Owned Student Accommodation (POSA)",
+      "Description": "UJ-accredited off-campus residences within a 2 km radius of UJ’s campuses (APK, APB, DFC, SWC), vetted for safety, security, and quality standards, including amenities like electricity, water, Wi-Fi, study areas, and transport services.",
+      "Application": "Apply directly to accredited POSA providers listed on the UJ website (https://www.uj.ac.za/admissions-aid/accommodation/posa-accredited-list/).",
+      "Note": "Costs vary depending on provider and amenities. NSFAS-funded students can use their accommodation allowance for POSA, capped at UJ residence rates. Verify accreditation to avoid scams and report suspicious providers to uj@thehotline.co.za. International students must ensure POSA providers comply with visa accommodation requirements.",
+      "Contact": {
+        "POSA Office": {
+          "Email": "offcampusaccom@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": "mylife@uj.ac.za",
+        "Ethics Hotline": "uj@thehotline.co.za"
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/accommodation/posa-accredited-list/"
+    },
+    {
+      "Topic": "Residence Fees and Payment",
+      "Description": "On-campus residence fees for 2026 will be confirmed in November 2025 and typically increase by 5–10% annually. For 2025, average residence fees range from R39,000 to R60,000 per year, depending on the campus and room type (single, double, or self-catering).",
+      "Deposit": "R1,220 (non-refundable, payable via bank transfer or at the UJ Cash Office).",
+      "Payment Details": {
+        "Bank": "First National Bank",
+        "Account": "626 158 73209",
+        "Branch Code": "210554",
+        "Reference": "Student Number and ‘Residence’"
+      },
+      "Note": "NSFAS-funded students have residence fees covered up to the university’s capped rate. Students with outstanding residence fees from previous years must complete an Acknowledgement of Debt (AOD) process to register. International students must provide proof of medical aid cover and comply with South African immigration regulations.",
+      "Contact": {
+        "Student Finance": {
+          "Email": "studentfinance@uj.ac.za",
+          "Phone": "+27 (0)11 559 1552 (Marutha Peggy)"
+        },
+        "General Inquiries": {
+          "Email": "mylife@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "International": {
+          "Email": "headinternat@uj.ac.za",
+          "Phone": "+27 (0)11 559 4399"
+        }
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/student-finance/"
+    },
+    {
+      "Topic": "Residence Facilities and Services",
+      "Description": "UJ residences offer furnished rooms (bed, desk, wardrobe), Wi-Fi, study areas, communal kitchens (in self-catering units), laundry facilities, 24/7 security, and access control. Some residences provide catering services (e.g., dining halls with meal plans).",
+      "Campus Offerings": [
+        {
+          "APK": "Largest campus with multiple residences (e.g., Impumelelo, Goudstad), offering single and double rooms, some with en-suite bathrooms."
+        },
+        {
+          "APB": "Smaller residences like Sophiatown, ideal for quieter environments."
+        },
+        {
+          "DFC": "Modern facilities like Habitat and Kilimanjaro, suited for Engineering and Health Sciences students."
+        },
+        {
+          "SWC": "Compact residences like YWCA, fostering a close-knit community."
+        }
+      ],
+      "Note": "Residences include recreational areas (e.g., TV rooms, sports facilities) and access to UJ’s academic support services (e.g., libraries, tutoring). Residence life programs promote community engagement through events and leadership opportunities.",
+      "Contact": {
+        "Residence Office": {
+          "Email": "residence@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "General Inquiries": "mylife@uj.ac.za"
+      },
+      "Website": "https://www.uj.ac.za/admissions-aid/accommodation/residence-life/"
+    },
+    {
+      "Topic": "International Student Accommodation",
+      "Description": "International students can apply for on-campus residences or accredited POSA, subject to the same deadlines and processes as local students (2025-04-01 to 2025-09-30). On-campus accommodation is recommended for ease of integration.",
+      "Requirements": [
+        "Valid study visa and proof of medical aid cover (recognized in South Africa).",
+        "International levy: Approximately R2,000 for SADC and African countries (subject to change; confirm 2026 rates in November 2025)."
+      ],
+      "Note": "The Division for Internationalisation assists with accommodation queries and visa compliance. Students choosing POSA must ensure the provider meets visa requirements (e.g., proof of address for Home Affairs). Early application is advised due to limited spaces and visa processing times (3–6 months).",
+      "Contact": {
+        "Division for Internationalisation": {
+          "Email": "headinternat@uj.ac.za",
+          "Phone": "+27 (0)11 559 4399"
+        },
+        "Document Submission": "intappsdocs@listsrv.uj.ac.za",
+        "Residence Office": {
+          "Email": "residence@uj.ac.za",
+          "Phone": "+27 (0)11 559 4555"
+        },
+        "General Inquiries": "mylife@uj.ac.za"
+      },
+      "Website": [
+        "https://www.uj.ac.za/admissions-aid/accommodation/",
+        "https://www.uj.ac.za/internationalisation/"
+      ]
+    }
+  ]
+}
