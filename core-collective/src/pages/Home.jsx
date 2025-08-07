@@ -393,31 +393,16 @@ const Home = () => {
 
       setWaitingForBot(false);
 
-      // After getting bot response, summarize the user message and rename the chat
-      try {
-        console.log("Sending message to summarize:", userMsg.text);
-        // 1. Get the summary
-        const summaryResponse = await fetch("http://localhost:3001/api/private/summarizeMessage", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: userMsg.text }),
-        });
-
-        if (!summaryResponse.ok) {
-          throw new Error(`Failed to get summary: ${await summaryResponse.text()}`);
-        }
-
-        const summaryData = await summaryResponse.json();
-        console.log("Summary response:", summaryData);
-        const summary = summaryData.summary || "New Chat";
-
-          // 2. Rename the chat session
+      // After getting bot response, use the user's message as the chat name
+      if (newSessionCreated) {
+        try {
+          // Rename the chat session with the user's message
           const renameResponse = await fetch("http://localhost:3001/api/private/renameChatSession", {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
               chat_session_id: sessionId,
-              name: summary,
+              name: userMsg.text,
             }),
           });
 
@@ -428,13 +413,13 @@ const Home = () => {
             // Update chat name in the UI
             setChats((prevChats) =>
               prevChats.map((chat) =>
-                chat.id === sessionId ? { ...chat, name: summary } : chat
+                chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
               )
             );
           }
-        
-      } catch (err) {
-        console.error("Error in summarize/rename process:", err);
+        } catch (err) {
+          console.error("Error in rename process:", err);
+        }
       }
 
       // Save bot message to chat history
