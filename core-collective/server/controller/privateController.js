@@ -264,9 +264,6 @@ exports.renameChatSession = async (req, res) => {
         .json({ error: "chat_session_id and name are required." });
     }
 
-    // Use the summary as the name for renaming
-    const summary = name; // Assuming the name passed is already the summary
-
     const response = await fetch(
       "https://api.privatecore.app/chat/rename-chat-session",
       {
@@ -277,7 +274,7 @@ exports.renameChatSession = async (req, res) => {
         },
         body: JSON.stringify({
           chat_session_id: chat_session_id,
-          name: summary,
+          name: name,
         }),
       }
     );
@@ -295,27 +292,55 @@ exports.renameChatSession = async (req, res) => {
   }
 };
 
-exports.summarizeMessage = async (message) => {
+exports.deleteChatSession = async (req, res) => {
   try {
-    const safeStringify = (obj) => {
-      const seen = new WeakSet();
-      return JSON.stringify(obj, (key, value) => {
-        if (typeof value === "object" && value !== null) {
-          if (seen.has(value)) {
-            return "[Circular]";
-          }
-          seen.add(value);
-        }
-        return value;
-      });
-    };
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
+    }
+
+    const sessionId = req.params.sessionId;
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID is required." });
+    }
+
+    const response = await fetch(
+      `https://api.privatecore.app/chat/delete-chat-session/${sessionId}`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ error: errorText });
+    }
+
+    res.json({ message: "Chat session deleted successfully" });
+  } catch (err) {
+    console.error("Failed to delete chat session:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.summarizeMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
 
     console.log("summarizeMessage function called"); // Log entry point
-    console.log("Request body:", safeStringify(message)); // Safely log request body
+    console.log("Message to summarize:", message); // Log the actual message
 
     if (!message) {
       console.log("Message is missing in the request body"); // Log missing message
-      throw new Error("Message is required for summarization.");
+      return res
+        .status(400)
+        .json({ error: "Message is required for summarization." });
     }
 
     const response = await fetch("https://api.mistral.ai/v1/chat/completions", {
@@ -361,9 +386,9 @@ exports.summarizeMessage = async (message) => {
     const summary = data.choices?.[0]?.message?.content?.trim() || "New Chat";
     console.log("Extracted summary:", summary);
 
-    return summary;
+    return res.json({ summary });
   } catch (err) {
     console.error("Error in summarizeMessage function:", err); // Log error
-    throw err;
+    return res.status(500).json({ error: err.message });
   }
 };

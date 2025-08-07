@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import ChatHistoryPopup from "../components/ChatHistoryPopup";
+import { AlertDialog } from "../components/ui/alert-dialog";
+import { useToast } from "../hooks/use-toast";
 import "../styles/HomeStyles/Home.css";
 import { FaHistory, FaUserCircle, FaRobot, FaTrash } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
@@ -137,19 +139,14 @@ const Home = () => {
   //     console.error("Failed to create chat session:", err);
   //   }
   // };
+
+  
+
   const handleNewChat = async () => {
     try {
-      // Clear all states first
-      setChatSessionId(null);
-      setActiveChat(null);
-      setInput("");
-      setMessages([
-        {
-          text: "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
-          sender: "bot",
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
+      // Reload the page to reset all states
+      window.location.reload();
+      return;
 
       // Create new session
       const response = await fetch("http://localhost:3001/api/private/createSession", {
@@ -168,7 +165,8 @@ const Home = () => {
       // Update states with new session
       setChatSessionId(newSessionId);
       setActiveChat(newSessionId);
-
+      setSessionCreated(false); // Reset session created flag
+      
       // Add new chat to list
       const today = new Date().toISOString().slice(0, 10);
       const newChat = {
@@ -182,14 +180,10 @@ const Home = () => {
       };
       setChats((prev) => [newChat, ...prev]);
       setShowHistory(false);
-      setSessionCreated(true); // Ensure newSessionCreated is set to true when a new chat is created
-
       console.log("New chat session created with new ID");
-
-      // Reload the page
-      window.location.reload();
     } catch (err) {
       console.error("Failed to create new chat:", err);
+      setSessionCreated(false); // Reset sessionCreated if creation fails
     }
   };
 
@@ -218,6 +212,7 @@ const Home = () => {
 
     // Only create a new session if there is no session id for the current view
     if (!sessionId) {
+      newSessionCreated = true; // Set this before creating the session
       try {
         const response = await fetch("http://localhost:3001/api/private/createSession", {
           method: "POST",
@@ -391,6 +386,35 @@ const Home = () => {
 
       setWaitingForBot(false);
 
+      // After getting bot response, use the user's message as the chat name
+      if (newSessionCreated) {
+        try {
+          // Rename the chat session with the user's message
+          const renameResponse = await fetch("http://localhost:3001/api/private/renameChatSession", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_session_id: sessionId,
+              name: userMsg.text,
+            }),
+          });
+
+          if (renameResponse.ok) {
+            const renameData = await renameResponse.json();
+            console.log("Chat renamed successfully:", renameData);
+            
+            // Update chat name in the UI
+            setChats((prevChats) =>
+              prevChats.map((chat) =>
+                chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
+              )
+            );
+          }
+        } catch (err) {
+          console.error("Error in rename process:", err);
+        }
+      }
+
       // Save bot message to chat history
       const botMsg = {
         text: botReply,
@@ -484,19 +508,40 @@ const Home = () => {
     }
   };
 
-  // Delete chat (frontend only)
+  // Delete chat with confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [chatToDelete, setChatToDelete] = useState(null);
+  const { toast } = useToast();
+
   const handleDeleteChat = (id) => {
-    // setChats((prev) => prev.filter((c) => c.id !== id));
-    // if (activeChat === id) {
-    //   setActiveChat(null);
-    //   setMessages([
-    //     {
-    //       text: "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
-    //       sender: "bot",
-    //       time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    //     },
-    //   ]);
-    // }
+    setChatToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    try {
+      // Backend delete
+      const res = await fetch(`http://localhost:3001/api/private/deleteChatSession/${chatToDelete}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete chat session");
+      setChats((prev) => prev.filter((c) => c.id !== chatToDelete));
+      if (activeChat === chatToDelete) {
+        setActiveChat(null);
+        setMessages([
+          {
+            text: "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
+            sender: "bot",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ]);
+      }
+      toast({ title: "Chat deleted", description: "The chat session was deleted successfully." });
+    } catch (err) {
+      toast({ title: "Delete failed", description: err.message || "Could not delete chat." });
+    } finally {
+      setDeleteDialogOpen(false);
+      setChatToDelete(null);
+    }
   };
 
   return (
@@ -639,14 +684,26 @@ const Home = () => {
       </div>
 
       {/* Chat history popup */}
-        <ChatHistoryPopup
-          isOpen={showHistory}
-          chats={chats}
-          activeChat={activeChat}
-          onSelectChat={(id) => { handleSelectChat(id); setShowHistory(false); }}
-          onDeleteChat={handleDeleteChat}
-          onClose={() => setShowHistory(false)}
-        />
+      <ChatHistoryPopup
+        isOpen={showHistory}
+        chats={chats}
+        activeChat={activeChat}
+        onSelectChat={(id) => { handleSelectChat(id); setShowHistory(false); }}
+        onDeleteChat={handleDeleteChat}
+        onClose={() => setShowHistory(false)}
+      />
+
+      {/* Delete confirmation dialog */}
+      <AlertDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        title="Delete Chat?"
+        description="Are you sure you want to delete this chat session? This action cannot be undone."
+        onConfirm={confirmDeleteChat}
+        onCancel={() => { setDeleteDialogOpen(false); setChatToDelete(null); }}
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };
