@@ -144,17 +144,9 @@ const Home = () => {
 
   const handleNewChat = async () => {
     try {
-      // Clear all states first
-      setChatSessionId(null);
-      setActiveChat(null);
-      setInput("");
-      setMessages([
-        {
-          text: "Hello! I'm VirtualAssist, your AI assistant. How can I help you today?",
-          sender: "bot",
-          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-        },
-      ]);
+      // Reload the page to reset all states
+      window.location.reload();
+      return;
 
       // Create new session
       const response = await fetch("http://localhost:3001/api/private/createSession", {
@@ -173,7 +165,8 @@ const Home = () => {
       // Update states with new session
       setChatSessionId(newSessionId);
       setActiveChat(newSessionId);
-
+      setSessionCreated(false); // Reset session created flag
+      
       // Add new chat to list
       const today = new Date().toISOString().slice(0, 10);
       const newChat = {
@@ -187,11 +180,10 @@ const Home = () => {
       };
       setChats((prev) => [newChat, ...prev]);
       setShowHistory(false);
-      setSessionCreated(true); // Ensure newSessionCreated is set to true when a new chat is created
-
       console.log("New chat session created with new ID");
     } catch (err) {
       console.error("Failed to create new chat:", err);
+      setSessionCreated(false); // Reset sessionCreated if creation fails
     }
   };
 
@@ -220,6 +212,7 @@ const Home = () => {
 
     // Only create a new session if there is no session id for the current view
     if (!sessionId) {
+      newSessionCreated = true; // Set this before creating the session
       try {
         const response = await fetch("http://localhost:3001/api/private/createSession", {
           method: "POST",
