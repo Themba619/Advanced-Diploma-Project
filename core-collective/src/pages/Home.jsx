@@ -207,6 +207,13 @@ const Home = () => {
     setWaitingForBot(true);
     setDisplayedBotMsg("");
 
+    // Add a processing message for longer requests
+    setTimeout(() => {
+      if (waitingForBot) {
+        setDisplayedBotMsg("Processing your request... This may take a moment for complex queries.");
+      }
+    }, 5000); // Show message after 5 seconds
+
     let sessionId = chatSessionId;
     let newSessionCreated = false;
 
@@ -214,15 +221,23 @@ const Home = () => {
     if (!sessionId) {
       newSessionCreated = true; // Set this before creating the session
       try {
-        const response = await fetch("http://localhost:3001/api/private/createSession", {
+        // Use fast session creation with timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for session creation
+
+        const response = await fetch("http://localhost:3001/api/private/createSessionFast", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ persona_id: 0, description: "Convo" }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
+
         if (!response.ok) throw new Error("Failed to create chat session");
         const data = await response.json();
         sessionId = data.chat_session_id;
-        console.log("Session was created with new Id");
+        console.log("Fast session was created with new Id");
         setChatSessionId(sessionId);
         setSessionCreated(true);
         setActiveChat(sessionId);
@@ -240,14 +255,25 @@ const Home = () => {
         setChats((prev) => [newChat, ...prev]);
         newSessionCreated = true;
       } catch (err) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            text: "Failed to create chat session.",
-            sender: "bot",
-            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          },
-        ]);
+        if (err.name === 'AbortError') {
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: "Session creation timed out. Please try again.",
+              sender: "bot",
+              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              text: "Failed to create chat session.",
+              sender: "bot",
+              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+            },
+          ]);
+        }
         setWaitingForBot(false);
         setIsTyping(false);
         return;
@@ -292,39 +318,36 @@ const Home = () => {
       }
     });
 
-    // If this is the first message in a new chat, update the description on the backend
+    // If this is the first message in a new chat, handle renaming asynchronously
     if (newSessionCreated) {
       console.log("New Session has been created")
-      try {
-        const response = await fetch("http://localhost:3001/api/private/renameChatSession", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" }, // Fixed syntax error
-          body: JSON.stringify({ chat_session_id: sessionId, name: userMsg.text }),
-        });
-        setChats((prevChats) =>
-          prevChats.map((chat) =>
-            chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
-          )
-        );
-
-        const data = await response.json();
-        console.log("Checking: ", data);
-        if (response) {
-          console.log(response.data);
-        } else {
-          console.log("Failed");
+      // Don't await this - let it run in background for better performance
+      fetch("http://localhost:3001/api/private/renameChatSession", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_session_id: sessionId, name: userMsg.text }),
+      }).then(response => {
+        if (response.ok) {
+          setChats((prevChats) =>
+            prevChats.map((chat) =>
+              chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
+            )
+          );
+          console.log("Chat renamed successfully");
         }
-      } catch (err) {
-        console.log(`New Error: ${err}`);
-      }
+      }).catch(err => {
+        console.log(`Rename Error: ${err}`);
+      });
     }
 
     // After sending a message, allow starting a new chat again
     // setChatSessionId(null);
 
     try {
-      // Send message to PrivateCore AI
-      // Include the is_new_session flag in the message body
+      // Send message to PrivateCore AI with timeout for better performance
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+
       const messageBody = {
         alternate_assistant_id: 0,
         chat_session_id: sessionId,
@@ -349,13 +372,17 @@ const Home = () => {
         },
         prompt_override: null,
         use_agentic_search: false,
-        is_new_session: newSessionCreated, // Pass the flag here
+        is_new_session: newSessionCreated,
       };
+
       const response = await fetch("http://localhost:3001/api/private/sendMessage", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(messageBody),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       let data;
       let botReply = "";
@@ -386,33 +413,14 @@ const Home = () => {
 
       setWaitingForBot(false);
 
-      // After getting bot response, use the user's message as the chat name
+      // After getting bot response, handle any remaining async operations
       if (newSessionCreated) {
-        try {
-          // Rename the chat session with the user's message
-          const renameResponse = await fetch("http://localhost:3001/api/private/renameChatSession", {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              chat_session_id: sessionId,
-              name: userMsg.text,
-            }),
-          });
-
-          if (renameResponse.ok) {
-            const renameData = await renameResponse.json();
-            console.log("Chat renamed successfully:", renameData);
-            
-            // Update chat name in the UI
-            setChats((prevChats) =>
-              prevChats.map((chat) =>
-                chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
-              )
-            );
-          }
-        } catch (err) {
-          console.error("Error in rename process:", err);
-        }
+        // Update UI immediately with user message as chat name
+        setChats((prevChats) =>
+          prevChats.map((chat) =>
+            chat.id === sessionId ? { ...chat, name: userMsg.text } : chat
+          )
+        );
       }
 
       // Save bot message to chat history
@@ -434,27 +442,34 @@ const Home = () => {
         );
       });
 
-      // Typing effect with requestAnimationFrame
+      // Typing effect with optimized performance (faster typing for better UX)
       setDisplayedBotMsg("");
       setIsTyping(true);
       let index = 0;
+      const typingSpeed = Math.max(1, Math.floor(botReply.length / 100)); // Adaptive typing speed
+      
       const typeBotMessage = () => {
         if (index < botReply.length) {
-          setDisplayedBotMsg((prev) => prev + botReply[index]);
-          index++;
-          requestAnimationFrame(typeBotMessage);
+          const nextChunk = botReply.slice(index, index + typingSpeed);
+          setDisplayedBotMsg((prev) => prev + nextChunk);
+          index += typingSpeed;
+          setTimeout(typeBotMessage, 20); // Faster typing at 20ms intervals
         } else {
           setMessages((prev) => [...prev, botMsg]);
           setDisplayedBotMsg("");
           setIsTyping(false);
         }
       };
-      requestAnimationFrame(typeBotMessage);
+      typeBotMessage();
     } catch (error) {
       let errorMsg = "Sorry, there was an error.";
-      if (error.response) {
+      if (error.name === 'AbortError') {
+        errorMsg = "The request is taking longer than expected. The AI might be processing a complex query. Please try again.";
+      } else if (error.response) {
         if (error.response.status === 500) {
           errorMsg = "Server error, please try again later.";
+        } else if (error.response.status === 408) {
+          errorMsg = "Request timed out. The AI service might be busy. Please try again.";
         } else {
           errorMsg = "Unexpected error occurred.";
         }

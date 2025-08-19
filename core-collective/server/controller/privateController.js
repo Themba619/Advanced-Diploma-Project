@@ -96,6 +96,60 @@ exports.createChatSession = async (req, res) => {
   }
 };
 
+// Fast session creation with timeout
+exports.createChatSessionFast = async (req, res) => {
+  try {
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
+    }
+
+    // Add timeout for faster response
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for session creation
+
+    const response = await fetch(
+      "https://api.privatecore.app/chat/create-chat-session",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+        body: JSON.stringify({
+          persona_id: 0,
+          description: "Convo",
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      return res.status(response.status).json({ error: errorText });
+    }
+    const data = await response.json();
+    console.log(
+      "Fast PrivateCore chat session created! ID:",
+      data.chat_session_id
+    );
+    res.json({ chat_session_id: data.chat_session_id });
+  } catch (err) {
+    if (err.name === "AbortError") {
+      console.error("Session creation timeout");
+      return res
+        .status(408)
+        .json({ error: "Session creation timeout. Please try again." });
+    }
+    console.error("Failed to create PrivateCore chat session:", err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 exports.sendMessage = async (req, res) => {
   try {
     const cookie = aiAuthCookie();
@@ -133,16 +187,6 @@ exports.sendMessage = async (req, res) => {
 
     console.log("User message received:", message);
 
-    // Summarize the user message
-    if (is_new_session) {
-      try {
-        const summarizedMessage = await exports.summarizeMessage(message);
-        console.log("Summarized message:", summarizedMessage);
-      } catch (err) {
-        console.error("Error summarizing message:", err);
-      }
-    }
-
     if (!chat_session_id || !message) {
       return res
         .status(400)
@@ -165,38 +209,43 @@ exports.sendMessage = async (req, res) => {
       use_agentic_search,
     };
 
-    // If this is the first message in a new session, summarize and rename the session
+    // For new sessions, handle renaming asynchronously after sending response
     if (is_new_session) {
-      try {
-        // Use the summarized message to rename the chat session
-        const summary = await exports.summarizeMessage(message);
-        console.log("Renaming chat session with summary:", summary);
+      // Don't await this - let it run in background
+      setImmediate(async () => {
+        try {
+          // Use first 50 chars of message as chat name for speed
+          const chatName =
+            message.length > 50 ? message.substring(0, 50) + "..." : message;
+          console.log("Renaming chat session with name:", chatName);
 
-        const renameResponse = await fetch(
-          "https://api.privatecore.app/chat/renameChatSession",
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ chat_session_id, name: summary }),
+          const renameResponse = await fetch(
+            "https://api.privatecore.app/chat/rename-chat-session",
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+                Cookie: cookie,
+              },
+              body: JSON.stringify({ chat_session_id, name: chatName }),
+            }
+          );
+
+          if (!renameResponse.ok) {
+            const errorText = await renameResponse.text();
+            console.error("Failed to rename chat session:", errorText);
+          } else {
+            console.log("Chat session renamed successfully.");
           }
-        );
-
-        if (!renameResponse.ok) {
-          const errorText = await renameResponse.text();
-          console.error("Failed to rename chat session:", errorText);
-        } else {
-          console.log("Chat session renamed successfully.");
+        } catch (err) {
+          console.error("Error during background renaming:", err);
         }
-      } catch (err) {
-        console.error("Error during renaming:", err);
-      }
-    } else {
-      console.log(
-        "Not the first message, skipping summarization and renaming."
-      );
+      });
     }
+
+    // Send message to PrivateCore with timeout for better performance
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
 
     const response = await fetch(
       "https://api.privatecore.app/chat/send-message",
@@ -207,8 +256,11 @@ exports.sendMessage = async (req, res) => {
           Cookie: cookie,
         },
         body: JSON.stringify(body),
+        signal: controller.signal,
       }
     );
+
+    clearTimeout(timeoutId);
 
     let rawText = await response.text();
     if (!response.ok) {
@@ -238,6 +290,17 @@ exports.sendMessage = async (req, res) => {
     res.json({ message: assistantMessage || null });
   } catch (err) {
     console.error("Failed to send message to model: ", err);
+
+    // Handle timeout errors specifically
+    if (err.name === "AbortError") {
+      return res
+        .status(408)
+        .json({
+          error:
+            "The AI service is taking longer than expected. Please try your request again.",
+        });
+    }
+
     return res
       .status(500)
       .json({ error: err.message || "Internal server error" });

@@ -45,7 +45,7 @@ async function loginAndStoreCookie() {
   const loginUrl = "https://api.privatecore.app/auth/login";
   const loginData = querystring.stringify({
     username: "thembabiyela20@gmail.com",
-    password: "GodSpeed1862!@#$",
+    password: "PointBreak2014!!!!",
   });
 
   const response = await fetch(loginUrl, {
