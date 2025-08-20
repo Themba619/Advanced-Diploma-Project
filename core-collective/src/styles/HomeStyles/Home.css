@@ -344,9 +344,24 @@
 /* Waiting Animation */
 .virtualassist-waiting {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  height: auto;
+  margin-left: 8px;
+}
+
+.virtualassist-processing-text {
+  font-size: 0.9rem;
+  color: #fefefe;
+  opacity: 0.9;
+  margin-bottom: 4px;
+  animation: fadeInOut 2s infinite;
+}
+
+.virtualassist-dots {
+  display: flex;
   align-items: center;
   height: 24px;
-  margin-left: 8px;
 }
 
 .virtualassist-waiting .dot {
@@ -364,6 +379,11 @@
 @keyframes bounce {
   0%, 80%, 100% { transform: translateY(0); }
   40% { transform: translateY(-8px); }
+}
+
+@keyframes fadeInOut {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
 }
 
 /* Alert Dialog */

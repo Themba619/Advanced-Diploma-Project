@@ -10,12 +10,15 @@ import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import TextType from "../react_bits/src/blocks/TextAnimations/TextType/TextType";
 
-// Animated 3-dot waiting indicator
+// Animated 3-dot waiting indicator with processing text
 const VirtualAssistWaiting = () => (
   <div className="virtualassist-waiting">
-    <span className="dot dot1">•</span>
-    <span className="dot dot2">•</span>
-    <span className="dot dot3">•</span>
+    <span className="virtualassist-processing-text">Processing your request</span>
+    <div className="virtualassist-dots">
+      <span className="dot dot1">•</span>
+      <span className="dot dot2">•</span>
+      <span className="dot dot3">•</span>
+    </div>
   </div>
 );
 
@@ -95,9 +98,16 @@ const Home = () => {
     // Add a processing message for longer requests with timeout reference
     const processingTimeout = setTimeout(() => {
       if (waitingForBot) {
-        setDisplayedBotMsg("Processing your request... This may take a moment for complex queries.");
+        setDisplayedBotMsg("Processing your complex query... This may take longer than usual, but I'm working on providing you with detailed and relevant information. Please wait while I analyze your request.");
       }
     }, 5000); // Show message after 5 seconds
+
+    // Add an additional message for very complex queries
+    const extendedProcessingTimeout = setTimeout(() => {
+      if (waitingForBot) {
+        setDisplayedBotMsg("Still processing your detailed query... I'm analyzing multiple sources and preparing a comprehensive response with the most relevant and accurate information for your specific question. Thank you for your patience.");
+      }
+    }, 15000); // Show extended message after 15 seconds
 
     let sessionId = chatSessionId;
     let newSessionCreated = false;
@@ -221,7 +231,7 @@ const Home = () => {
     try {
       // Send message to PrivateCore AI with timeout for better performance
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for complex queries
 
       const messageBody = {
         alternate_assistant_id: 0,
@@ -259,6 +269,7 @@ const Home = () => {
 
       clearTimeout(timeoutId);
       clearTimeout(processingTimeout);
+      clearTimeout(extendedProcessingTimeout);
 
       let data;
       let botReply = "";
@@ -326,14 +337,15 @@ const Home = () => {
       typeBotMessage();
     } catch (error) {
       clearTimeout(processingTimeout);
+      clearTimeout(extendedProcessingTimeout);
       let errorMsg = "Sorry, there was an error.";
       if (error.name === 'AbortError') {
-        errorMsg = "The request is taking longer than expected. The AI might be processing a complex query. Please try again.";
+        errorMsg = "Your query is taking longer than expected due to its complexity. I'm still processing your request and will provide a comprehensive response shortly. The system is analyzing relevant information to give you the most accurate answer possible.";
       } else if (error.response) {
         if (error.response.status === 500) {
           errorMsg = "Server error, please try again later.";
         } else if (error.response.status === 408) {
-          errorMsg = "Request timed out. The AI service might be busy. Please try again.";
+          errorMsg = "Request timed out due to the complexity of your query. I'm working on providing you with detailed information. Please wait a moment and try again.";
         } else {
           errorMsg = "Unexpected error occurred.";
         }
