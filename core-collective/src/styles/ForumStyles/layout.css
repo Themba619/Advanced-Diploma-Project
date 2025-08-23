@@ -5,10 +5,52 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    margin-top: 80px; /* Increase even more to prevent cutoff */
+    position: relative; /* Override global absolute positioning */
+    min-height: calc(100vh - 80px); /* Ensure minimum height accounting for navbar */
+    height: auto; /* Allow content to determine height */
+}
+
+/* Override global main-content styles for forum */
+.forum-container .main-content {
+    position: static !important; /* Override global absolute positioning */
+    height: auto !important; /* Override global 100vh */
+    width: auto !important; /* Override global 100% */
+    top: auto !important; /* Reset top positioning */
+    left: auto !important; /* Reset left positioning */
+    margin: 0 !important; /* Reset margin but allow container margin-top */
+    overflow: visible !important; /* Override global overflow auto */
+    z-index: auto !important; /* Reset z-index */
+    padding-top: 0 !important;
+}
+
+/* Override drawer container overflow when forum is active */
+body:has(.forum-container) .drawer-container,
+.drawer-container:has(.forum-container) {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+.forum-page .drawer-container {
+    overflow: visible !important;
+    height: auto !important;
+    min-height: 100vh !important;
+}
+
+.forum-container .main-content {
+    padding-top: 0 !important;
 }
   
 @media (max-width: 768px) {
     .forum-container {
       grid-template-columns: 1fr;
+      margin-top: 10px; /* Increase mobile top margin accordingly */
+      padding: 1rem; /* Reduce padding on mobile */
+    }
+    
+    .forum-container .main-content {
+        position: static; /* Ensure override on mobile too */
     }
 }

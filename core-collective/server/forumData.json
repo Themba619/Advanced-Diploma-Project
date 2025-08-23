@@ -9,8 +9,15 @@
       "Academic Support",
       "General"
     ],
-    "chatCount": 4,
+    "chatCount": 5,
     "replies": [
+      {
+        "id": 1755952762019,
+        "user": "Anonymous",
+        "content": "Test",
+        "timeAgo": "2025-08-23T12:39:22.019Z",
+        "replies": []
+      },
       {
         "id": 1747060938012,
         "user": "Anonymous",

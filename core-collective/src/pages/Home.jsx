@@ -3,7 +3,7 @@ import ChatHistoryPopup from "../components/ChatHistoryPopup";
 import { AlertDialog } from "../components/ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
 import "../styles/HomeStyles/Home.css";
-import { FaHistory, FaUserCircle, FaRobot, FaTrash } from "react-icons/fa";
+import { FaHistory, FaUserCircle, FaRobot, FaTrash, FaVolumeUp, FaVolumeMute, FaStop, FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -39,9 +39,17 @@ const Home = () => {
   const [displayedBotMsg, setDisplayedBotMsg] = useState("");
   const [chatSessionId, setChatSessionId] = useState(null);
   const [sessionCreated, setSessionCreated] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [currentSpeechIndex, setCurrentSpeechIndex] = useState(null);
+  const [isListening, setIsListening] = useState(false);
+  const [speechRecognition, setSpeechRecognition] = useState(null);
+  const [transcript, setTranscript] = useState("");
+  const [isRecognitionSupported, setIsRecognitionSupported] = useState(false);
 
   const chatEndRef = useRef(null);
   const userInputRef = useRef(null);
+  const speechSynthesisRef = useRef(null);
+  const recognitionRef = useRef(null);
   const { toast } = useToast();
 
   // Fetch chat sessions on initial load
@@ -70,6 +78,24 @@ const Home = () => {
     fetchChats();
   }, []);
 
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      
+      recognitionRef.current = recognition;
+      setIsRecognitionSupported(true);
+    } else {
+      setIsRecognitionSupported(false);
+      console.warn('Speech recognition not supported in this browser');
+    }
+  }, []);
+
   // Scroll to bottom on new messages
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -77,6 +103,211 @@ const Home = () => {
 
   const handleNewChat = async () => {
     window.location.reload();
+  };
+
+  // Text-to-Speech Functions
+  const cleanTextForSpeech = (text) => {
+    // Remove markdown formatting and special characters for cleaner speech
+    return text
+      .replace(/[#*_`~]/g, '') // Remove markdown symbols
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Convert links to just the text
+      .replace(/```[\s\S]*?```/g, 'code block') // Replace code blocks
+      .replace(/`([^`]+)`/g, '$1') // Remove inline code backticks
+      .replace(/\n+/g, ' ') // Replace newlines with spaces
+      .trim();
+  };
+
+  const speakText = (text, messageIndex) => {
+    // Stop any current speech
+    if (speechSynthesisRef.current) {
+      window.speechSynthesis.cancel();
+    }
+
+    // Check if browser supports speech synthesis
+    if (!('speechSynthesis' in window)) {
+      toast({
+        title: "Text-to-Speech Not Supported",
+        description: "Your browser doesn't support text-to-speech functionality.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const cleanedText = cleanTextForSpeech(text);
+    const utterance = new SpeechSynthesisUtterance(cleanedText);
+    
+    // Configure speech settings
+    utterance.rate = 0.9; // Slightly slower for better comprehension
+    utterance.pitch = 1;
+    utterance.volume = 0.8;
+
+    // Set voice (prefer English voices)
+    const voices = window.speechSynthesis.getVoices();
+    const englishVoice = voices.find(voice => voice.lang.startsWith('en'));
+    if (englishVoice) {
+      utterance.voice = englishVoice;
+    }
+
+    // Event handlers
+    utterance.onstart = () => {
+      setIsSpeaking(true);
+      setCurrentSpeechIndex(messageIndex);
+    };
+
+    utterance.onend = () => {
+      setIsSpeaking(false);
+      setCurrentSpeechIndex(null);
+    };
+
+    utterance.onerror = (event) => {
+      console.error('Speech synthesis error:', event);
+      setIsSpeaking(false);
+      setCurrentSpeechIndex(null);
+      toast({
+        title: "Speech Error",
+        description: "There was an error with text-to-speech. Please try again.",
+        variant: "destructive",
+      });
+    };
+
+    speechSynthesisRef.current = utterance;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const stopSpeech = () => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeaking(false);
+      setCurrentSpeechIndex(null);
+    }
+  };
+
+  // Cleanup speech on component unmount
+  useEffect(() => {
+    return () => {
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      if (recognitionRef.current && isListening) {
+        recognitionRef.current.stop();
+      }
+    };
+  }, [isListening]);
+
+  // Speech-to-Text Functions
+  const startListening = () => {
+    if (!isRecognitionSupported) {
+      toast({
+        title: "Speech Recognition Not Supported",
+        description: "Your browser doesn't support speech recognition. Please try typing your message instead.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!recognitionRef.current) {
+      toast({
+        title: "Speech Recognition Error",
+        description: "Speech recognition is not initialized. Please refresh the page and try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const recognition = recognitionRef.current;
+    
+    recognition.onstart = () => {
+      setIsListening(true);
+      setTranscript("");
+      toast({
+        title: "Listening...",
+        description: "Speak now. Your speech will be converted to text.",
+      });
+    };
+
+    recognition.onresult = (event) => {
+      let interimTranscript = '';
+      let finalTranscript = '';
+
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcriptPart = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTranscript += transcriptPart;
+        } else {
+          interimTranscript += transcriptPart;
+        }
+      }
+
+      const fullTranscript = finalTranscript + interimTranscript;
+      setTranscript(fullTranscript);
+      setInput(fullTranscript);
+    };
+
+    recognition.onerror = (event) => {
+      console.error('Speech recognition error:', event.error);
+      setIsListening(false);
+      
+      let errorMessage = "An error occurred during speech recognition.";
+      switch (event.error) {
+        case 'no-speech':
+          errorMessage = "No speech was detected. Please try again.";
+          break;
+        case 'audio-capture':
+          errorMessage = "Microphone access was denied or no microphone was found.";
+          break;
+        case 'not-allowed':
+          errorMessage = "Microphone access was denied. Please allow microphone access and try again.";
+          break;
+        case 'network':
+          errorMessage = "Network error occurred during speech recognition.";
+          break;
+        default:
+          errorMessage = `Speech recognition error: ${event.error}`;
+      }
+      
+      toast({
+        title: "Speech Recognition Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      if (transcript.trim()) {
+        toast({
+          title: "Speech Captured",
+          description: "You can now edit the text if needed, then send your message.",
+        });
+        // Focus the input field so user can edit if needed
+        userInputRef.current?.focus();
+      }
+    };
+
+    try {
+      recognition.start();
+    } catch (error) {
+      console.error('Failed to start speech recognition:', error);
+      setIsListening(false);
+      toast({
+        title: "Speech Recognition Error",
+        description: "Failed to start speech recognition. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopListening = () => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+    }
+  };
+
+  const clearTranscript = () => {
+    setTranscript("");
+    setInput("");
+    userInputRef.current?.focus();
   };
 
   const handleSend = async (e) => {
@@ -497,6 +728,36 @@ const Home = () => {
                 >
                   {msg.text}
                 </ReactMarkdown>
+                {msg.sender === "bot" && (
+                  <div className="virtualassist-msg-actions">
+                    <button
+                      className={`virtualassist-tts-btn ${
+                        isSpeaking && currentSpeechIndex === idx ? 'speaking' : ''
+                      }`}
+                      onClick={() => 
+                        isSpeaking && currentSpeechIndex === idx 
+                          ? stopSpeech() 
+                          : speakText(msg.text, idx)
+                      }
+                      aria-label={
+                        isSpeaking && currentSpeechIndex === idx 
+                          ? "Stop reading message" 
+                          : "Read message aloud"
+                      }
+                      title={
+                        isSpeaking && currentSpeechIndex === idx 
+                          ? "Stop reading" 
+                          : "Read aloud"
+                      }
+                    >
+                      {isSpeaking && currentSpeechIndex === idx ? (
+                        <FaStop />
+                      ) : (
+                        <FaVolumeUp />
+                      )}
+                    </button>
+                  </div>
+                )}
                 <div className="virtualassist-msg-time">{msg.time}</div>
               </div>
             </div>
@@ -538,6 +799,36 @@ const Home = () => {
                 >
                   {displayedBotMsg}
                 </ReactMarkdown>
+                {displayedBotMsg && (
+                  <div className="virtualassist-msg-actions">
+                    <button
+                      className={`virtualassist-tts-btn ${
+                        isSpeaking && currentSpeechIndex === 'typing' ? 'speaking' : ''
+                      }`}
+                      onClick={() => 
+                        isSpeaking && currentSpeechIndex === 'typing' 
+                          ? stopSpeech() 
+                          : speakText(displayedBotMsg, 'typing')
+                      }
+                      aria-label={
+                        isSpeaking && currentSpeechIndex === 'typing' 
+                          ? "Stop reading message" 
+                          : "Read message aloud"
+                      }
+                      title={
+                        isSpeaking && currentSpeechIndex === 'typing' 
+                          ? "Stop reading" 
+                          : "Read aloud"
+                      }
+                    >
+                      {isSpeaking && currentSpeechIndex === 'typing' ? (
+                        <FaStop />
+                      ) : (
+                        <FaVolumeUp />
+                      )}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           )}
@@ -545,19 +836,60 @@ const Home = () => {
           <div ref={chatEndRef} />
         </div>
 
+        {/* Listening Status Indicator */}
+        {isListening && (
+          <div className="virtualassist-listening-indicator">
+            <div className="listening-animation">
+              <span className="listening-dot"></span>
+              <span className="listening-dot"></span>
+              <span className="listening-dot"></span>
+            </div>
+            <span className="listening-text">Listening... Speak now</span>
+          </div>
+        )}
+
         <form className="virtualassist-input-row" onSubmit={handleSend}>
           <input
             ref={userInputRef}
             className="virtualassist-input"
             type="text"
-            placeholder="Type your message here..."
+            placeholder={isRecognitionSupported ? "Type your message or click the microphone to speak..." : "Type your message here..."}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            disabled={waitingForBot}
+            disabled={waitingForBot || isListening}
             aria-label="Chat input"
             autoFocus
           />
-          <button className="virtualassist-send-btn" type="submit" disabled={waitingForBot} aria-label="Send message">
+          
+          {/* Speech-to-Text Button */}
+          {isRecognitionSupported && (
+            <button
+              type="button"
+              className={`virtualassist-mic-btn ${isListening ? 'listening' : ''}`}
+              onClick={isListening ? stopListening : startListening}
+              disabled={waitingForBot}
+              aria-label={isListening ? "Stop listening" : "Start voice input"}
+              title={isListening ? "Stop listening" : "Click to speak"}
+            >
+              {isListening ? <FaMicrophoneSlash /> : <FaMicrophone />}
+            </button>
+          )}
+          
+          {/* Clear Transcript Button (shown when there's transcribed text) */}
+          {transcript && !isListening && (
+            <button
+              type="button"
+              className="virtualassist-clear-btn"
+              onClick={clearTranscript}
+              disabled={waitingForBot}
+              aria-label="Clear transcribed text"
+              title="Clear transcribed text"
+            >
+              ✕
+            </button>
+          )}
+          
+          <button className="virtualassist-send-btn" type="submit" disabled={waitingForBot || isListening} aria-label="Send message">
             <svg
               width="24"
               height="24"
