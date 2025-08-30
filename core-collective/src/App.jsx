@@ -109,7 +109,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotPwd" element={<ForgotPwd />} />
-          <Route path="/" element={<DrawerNavigation />} />
+          <Route path="/" element={<LoginPage />} />
           {/* Authenticated routes (with DrawerNavigation) */}
           <Route element={<DrawerNavigation />}>
             <Route path="/home" element={<Home />} />
