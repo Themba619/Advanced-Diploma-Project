@@ -42,15 +42,42 @@ const Home = () => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [currentSpeechIndex, setCurrentSpeechIndex] = useState(null);
   const [isListening, setIsListening] = useState(false);
-  const [speechRecognition, setSpeechRecognition] = useState(null);
   const [transcript, setTranscript] = useState("");
   const [isRecognitionSupported, setIsRecognitionSupported] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [filteredSuggestions, setFilteredSuggestions] = useState([]);
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
   const chatEndRef = useRef(null);
   const userInputRef = useRef(null);
   const speechSynthesisRef = useRef(null);
   const recognitionRef = useRef(null);
+  const suggestionsRef = useRef(null);
   const { toast } = useToast();
+
+  // FAQ suggestions for auto-complete
+  const faqSuggestions = [
+    "When do I apply?",
+    "How many choices of study may I apply for?",
+    "When and how will I receive the outcome of my application?",
+    "Can I apply without a copy of my ID/Passport?",
+    "Can I apply via email?",
+    "Can I apply with my mid-year Grade 12 results?",
+    "Do I get credits for courses taken at other colleges?",
+    "Does UJ offer financial assistance (bursaries, loans)?",
+    "What should I do if I have not received a response after applying?",
+    "Do I need to apply again if I previously applied and was not accepted?",
+    "How do I qualify for a mature-age exemption?",
+    "Can I apply for undergraduate studies if I am writing the National Senior Certificate through IEB or SACAI?",
+    "How can I check my application or admission status online?",
+    "What documents must I present as an international (non–South African) student at UJ?",
+    "How do I apply for on-campus residence (student housing) at UJ?",
+    "What student clubs and societies are available at UJ?",
+    "Where can I find information on all the programs and courses offered at UJ?",
+    "What are the admission requirements for UJ?",
+    "How much are the tuition fees at UJ?",
+    "What is the academic calendar for UJ?"
+  ];
 
   // Fetch chat sessions on initial load
   useEffect(() => {
@@ -308,6 +335,68 @@ const Home = () => {
     setTranscript("");
     setInput("");
     userInputRef.current?.focus();
+  };
+
+  // Auto-suggest Functions
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setInput(value);
+    
+    if (value.trim().length > 0) {
+      const filtered = faqSuggestions.filter(suggestion =>
+        suggestion.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredSuggestions(filtered.slice(0, 5)); // Limit to 5 suggestions
+      setShowSuggestions(filtered.length > 0);
+      setSelectedSuggestionIndex(-1);
+    } else {
+      setShowSuggestions(false);
+      setFilteredSuggestions([]);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (!showSuggestions || filteredSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev < filteredSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setSelectedSuggestionIndex(prev => 
+          prev > 0 ? prev - 1 : filteredSuggestions.length - 1
+        );
+        break;
+      case 'Enter':
+        if (selectedSuggestionIndex >= 0) {
+          e.preventDefault();
+          selectSuggestion(filteredSuggestions[selectedSuggestionIndex]);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        setSelectedSuggestionIndex(-1);
+        break;
+    }
+  };
+
+  const selectSuggestion = (suggestion) => {
+    setInput(suggestion);
+    setShowSuggestions(false);
+    setSelectedSuggestionIndex(-1);
+    userInputRef.current?.focus();
+  };
+
+  const hideSuggestions = () => {
+    // Delay hiding to allow click events on suggestions
+    setTimeout(() => {
+      setShowSuggestions(false);
+      setSelectedSuggestionIndex(-1);
+    }, 150);
   };
 
   const handleSend = async (e) => {
@@ -849,17 +938,50 @@ const Home = () => {
         )}
 
         <form className="virtualassist-input-row" onSubmit={handleSend}>
-          <input
-            ref={userInputRef}
-            className="virtualassist-input"
-            type="text"
-            placeholder={isRecognitionSupported ? "Type your message or click the microphone to speak..." : "Type your message here..."}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            disabled={waitingForBot || isListening}
-            aria-label="Chat input"
-            autoFocus
-          />
+          <div className="virtualassist-input-container">
+            <input
+              ref={userInputRef}
+              className="virtualassist-input"
+              type="text"
+              placeholder={isRecognitionSupported ? "Type your message or click the microphone to speak..." : "Type your message here..."}
+              value={input}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onBlur={hideSuggestions}
+              onFocus={() => {
+                if (input.trim().length > 0 && filteredSuggestions.length > 0) {
+                  setShowSuggestions(true);
+                }
+              }}
+              disabled={waitingForBot || isListening}
+              aria-label="Chat input"
+              autoFocus
+              autoComplete="off"
+            />
+            
+            {/* Auto-suggest Dropdown */}
+            {showSuggestions && filteredSuggestions.length > 0 && (
+              <div ref={suggestionsRef} className="virtualassist-suggestions-dropdown">
+                {filteredSuggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className={`virtualassist-suggestion-item ${
+                      index === selectedSuggestionIndex ? 'selected' : ''
+                    }`}
+                    onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                    onClick={() => selectSuggestion(suggestion)}
+                    onMouseEnter={() => setSelectedSuggestionIndex(index)}
+                  >
+                    <span className="suggestion-icon">💡</span>
+                    <span className="suggestion-text">{suggestion}</span>
+                  </div>
+                ))}
+                <div className="suggestion-footer">
+                  <span>Press ↑↓ to navigate, Enter to select, Esc to close</span>
+                </div>
+              </div>
+            )}
+          </div>
           
           {/* Speech-to-Text Button */}
           {isRecognitionSupported && (

@@ -226,6 +226,7 @@
 
 .virtualassist-input {
   flex: 1;
+  width: 100%;
   border: none;
   border-radius: 24px;
   padding: 1rem 1.5rem;
@@ -414,6 +415,116 @@
 .listening-text {
   color: #f44336;
   font-weight: 600;
+}
+
+/* Auto-suggest Dropdown Styles */
+.virtualassist-input-container {
+  position: relative;
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.virtualassist-suggestions-dropdown {
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  margin-bottom: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+  animation: slideUpFadeIn 0.2s ease-out;
+}
+
+.virtualassist-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #2d3748;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.virtualassist-suggestion-item:last-of-type {
+  border-bottom: none;
+}
+
+.virtualassist-suggestion-item:hover,
+.virtualassist-suggestion-item.selected {
+  background: rgba(66, 153, 225, 0.1);
+  color: #2b6cb0;
+  transform: translateX(4px);
+}
+
+.suggestion-icon {
+  font-size: 1rem;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.suggestion-footer {
+  padding: 0.5rem 1rem;
+  background: rgba(0, 0, 0, 0.03);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+.suggestion-footer span {
+  font-size: 0.75rem;
+  color: #718096;
+  font-style: italic;
+}
+
+@keyframes slideUpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Dark theme for suggestions */
+.virtualassist-bg .virtualassist-suggestions-dropdown {
+  background: rgba(45, 55, 72, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.virtualassist-bg .virtualassist-suggestion-item {
+  color: #e2e8f0;
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.virtualassist-bg .virtualassist-suggestion-item:hover,
+.virtualassist-bg .virtualassist-suggestion-item.selected {
+  background: rgba(66, 153, 225, 0.2);
+  color: #90cdf4;
+}
+
+.virtualassist-bg .suggestion-footer {
+  background: rgba(0, 0, 0, 0.2);
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.virtualassist-bg .suggestion-footer span {
+  color: #a0aec0;
 }
 
 /* Chat History Sidebar */
