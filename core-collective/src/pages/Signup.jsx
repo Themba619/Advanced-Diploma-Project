@@ -14,15 +14,60 @@ const Signup = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validatePassword = (pass) => {
+    if (pass.length === 0) {
+      setPasswordError('');
+      return false;
+    }
+    
+    if (pass.length < 8) {
+      setPasswordError('Password must be at least 8 characters long');
+      return false;
+    }
+    
+    if (!/[A-Z]/.test(pass)) {
+      setPasswordError('Password must contain at least one uppercase letter');
+      return false;
+    }
+    
+    if (!/[a-z]/.test(pass)) {
+      setPasswordError('Password must contain at least one lowercase letter');
+      return false;
+    }
+    
+    if (!/[0-9]/.test(pass)) {
+      setPasswordError('Password must contain at least one number');
+      return false;
+    }
+    
+    if (!/[@$!%*?&]/.test(pass)) {
+      setPasswordError('Password must contain at least one special character (@$!%*?&)');
+      return false;
+    }
+    
+    setPasswordError('');
+    return true;
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    validatePassword(newPassword);
+  };
 
   const handleSignup = async () => {
+    if (!validatePassword(password)) {
+      return;
+    }
+    
     try {
       const response = await axios.post('http://localhost:3001/api/auth/register', {
         fullName,
         email,
         password
       });
-
       navigate('/login');
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed');
@@ -74,18 +119,22 @@ const Signup = () => {
                 type="password"
                 placeholder="Password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 required
               />
             </div>
+            
+            {passwordError && <p className="error-message" style={{ fontSize: '0.8rem', marginTop: '-10px', marginBottom: '10px' }}>{passwordError}</p>}
 
-            <button className="sign-in-btn" onClick={handleSignup}>SIGN UP</button>
+            <button 
+              className="sign-in-btn" 
+              onClick={handleSignup}
+              disabled={!!passwordError || password.length === 0}
+            >
+              SIGN UP
+            </button>
 
             <p className="or-login-with">or sign up with</p>
-            {/* <div className="social-login">
-              <button className="social-btn">Google</button>
-              <button className="social-btn">Apple</button>
-            </div> */}
 
             <p className="signup-link">
               Already have an account? <a href="/login">Sign In</a>
