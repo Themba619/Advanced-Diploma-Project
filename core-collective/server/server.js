@@ -44,7 +44,7 @@ async function loginAndStoreCookie() {
   }
   const loginUrl = "https://api.privatecore.app/auth/login";
   const loginData = querystring.stringify({
-    username: "thembabiyela20@gmail.com",
+    username: "fakej710@gmail.com",
     password: "PointBreak2014!!!!",
   });
 
@@ -176,10 +176,12 @@ app.post("/api/auth/register", async (req, res) => {
   }
 
   // Password complexity requirements
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(password)) {
-    return res.status(400).json({ 
-      error: 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)'
+    return res.status(400).json({
+      error:
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)",
     });
   }
 
