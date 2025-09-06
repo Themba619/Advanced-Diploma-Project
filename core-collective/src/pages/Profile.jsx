@@ -1,14 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import '../styles/ProfileStyles/Profiles.css';
 
 const Profile = () => {
+  const navigate = useNavigate();
+
+  // State for profile data - will be populated from JWT token
   const [profileData, setProfileData] = useState({
-    username: "Evan Peters",
+    username: "",
     status: "Available",
-    course: "Computer Science",
-    year: "3rd Year",
+    course: "Not specified", // Default values since not in database yet
+    year: "Not specified",
     profileImage: ""
   });
+
+  // Load user data from JWT token on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        setProfileData(prev => ({
+          ...prev,
+          username: decoded.fullName || "Unknown User",
+          // Keep other fields as they were, since course/year not in database yet
+        }));
+      } catch (err) {
+        console.error("Failed to decode token:", err);
+        // If token is invalid, redirect to login
+        navigate("/login");
+      }
+    } else {
+      // No token found, redirect to login
+      navigate("/login");
+    }
+  }, [navigate]);
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",

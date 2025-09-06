@@ -44,13 +44,14 @@ const Signup = () => {
               required
             />
           </div>
-          <div>
+          <div style={{border: '2px solid red', margin: '10px 0'}}>
             <input
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{width: '100%', padding: '10px', fontSize: '16px'}}
             />
           </div>
           <div>

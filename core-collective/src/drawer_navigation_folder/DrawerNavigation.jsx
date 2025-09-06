@@ -14,6 +14,7 @@ const DrawerNavigation = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [userName, setUserName] = useState("User");
+  const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -30,6 +31,9 @@ const DrawerNavigation = () => {
           setUserName(decoded.fullName);
         } else if (decoded.email) {
           setUserName(decoded.email);
+        }
+        if (decoded.email) {
+          setUserEmail(decoded.email);
         }
       } catch (err) {
         console.error("Failed to decode token:", err);
@@ -276,8 +280,8 @@ const DrawerNavigation = () => {
                 </div>
               </div>
               <div className="profile-info">
-                <div className="profile-name">themba Biyela</div>
-                <div className="profile-email">thembabiyela20@gmail.com</div>
+                <div className="profile-name">{userName}</div>
+                <div className="profile-email">{userEmail}</div>
               </div>
               <button className="close-button" onClick={() => setShowProfile(false)}>×</button>
             </div>

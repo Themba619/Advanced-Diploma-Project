@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import ChatHistoryPopup from "../components/ChatHistoryPopup";
 import { AlertDialog } from "../components/ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
@@ -23,6 +24,39 @@ const VirtualAssistWaiting = () => (
 );
 
 const Home = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  // Helper function to get authentication headers
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      toast({
+        title: "Authentication Error",
+        description: "Please log in again to continue.",
+        variant: "destructive",
+      });
+      navigate('/login');
+      throw new Error('No authentication token found');
+    }
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
+  // Helper function to handle authentication errors
+  const handleAuthError = (error) => {
+    console.error('Authentication error:', error);
+    localStorage.removeItem('token'); // Clear invalid token
+    toast({
+      title: "Session Expired",
+      description: "Please log in again to continue.",
+      variant: "destructive",
+    });
+    navigate('/login');
+  };
+
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([
     {
@@ -53,7 +87,6 @@ const Home = () => {
   const speechSynthesisRef = useRef(null);
   const recognitionRef = useRef(null);
   const suggestionsRef = useRef(null);
-  const { toast } = useToast();
 
   // FAQ suggestions for auto-complete
   const faqSuggestions = [
@@ -83,8 +116,16 @@ const Home = () => {
   useEffect(() => {
     async function fetchChats() {
       try {
-        const res = await fetch("http://localhost:3001/api/private/getUserChatSessions");
-        if (!res.ok) throw new Error("Failed to fetch chat sessions");
+        const res = await fetch("http://localhost:3001/api/private/getUserChatSessions", {
+          headers: getAuthHeaders()
+        });
+        if (!res.ok) {
+          if (res.status === 401 || res.status === 403) {
+            handleAuthError(new Error('Authentication failed'));
+            return;
+          }
+          throw new Error("Failed to fetch chat sessions");
+        }
         const data = await res.json();
         const sessions = data.sessions || [];
         setChats(sessions);
@@ -100,6 +141,9 @@ const Home = () => {
         ]);
       } catch (err) {
         console.error("Failed to fetch chat sessions:", err);
+        if (err.message.includes('authentication')) {
+          handleAuthError(err);
+        }
       }
     }
     fetchChats();
@@ -403,17 +447,20 @@ const Home = () => {
     e.preventDefault();
     if (!input.trim()) return;
 
-    const userMsg = {
-      text: input,
-      sender: "user",
-      time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
+    try {
+      const authHeaders = getAuthHeaders(); // This will handle auth errors
+      
+      const userMsg = {
+        text: input,
+        sender: "user",
+        time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+      };
 
-    const originalInput = input; // Store original input for API call
-    setInput("");
-    setIsTyping(true);
-    setWaitingForBot(true);
-    setDisplayedBotMsg("");
+      const originalInput = input; // Store original input for API call
+      setInput("");
+      setIsTyping(true);
+      setWaitingForBot(true);
+      setDisplayedBotMsg("");
 
     // Add a processing message for longer requests with timeout reference
     const processingTimeout = setTimeout(() => {
@@ -441,7 +488,7 @@ const Home = () => {
 
         const response = await fetch("http://localhost:3001/api/private/createSessionFast", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: authHeaders,
           body: JSON.stringify({ persona_id: 0, description: "Convo" }),
           signal: controller.signal,
         });
@@ -531,7 +578,7 @@ const Home = () => {
       setTimeout(() => {
         fetch("http://localhost:3001/api/private/renameChatSession", {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: authHeaders,
           body: JSON.stringify({ chat_session_id: sessionId, name: userMsg.text }),
         }).then(response => {
           if (response.ok) {
@@ -582,7 +629,7 @@ const Home = () => {
 
       const response = await fetch("http://localhost:3001/api/private/sendMessage", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify(messageBody),
         signal: controller.signal,
       });
@@ -685,6 +732,25 @@ const Home = () => {
       setWaitingForBot(false);
       setIsTyping(false);
     }
+    } catch (err) {
+      console.error("Error in handleSend:", err);
+      if (err.message.includes('authentication')) {
+        handleAuthError(err);
+        return;
+      }
+      
+      const errorMsg = "I apologize, but there was an error processing your request. Please try again.";
+      setMessages((prev) => [
+        ...prev,
+        {
+          text: errorMsg,
+          sender: "bot",
+          time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        },
+      ]);
+      setWaitingForBot(false);
+      setIsTyping(false);
+    }
   };
 
   const handleShowHistory = () => {
@@ -696,7 +762,11 @@ const Home = () => {
     setActiveChat(id);
     setShowHistory(false);
     try {
-      const res = await fetch(`http://localhost:3001/api/private/getChatSession/${id}`);
+      const authHeaders = getAuthHeaders();
+
+      const res = await fetch(`http://localhost:3001/api/private/getChatSession/${id}`, {
+        headers: authHeaders
+      });
       if (!res.ok) throw new Error("Failed to fetch chat session");
       const data = await res.json();
       const chatMessages = (data.messages || [])
@@ -728,7 +798,12 @@ const Home = () => {
   const confirmDeleteChat = async () => {
     if (!chatToDelete) return;
     try {
-      const res = await fetch(`http://localhost:3001/api/private/deleteChatSession/${chatToDelete}`, { method: "DELETE" });
+      const authHeaders = getAuthHeaders();
+
+      const res = await fetch(`http://localhost:3001/api/private/deleteChatSession/${chatToDelete}`, { 
+        method: "DELETE",
+        headers: authHeaders
+      });
       if (!res.ok) throw new Error("Failed to delete chat session");
       setChats((prev) => prev.filter((c) => c.id !== chatToDelete));
       if (activeChat === chatToDelete) {

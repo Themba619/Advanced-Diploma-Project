@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 
-console.log("Loading FINAL privateController with complete AI functionality...");
+console.log(
+  "Loading FINAL privateController with complete AI functionality..."
+);
 
 let aiAuthCookie, pool;
 
@@ -14,53 +16,58 @@ function initDependencies() {
 
 exports.getChats = async (req, res) => {
   console.log("🎯 ENTERED getChats function!");
-  
+
   try {
     initDependencies();
     console.log("🔍 Starting getChats execution...");
-    
+
     const cookie = aiAuthCookie();
     if (!cookie) {
       console.log("❌ No AI Auth Cookie found");
-      return res.status(401).json({ error: "AI Auth Cookie not set. Please login first." });
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
     const userEmail = req.user?.email || "unknown";
     console.log(`👤 User email: ${userEmail}`);
-    
+
     // Get user ID first
     const userResult = await pool.query(
       "SELECT id FROM users WHERE email = $1",
       [userEmail]
     );
-    
+
     if (userResult.rows.length === 0) {
       console.log("❌ User not found in database");
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
     console.log(`👤 User ID: ${userId}`);
-    
+
     // Get all chat IDs belonging to this user
     const userChatsResult = await pool.query(
       "SELECT chat_id FROM chat_sessions WHERE user_id = $1",
       [userId]
     );
-    
-    const userChatIds = userChatsResult.rows.map(row => row.chat_id);
-    console.log(`📋 User has ${userChatIds.length} chat sessions:`, userChatIds);
-    
+
+    const userChatIds = userChatsResult.rows.map((row) => row.chat_id);
+    console.log(
+      `📋 User has ${userChatIds.length} chat sessions:`,
+      userChatIds
+    );
+
     // If user has no chats, return empty result
     if (userChatIds.length === 0) {
       console.log("📭 User has no chat sessions");
-      return res.json({ 
-        sessions: [], 
+      return res.json({
+        sessions: [],
         data: [],
-        message: "No chat sessions found for this user"
+        message: "No chat sessions found for this user",
       });
     }
-    
+
     // Fetch all sessions from PrivateCore API
     console.log("🌐 Fetching sessions from PrivateCore API...");
     const response = await fetch(
@@ -73,43 +80,53 @@ exports.getChats = async (req, res) => {
         },
       }
     );
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error("❌ PrivateCore API error:", errorText);
       return res.status(response.status).json({ error: errorText });
     }
-    
+
     const data = await response.json();
-    console.log(`📦 Raw API response sessions count:`, data.sessions?.length || 0);
-    
+    console.log(
+      `📦 Raw API response sessions count:`,
+      data.sessions?.length || 0
+    );
+
     // Filter sessions to only include the user's chat IDs
     let userSessions = [];
     if (data && data.sessions) {
-      console.log(`📊 Total sessions from PrivateCore: ${data.sessions.length}`);
-      
-      userSessions = data.sessions.filter(session => {
-        const sessionId = session.id || session.sessionId || session.session_id || session.chat_session_id;
+      console.log(
+        `📊 Total sessions from PrivateCore: ${data.sessions.length}`
+      );
+
+      userSessions = data.sessions.filter((session) => {
+        const sessionId =
+          session.id ||
+          session.sessionId ||
+          session.session_id ||
+          session.chat_session_id;
         const isUserSession = userChatIds.includes(sessionId);
         if (isUserSession) {
           console.log(`✅ Found user session: ${sessionId}`);
         }
         return isUserSession;
       });
-      
+
       console.log(`✅ Filtered sessions count: ${userSessions.length}`);
     }
-    
+
     // Return filtered data
     const result = {
       ...data,
       sessions: userSessions,
-      data: userSessions
+      data: userSessions,
     };
-    
-    console.log(`📤 Returning ${userSessions.length} sessions to user ${userEmail}`);
+
+    console.log(
+      `📤 Returning ${userSessions.length} sessions to user ${userEmail}`
+    );
     return res.json(result);
-    
   } catch (err) {
     console.error("❌ Error in getChats:", err);
     res.status(500).json({ error: err.message });
@@ -119,12 +136,14 @@ exports.getChats = async (req, res) => {
 exports.createChatSessionFast = async (req, res) => {
   try {
     console.log("🎯 ENTERED createChatSessionFast function!");
-    
+
     initDependencies();
-    
+
     const cookie = aiAuthCookie();
     if (!cookie) {
-      return res.status(401).json({ error: "AI Auth Cookie not set. Please login first." });
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
     const userEmail = req.user?.email || "unknown";
@@ -135,12 +154,12 @@ exports.createChatSessionFast = async (req, res) => {
       "SELECT id FROM users WHERE email = $1",
       [userEmail]
     );
-    
+
     if (userResult.rows.length === 0) {
       console.log("❌ User not found in database");
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
     console.log(`👤 User ID: ${userId}`);
 
@@ -165,23 +184,25 @@ exports.createChatSessionFast = async (req, res) => {
       console.error("❌ PrivateCore API error:", errorText);
       return res.status(response.status).json({ error: errorText });
     }
-    
+
     const data = await response.json();
     const newChatId = data.chat_session_id;
-    
+
     console.log(`🆕 PrivateCore created chat session: ${newChatId}`);
-    
+
     // Save the chat ID to the user in our database
     try {
       await pool.query(
         "INSERT INTO chat_sessions (user_id, chat_id) VALUES ($1, $2)",
         [userId, newChatId]
       );
-      console.log(`✅ Saved chat ${newChatId} to user ID ${userId} (${userEmail})`);
+      console.log(
+        `✅ Saved chat ${newChatId} to user ID ${userId} (${userEmail})`
+      );
     } catch (dbError) {
       console.error("❌ Error saving chat to database:", dbError);
     }
-    
+
     console.log("📤 Returning chat session ID to frontend");
     res.json({ chat_session_id: newChatId });
   } catch (err) {
@@ -192,17 +213,19 @@ exports.createChatSessionFast = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   console.log("🎯 ENTERED sendMessage function!");
-  
+
   try {
     initDependencies();
-    
+
     const cookie = aiAuthCookie();
     if (!cookie) {
       console.log("❌ No AI Auth Cookie found");
-      return res.status(401).json({ error: "AI Auth Cookie not set. Please login first." });
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
-    const userEmail = req.user?.email || 'unknown';
+    const userEmail = req.user?.email || "unknown";
     const {
       chat_session_id,
       message,
@@ -230,29 +253,38 @@ exports.sendMessage = async (req, res) => {
       is_new_session = false,
     } = req.body;
 
-    console.log(`👤 User: ${userEmail} sending message to session: ${chat_session_id}`);
+    console.log(
+      `👤 User: ${userEmail} sending message to session: ${chat_session_id}`
+    );
     console.log(`💬 Message: ${message}`);
 
     if (!chat_session_id || !message) {
-      return res.status(400).json({ error: "chat_session_id and message are required." });
+      return res
+        .status(400)
+        .json({ error: "chat_session_id and message are required." });
     }
 
     // Verify user owns this chat session
-    const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [userEmail]);
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
-    
+
     // Check if user has access to this chat session
     const chatCheck = await pool.query(
-      'SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2',
+      "SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
       [userId, chat_session_id]
     );
-    
+
     if (chatCheck.rows.length === 0) {
-      return res.status(403).json({ error: 'Access denied to this chat session' });
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
     }
 
     const body = {
@@ -307,9 +339,9 @@ exports.sendMessage = async (req, res) => {
     // Parse streaming JSON lines
     const lines = rawText.split(/\r?\n/).filter(Boolean);
     let assistantMessage = null;
-    
+
     console.log(`📦 Processing ${lines.length} response lines...`);
-    
+
     for (const line of lines) {
       try {
         const obj = JSON.parse(line);
@@ -321,20 +353,22 @@ exports.sendMessage = async (req, res) => {
         // Ignore lines that aren't valid JSON
       }
     }
-    
+
     console.log("📤 Returning AI response to frontend");
     res.json({ message: assistantMessage || null });
-    
   } catch (err) {
     console.error("❌ Failed to send message to model:", err);
 
     if (err.name === "AbortError") {
       return res.status(408).json({
-        error: "The AI service is taking longer than expected. Please try your request again.",
+        error:
+          "The AI service is taking longer than expected. Please try your request again.",
       });
     }
 
-    return res.status(500).json({ error: err.message || "Internal server error" });
+    return res
+      .status(500)
+      .json({ error: err.message || "Internal server error" });
   }
 };
 
@@ -345,33 +379,40 @@ exports.createChatSession = async (req, res) => {
 exports.getChatSessionById = async (req, res) => {
   try {
     initDependencies();
-    
+
     const cookie = aiAuthCookie();
     if (!cookie) {
-      return res.status(401).json({ error: "AI Auth Cookie not set. Please login first." });
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
     const { id } = req.params;
-    const userEmail = req.user?.email || 'unknown';
-    
+    const userEmail = req.user?.email || "unknown";
+
     console.log(`👤 User: ${userEmail} requesting session: ${id}`);
 
     // Verify user owns this chat session
-    const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [userEmail]);
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
-    
+
     // Check if user has access to this chat session
     const chatCheck = await pool.query(
-      'SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2',
+      "SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
       [userId, id]
     );
-    
+
     if (chatCheck.rows.length === 0) {
-      return res.status(403).json({ error: 'Access denied to this chat session' });
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
     }
 
     const response = await fetch(
@@ -401,35 +442,44 @@ exports.getChatSessionById = async (req, res) => {
 exports.renameChatSession = async (req, res) => {
   try {
     initDependencies();
-    
+
     const cookie = aiAuthCookie();
     if (!cookie) {
-      return res.status(401).json({ error: "AI Auth Cookie not set. Please login first." });
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
-    const userEmail = req.user?.email || 'unknown';
+    const userEmail = req.user?.email || "unknown";
     const { chat_session_id, name } = req.body;
 
     if (!chat_session_id || !name) {
-      return res.status(400).json({ error: "chat_session_id and name are required." });
+      return res
+        .status(400)
+        .json({ error: "chat_session_id and name are required." });
     }
 
     // Verify user owns this chat session
-    const userResult = await pool.query('SELECT id FROM users WHERE email = $1', [userEmail]);
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
     if (userResult.rows.length === 0) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
-    
+
     // Check if user has access to this chat session
     const chatCheck = await pool.query(
-      'SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2',
+      "SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
       [userId, chat_session_id]
     );
-    
+
     if (chatCheck.rows.length === 0) {
-      return res.status(403).json({ error: 'Access denied to this chat session' });
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
     }
 
     const response = await fetch(
@@ -460,38 +510,39 @@ exports.renameChatSession = async (req, res) => {
 exports.deleteChatSession = async (req, res) => {
   try {
     initDependencies();
-    
+
     const { sessionId } = req.params;
     const userEmail = req.user?.email || "unknown";
-    
+
     console.log(`🗑️ Deleting chat session ${sessionId} for user ${userEmail}`);
-    
+
     // Get user ID
     const userResult = await pool.query(
       "SELECT id FROM users WHERE email = $1",
       [userEmail]
     );
-    
+
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: "User not found" });
     }
-    
+
     const userId = userResult.rows[0].id;
-    
+
     // Remove the chat session from our database
     const deleteResult = await pool.query(
       "DELETE FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
       [userId, sessionId]
     );
-    
+
     if (deleteResult.rowCount === 0) {
       console.log(`❌ Chat session ${sessionId} not found for user`);
       return res.status(404).json({ error: "Chat session not found" });
     }
-    
-    console.log(`✅ Removed chat ${sessionId} from user ${userEmail}'s sessions`);
+
+    console.log(
+      `✅ Removed chat ${sessionId} from user ${userEmail}'s sessions`
+    );
     res.json({ message: "Chat session deleted successfully" });
-    
   } catch (err) {
     console.error("❌ Error deleting chat session:", err);
     res.status(500).json({ error: err.message });
@@ -518,4 +569,6 @@ exports.setChatHistory = async (req, res) => {
   res.json({ message: "setChatHistory placeholder" });
 };
 
-console.log("FINAL privateController with complete AI functionality loaded successfully");
+console.log(
+  "FINAL privateController with complete AI functionality loaded successfully"
+);

@@ -11,17 +11,22 @@ const querystring = require("querystring");
 
 let aiAuthCookie = null;
 
-// Export cookie for use in other modules
-module.exports.aiAuthCookie = () => aiAuthCookie;
-
 const app = express();
 const PORT = process.env.PORT || 3001;
 const FILE_PATH = path.join(__dirname, "forumData.json");
 
 // PostgreSQL connection
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  user: "postgres",
+  host: "localhost",
+  database: "corecollective",
+  password: "postgres",
+  port: 5432,
 });
+
+// Export cookie and pool for use in other modules
+module.exports.aiAuthCookie = () => aiAuthCookie;
+module.exports.pool = pool;
 
 // Routes
 const profanityRoute = require("./routes/profanityRoute");
@@ -33,9 +38,31 @@ const privateRoute = require("./routes/privateRoute");
 app.use(cors());
 app.use(express.json());
 
+// JWT Authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token required" });
+  }
+
+  jwt.verify(
+    token,
+    process.env.JWT_SECRET || "default_jwt_secret",
+    (err, user) => {
+      if (err) {
+        return res.status(403).json({ error: "Invalid or expired token" });
+      }
+      req.user = user; // { userId, email, fullName }
+      next();
+    }
+  );
+};
+
 app.use("/api/profanityRoute", profanityRoute);
 app.use("/api/email", emailRoute);
-app.use("/api/private", privateRoute);
+app.use("/api/private", authenticateToken, privateRoute); // Protect private routes with JWT
 
 async function loginAndStoreCookie() {
   if (aiAuthCookie) {
@@ -94,6 +121,66 @@ app.get("/api/db-check", async (req, res) => {
     console.error("Database connection test failed:", err);
     res.status(500).json({ status: "fail", error: err.message });
   }
+});
+
+// Add this new endpoint:
+app.get("/api/db-tables", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT table_name, column_name, data_type 
+      FROM information_schema.columns 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name, ordinal_position
+    `);
+    res.json({ tables: result.rows });
+  } catch (err) {
+    console.error("Error getting tables:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create user_sessions table if it doesn't exist
+app.get("/api/init-db", async (req, res) => {
+  try {
+    // Create users table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        full_name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password_hash VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Create user_sessions table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS user_sessions (
+        id SERIAL PRIMARY KEY,
+        user_email VARCHAR(255) NOT NULL,
+        session_id VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(user_email, session_id)
+      )
+    `);
+
+    res.json({
+      message:
+        "Database initialized successfully - users and user_sessions tables created",
+    });
+  } catch (err) {
+    console.error("Error initializing database:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Test endpoint for JWT authentication
+app.get("/api/test-auth", authenticateToken, (req, res) => {
+  res.json({
+    message: "Authentication successful",
+    user: req.user,
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // --- Existing JSON file-based post and reply endpoints (untouched) ---
@@ -170,18 +257,39 @@ app.post("/posts/:postId/replies", async (req, res) => {
 
 //Register endpoint ---
 app.post("/api/auth/register", async (req, res) => {
-  const { fullName, email, password } = req.body;
-  if (!fullName || !email || !password) {
-    return res.status(400).json({ error: "All fields are required" });
+  const { fullName, name, email, password } = req.body;
+
+  // Handle both fullName and name fields
+  const finalFullName = fullName || name;
+
+  // Debug logging
+  console.log("Registration attempt:", {
+    fullName: fullName || "undefined",
+    name: name || "undefined",
+    finalFullName: finalFullName || "undefined",
+    email: email || "undefined",
+    password: password ? "[PROVIDED]" : "undefined",
+    bodyKeys: Object.keys(req.body),
+  });
+
+  if (!finalFullName || !email || !password) {
+    return res.status(400).json({
+      error: "All fields are required",
+      received: {
+        fullName: !!finalFullName,
+        email: !!email,
+        password: !!password,
+      },
+    });
   }
 
-  // Password complexity requirements
+  // Password complexity requirements - updated to include more special characters
   const passwordRegex =
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
   if (!passwordRegex.test(password)) {
     return res.status(400).json({
       error:
-        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&)",
+        "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)",
     });
   }
 
@@ -197,7 +305,7 @@ app.post("/api/auth/register", async (req, res) => {
     const passwordHash = await bcrypt.hash(password, salt);
     const result = await pool.query(
       "INSERT INTO users (full_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, email",
-      [fullName, email, passwordHash]
+      [finalFullName, email, passwordHash]
     );
     res.status(201).json({ message: "User registered", user: result.rows[0] });
   } catch (err) {
