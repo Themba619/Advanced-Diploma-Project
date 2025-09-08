@@ -21,11 +21,31 @@
 }
 
 .icon {
-  transition: transform 0.2s ease;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
 .icon:hover {
   transform: scale(1.2);
+}
+
+.icon.liked {
+  color: #007bff !important;
+}
+
+.icon.like {
+  color: #666;
+}
+
+.likes-count {
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  margin: 0;
+  padding: 4px 8px;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  min-width: 20px;
+  text-align: center;
 }
 
 .like {

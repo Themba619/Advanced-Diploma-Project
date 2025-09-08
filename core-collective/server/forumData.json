@@ -16,14 +16,25 @@
         "user": "Anonymous",
         "content": "Test",
         "timeAgo": "2025-08-23T12:39:22.019Z",
-        "replies": []
+        "replies": [],
+        "likes": 1,
+        "likedBy": [
+          "frank@foot.com"
+        ]
       },
       {
         "id": 1747060938012,
         "user": "Anonymous",
         "content": "Second reply test",
         "timeAgo": "2025-05-12T14:42:18.012Z",
-        "replies": []
+        "replies": [],
+        "likes": 4,
+        "likedBy": [
+          "user1@example.com",
+          "user2@example.com",
+          "user3@example.com",
+          "frank@foot.com"
+        ]
       },
       {
         "id": 1.1,
@@ -36,8 +47,17 @@
             "user": "NewbieUJ",
             "content": "Thanks! Is there a specific time I should go?",
             "timeAgo": "2025-04-25T11:00:00.000Z",
-            "replies": []
+            "replies": [],
+            "likes": 0,
+            "likedBy": []
           }
+        ],
+        "likes": 4,
+        "likedBy": [
+          "user4@example.com",
+          "user5@example.com",
+          "frank@foot.com",
+          "Peter@smith.com"
         ]
       }
     ]
@@ -66,6 +86,10 @@
             "timeAgo": "2025-05-11T16:32:01.017Z",
             "replies": []
           }
+        ],
+        "likes": 1,
+        "likedBy": [
+          "frank@foot.com"
         ]
       }
     ]

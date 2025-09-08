@@ -224,6 +224,8 @@ app.post("/posts/:postId/replies", async (req, res) => {
     content,
     timeAgo: new Date(),
     replies: [],
+    likes: 0,
+    likedBy: [],
   };
   try {
     const data = await fs.readFile(FILE_PATH, "utf8");
@@ -252,6 +254,57 @@ app.post("/posts/:postId/replies", async (req, res) => {
   } catch (error) {
     console.error("Error saving reply:", error);
     res.status(500).json({ error: "Failed to save reply" });
+  }
+});
+
+// Like/Unlike reply endpoints
+app.post("/posts/:postId/replies/:replyId/like", authenticateToken, async (req, res) => {
+  const postId = parseInt(req.params.postId);
+  const replyId = parseFloat(req.params.replyId);
+  const userEmail = req.user.email;
+
+  try {
+    const data = await fs.readFile(FILE_PATH, "utf8");
+    let posts = JSON.parse(data);
+
+    const updateReplyLikes = (replies) => {
+      return replies.map((reply) => {
+        if (reply.id === replyId) {
+          // Initialize likes fields if they don't exist
+          if (!reply.likes) reply.likes = 0;
+          if (!reply.likedBy) reply.likedBy = [];
+
+          // Check if user already liked this reply
+          const userIndex = reply.likedBy.indexOf(userEmail);
+          if (userIndex === -1) {
+            // User hasn't liked it, add like
+            reply.likes++;
+            reply.likedBy.push(userEmail);
+          } else {
+            // User already liked it, remove like (unlike)
+            reply.likes--;
+            reply.likedBy.splice(userIndex, 1);
+          }
+          return reply;
+        }
+        // Check nested replies
+        reply.replies = updateReplyLikes(reply.replies);
+        return reply;
+      });
+    };
+
+    posts = posts.map((post) => {
+      if (post.id === postId) {
+        post.replies = updateReplyLikes(post.replies);
+      }
+      return post;
+    });
+
+    await fs.writeFile(FILE_PATH, JSON.stringify(posts, null, 2));
+    res.status(200).json({ message: "Like status updated successfully" });
+  } catch (error) {
+    console.error("Error updating like:", error);
+    res.status(500).json({ error: "Failed to update like" });
   }
 });
 
@@ -349,6 +402,96 @@ app.post("/api/auth/login", async (req, res) => {
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ error: "Server error during login" });
+  }
+});
+
+//Change Password endpoint
+app.post("/api/auth/change-password", authenticateToken, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ 
+      error: "Current password and new password are required" 
+    });
+  }
+
+  // Password complexity requirements - same as registration
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+  if (!passwordRegex.test(newPassword)) {
+    return res.status(400).json({
+      error:
+        "New password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)",
+    });
+  }
+
+  try {
+    // Get user from database using userId from JWT token
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE id = $1",
+      [req.user.userId]
+    );
+    const user = userResult.rows[0];
+    
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Verify current password
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!isCurrentPasswordValid) {
+      return res.status(401).json({ error: "Current password is incorrect" });
+    }
+
+    // Check if new password is different from current password
+    const isSamePassword = await bcrypt.compare(newPassword, user.password_hash);
+    if (isSamePassword) {
+      return res.status(400).json({ 
+        error: "New password must be different from current password" 
+      });
+    }
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    const newPasswordHash = await bcrypt.hash(newPassword, salt);
+
+    // Update password in database
+    await pool.query(
+      "UPDATE users SET password_hash = $1 WHERE id = $2",
+      [newPasswordHash, req.user.userId]
+    );
+
+    res.json({ message: "Password changed successfully" });
+    
+  } catch (err) {
+    console.error("Change password error:", err);
+    res.status(500).json({ error: "Server error during password change" });
+  }
+});
+
+// Get user profile endpoint
+app.get("/api/auth/profile", authenticateToken, async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      "SELECT id, full_name, email, created_at FROM users WHERE id = $1",
+      [req.user.userId]
+    );
+    
+    const user = userResult.rows[0];
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({
+      id: user.id,
+      fullName: user.full_name,
+      email: user.email,
+      createdAt: user.created_at
+    });
+    
+  } catch (err) {
+    console.error("Get profile error:", err);
+    res.status(500).json({ error: "Server error while fetching profile" });
   }
 });
 

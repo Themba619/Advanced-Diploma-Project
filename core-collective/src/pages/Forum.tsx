@@ -23,6 +23,8 @@ interface Reply {
   content: string;
   timeAgo: Date;
   replies: Reply[];
+  likes: number;
+  likedBy: string[]; // Array of user emails who liked this reply
 }
 
 interface Post {
@@ -77,8 +79,12 @@ const defaultPosts: Post[] = [
             content: "Thanks! Is there a specific time I should go?",
             timeAgo: new Date("2025-04-25T11:00:00Z"),
             replies: [],
+            likes: 0,
+            likedBy: [],
           },
         ],
+        likes: 2,
+        likedBy: ["user1@example.com", "user2@example.com"],
       },
     ],
   },
@@ -287,9 +293,13 @@ const fetchPosts = async (): Promise<Post[]> => {
     replies: post.replies.map((reply: Reply) => ({
       ...reply,
       timeAgo: new Date(reply.timeAgo),
+      likes: reply.likes || 0,
+      likedBy: reply.likedBy || [],
       replies: reply.replies.map((nestedReply: Reply) => ({
         ...nestedReply,
         timeAgo: new Date(nestedReply.timeAgo),
+        likes: nestedReply.likes || 0,
+        likedBy: nestedReply.likedBy || [],
       })),
     })),
   }));
@@ -329,6 +339,34 @@ const addReply = async ({
   return res.json();
 };
 
+const toggleLike = async ({
+  postId,
+  replyId,
+}: {
+  postId: number;
+  replyId: number;
+}) => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    throw new Error("User not authenticated");
+  }
+
+  const res = await fetch(`http://localhost:3001/posts/${postId}/replies/${replyId}/like`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json"
+    }
+  });
+  
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to update like status");
+  }
+  
+  return res.json();
+};
+
 const Forum: React.FC = () => {
   const topics = [
     "All Topics",
@@ -356,7 +394,8 @@ const Forum: React.FC = () => {
     queryKey: ["posts"],
     queryFn: fetchPosts,
     retry: 1,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds - refresh more frequently for real-time updates
+    refetchInterval: 1000 * 60, // Auto-refetch every minute to see other users' likes
   });
 
   // Add new post
@@ -381,6 +420,18 @@ const Forum: React.FC = () => {
     },
     onError: (error: Error) => {
       toast.error(error.message || "Failed to add reply");
+    },
+  });
+
+  // Toggle like/unlike
+  const likeMutation = useMutation({
+    mutationFn: toggleLike,
+    onSuccess: () => {
+      // Invalidate and refetch posts to get updated like counts
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to update like");
     },
   });
 
@@ -481,7 +532,10 @@ const Forum: React.FC = () => {
     postId: number,
     level: number = 1
   ) => {
-    return replies.map((reply) => (
+    // Sort replies by likes (most liked first)
+    const sortedReplies = [...replies].sort((a, b) => (b.likes || 0) - (a.likes || 0));
+    
+    return sortedReplies.map((reply) => (
       <div key={reply.id} className={`reply level-${level}`}>
         <div className="reply-content">
           <span className="reply-user">{reply.user}</span>
@@ -505,7 +559,13 @@ const Forum: React.FC = () => {
           >
             {expandedReplies[`form-${reply.id}`] ? "Cancel Reply" : "Reply"}
           </button>
-          <ForumLikes />
+          <ForumLikes 
+            postId={postId}
+            replyId={reply.id}
+            initialLikes={reply.likes || 0}
+            initialLikedBy={reply.likedBy || []}
+            onToggleLike={(postId, replyId) => likeMutation.mutate({ postId, replyId })}
+          />
         </div>
         {expandedReplies[`form-${reply.id}`] && (
           <ReplyForm

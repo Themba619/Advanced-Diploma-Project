@@ -1,12 +1,78 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 import "../styles/SettingsStyles/Settings.css";
 import { FaBell, FaPalette, FaShieldAlt, FaUserCog } from "react-icons/fa";
 
 const Settings = () => {
+  const navigate = useNavigate();
+
+  // State for user data
+  const [userData, setUserData] = useState({
+    fullName: "",
+    email: ""
+  });
+  const [userLoading, setUserLoading] = useState(true);
 
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
   const [twoFactor, setTwoFactor] = useState(false);
+
+  // Load user data from backend on component mount
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        // Verify token and get user data
+        const response = await fetch("http://localhost:3001/api/auth/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token is invalid, redirect to login
+            localStorage.removeItem("token");
+            navigate("/login");
+            return;
+          }
+          throw new Error("Failed to fetch user data");
+        }
+
+        const user = await response.json();
+        setUserData({
+          fullName: user.fullName || "",
+          email: user.email || ""
+        });
+
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+        // If there's an error, try to decode the token as fallback
+        try {
+          const decoded = jwtDecode(token);
+          setUserData({
+            fullName: decoded.fullName || "Unknown User",
+            email: decoded.email || ""
+          });
+        } catch (decodeErr) {
+          console.error("Failed to decode token:", decodeErr);
+          navigate("/login");
+        }
+      } finally {
+        setUserLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [navigate]);
 
   return (
     <div className="settings-bg">
@@ -26,16 +92,35 @@ const Settings = () => {
             <span className="settings-card-title">Profile</span>
           </div>
           <div className="settings-card-desc">Update your personal information and profile details</div>
-          <div className="settings-profile-row">
-            <div>
-              <label className="settings-label">Full Name</label>
-              <input className="settings-input" type="text" value="John Doe" disabled />
+          
+          {userLoading ? (
+            <div style={{ padding: '20px', textAlign: 'center', color: '#666' }}>
+              Loading profile information...
             </div>
-            <div>
-              <label className="settings-label">Email Address</label>
-              <input className="settings-input" type="email" value="john@example.com" disabled />
+          ) : (
+            <div className="settings-profile-row">
+              <div>
+                <label className="settings-label">Full Name</label>
+                <input 
+                  className="settings-input" 
+                  type="text" 
+                  value={userData.fullName} 
+                  disabled 
+                  style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                />
+              </div>
+              <div>
+                <label className="settings-label">Email Address</label>
+                <input 
+                  className="settings-input" 
+                  type="email" 
+                  value={userData.email} 
+                  disabled 
+                  style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                />
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* Notifications */}
@@ -106,10 +191,10 @@ const Settings = () => {
             </label>
           </div>
           <hr className="settings-divider" />
-          <div className="settings-actions">
+          {/* <div className="settings-actions">
             <button type="button" className="settings-btn settings-btn-outline">Change Password</button>
             <button type="button" className="settings-btn settings-btn-outline">Update Password</button>
-          </div>
+          </div> */}
         </section>
 
         {/* Save Changes Button */}

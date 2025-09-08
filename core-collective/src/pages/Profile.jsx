@@ -6,35 +6,75 @@ import '../styles/ProfileStyles/Profiles.css';
 const Profile = () => {
   const navigate = useNavigate();
 
-  // State for profile data - will be populated from JWT token
+  // State for profile data
   const [profileData, setProfileData] = useState({
-    username: "",
+    fullName: "",
+    email: "",
     status: "Available",
     course: "Not specified", // Default values since not in database yet
     year: "Not specified",
     profileImage: ""
   });
 
-  // Load user data from JWT token on component mount
+  // State for loading user data
+  const [userLoading, setUserLoading] = useState(true);
+
+  // Load user data from backend on component mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
       try {
-        const decoded = jwtDecode(token);
+        // Verify token and get user data
+        const response = await fetch("http://localhost:3001/api/auth/profile", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Token is invalid, redirect to login
+            localStorage.removeItem("token");
+            navigate("/login");
+            return;
+          }
+          throw new Error("Failed to fetch user data");
+        }
+
+        const userData = await response.json();
         setProfileData(prev => ({
           ...prev,
-          username: decoded.fullName || "Unknown User",
-          // Keep other fields as they were, since course/year not in database yet
+          fullName: userData.fullName || "",
+          email: userData.email || "",
         }));
+
       } catch (err) {
-        console.error("Failed to decode token:", err);
-        // If token is invalid, redirect to login
-        navigate("/login");
+        console.error("Failed to fetch user data:", err);
+        // If there's an error, try to decode the token as fallback
+        try {
+          const decoded = jwtDecode(token);
+          setProfileData(prev => ({
+            ...prev,
+            fullName: decoded.fullName || "Unknown User",
+            email: decoded.email || "",
+          }));
+        } catch (decodeErr) {
+          console.error("Failed to decode token:", decodeErr);
+          navigate("/login");
+        }
+      } finally {
+        setUserLoading(false);
       }
-    } else {
-      // No token found, redirect to login
-      navigate("/login");
-    }
+    };
+
+    fetchUserData();
   }, [navigate]);
 
   const [passwordData, setPasswordData] = useState({
@@ -48,6 +88,10 @@ const Profile = () => {
     new: false,
     confirm: false
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const [imagePreview, setImagePreview] = useState("");
 
@@ -72,6 +116,12 @@ const Profile = () => {
   };
 
   const handlePasswordChange = (field, value) => {
+    // Clear error and success messages when user starts typing
+    if (error || success) {
+      setError("");
+      setSuccess("");
+    }
+    
     setPasswordData(prev => ({
       ...prev,
       [field]: value
@@ -85,25 +135,83 @@ const Profile = () => {
     }));
   };
 
-  const handleSave = () => {
-    if (passwordData.currentPassword || passwordData.newPassword || passwordData.confirmPassword) {
+  const handleSave = async () => {
+    setError("");
+    setSuccess("");
+    
+    // Check if password fields are filled
+    const hasPasswordData = passwordData.currentPassword || passwordData.newPassword || passwordData.confirmPassword;
+    
+    if (hasPasswordData) {
+      // Validate password fields
       if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
-        alert("Please fill in all password fields or leave them all empty.");
+        setError("Please fill in all password fields or leave them all empty.");
         return;
       }
+      
       if (passwordData.newPassword !== passwordData.confirmPassword) {
-        alert("New passwords do not match!");
+        setError("New passwords do not match!");
         return;
       }
+
+      if (passwordData.newPassword.length < 8) {
+        setError("New password must be at least 8 characters long.");
+        return;
+      }
+
+      // Password complexity check
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+      if (!passwordRegex.test(passwordData.newPassword)) {
+        setError("New password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#).");
+        return;
+      }
+
+      try {
+        setLoading(true);
+        
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setError("Authentication token not found. Please log in again.");
+          navigate("/login");
+          return;
+        }
+
+        const response = await fetch("http://localhost:3001/api/auth/change-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            currentPassword: passwordData.currentPassword,
+            newPassword: passwordData.newPassword
+          })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Failed to change password");
+        }
+
+        setSuccess("Password changed successfully!");
+        setPasswordData({
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: ""
+        });
+
+      } catch (err) {
+        console.error("Password change error:", err);
+        setError(err.message || "Failed to change password. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      // If no password change, just show success for profile data
+      console.log("Profile data saved:", profileData);
+      setSuccess("Profile updated successfully!");
     }
-    console.log("Profile data saved:", profileData);
-    console.log("Password data:", passwordData);
-    alert("Profile updated successfully!");
-    setPasswordData({
-      currentPassword: "",
-      newPassword: "",
-      confirmPassword: ""
-    });
   };
 
   return (
@@ -142,41 +250,58 @@ const Profile = () => {
                 />
               </label>
             </div>
-            <h2 className="profile-username">{profileData.username}</h2>
+            <h2 className="profile-username">{profileData.fullName}</h2>
           </div>
 
-          {/* Profile Form */}
-          <div className="profile-form">
-            {/* Basic Information */}
-            <div className="form-section">
-              <h3 className="section-title">Basic Information</h3>
-              
-              <div className="form-group">
-                <label className="form-label">Username</label>
-                <input
-                  type="text"
-                  className="form-input"
-                  value={profileData.username}
-                  onChange={(e) => handleInputChange('username', e.target.value)}
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label">Status</label>
-                <select
-                  className="form-select"
-                  value={profileData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value)}
-                >
-                  <option value="Available">Available</option>
-                  <option value="Busy">Busy</option>
-                  <option value="Do Not Disturb">Do Not Disturb</option>
-                  <option value="Away">Away</option>
-                  <option value="In class">In class</option>
-                  <option value="Studying">Studying</option>
-                </select>
-              </div>
+          {/* Show loading state while fetching user data */}
+          {userLoading ? (
+            <div style={{ textAlign: 'center', padding: '20px' }}>
+              <p>Loading profile...</p>
             </div>
+          ) : (
+            <div className="profile-form">
+              {/* Basic Information */}
+              <div className="form-section">
+                <h3 className="section-title">Basic Information</h3>
+                
+                <div className="form-group">
+                  <label className="form-label">Full Name</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={profileData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Email Address</label>
+                  <input
+                    type="email"
+                    className="form-input"
+                    value={profileData.email}
+                    disabled
+                    style={{ backgroundColor: '#f5f5f5', cursor: 'not-allowed' }}
+                  />
+                  <small style={{ color: '#666', fontSize: '12px' }}>Email cannot be changed</small>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Status</label>
+                  <select
+                    className="form-select"
+                    value={profileData.status}
+                    onChange={(e) => handleInputChange('status', e.target.value)}
+                  >
+                    <option value="Available">Available</option>
+                    <option value="Busy">Busy</option>
+                    <option value="Do Not Disturb">Do Not Disturb</option>
+                    <option value="Away">Away</option>
+                    <option value="In class">In class</option>
+                    <option value="Studying">Studying</option>
+                  </select>
+                </div>
+              </div>
 
             {/* Academic Information */}
             <div className="form-section">
@@ -212,6 +337,35 @@ const Profile = () => {
             {/* Change Password */}
             <div className="form-section">
               <h3 className="section-title">Change Password</h3>
+              
+              {/* Error and Success Messages */}
+              {error && (
+                <div className="alert alert-error" style={{
+                  backgroundColor: '#fee2e2',
+                  border: '1px solid #fecaca',
+                  color: '#dc2626',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginBottom: '16px',
+                  fontSize: '14px'
+                }}>
+                  {error}
+                </div>
+              )}
+              
+              {success && (
+                <div className="alert alert-success" style={{
+                  backgroundColor: '#dcfce7',
+                  border: '1px solid #bbf7d0',
+                  color: '#16a34a',
+                  padding: '12px',
+                  borderRadius: '6px',
+                  marginBottom: '16px',
+                  fontSize: '14px'
+                }}>
+                  {success}
+                </div>
+              )}
               
               <div className="form-group">
                 <label className="form-label">Current Password</label>
@@ -301,10 +455,19 @@ const Profile = () => {
               </div>
             </div>
 
-            <button className="save-button" onClick={handleSave}>
-              Save Changes
+            <button 
+              className="save-button" 
+              onClick={handleSave}
+              disabled={loading}
+              style={{
+                opacity: loading ? 0.7 : 1,
+                cursor: loading ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {loading ? "Changing Password..." : "Save Changes"}
             </button>
-          </div>
+            </div>
+          )}
         </div>
       </div>
 
