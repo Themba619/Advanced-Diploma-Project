@@ -351,19 +351,22 @@ const toggleLike = async ({
     throw new Error("User not authenticated");
   }
 
-  const res = await fetch(`http://localhost:3001/posts/${postId}/replies/${replyId}/like`, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
+  const res = await fetch(
+    `http://localhost:3001/posts/${postId}/replies/${replyId}/like`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
     }
-  });
-  
+  );
+
   if (!res.ok) {
     const err = await res.json();
     throw new Error(err.error || "Failed to update like status");
   }
-  
+
   return res.json();
 };
 
@@ -533,8 +536,10 @@ const Forum: React.FC = () => {
     level: number = 1
   ) => {
     // Sort replies by likes (most liked first)
-    const sortedReplies = [...replies].sort((a, b) => (b.likes || 0) - (a.likes || 0));
-    
+    const sortedReplies = [...replies].sort(
+      (a, b) => (b.likes || 0) - (a.likes || 0)
+    );
+
     return sortedReplies.map((reply) => (
       <div key={reply.id} className={`reply level-${level}`}>
         <div className="reply-content">
@@ -559,12 +564,14 @@ const Forum: React.FC = () => {
           >
             {expandedReplies[`form-${reply.id}`] ? "Cancel Reply" : "Reply"}
           </button>
-          <ForumLikes 
+          <ForumLikes
             postId={postId}
             replyId={reply.id}
             initialLikes={reply.likes || 0}
             initialLikedBy={reply.likedBy || []}
-            onToggleLike={(postId, replyId) => likeMutation.mutate({ postId, replyId })}
+            onToggleLike={(postId, replyId) =>
+              likeMutation.mutate({ postId, replyId })
+            }
           />
         </div>
         {expandedReplies[`form-${reply.id}`] && (

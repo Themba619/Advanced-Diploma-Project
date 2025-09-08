@@ -12,13 +12,13 @@ interface ForumLikesProps {
   onToggleLike?: (postId: number, replyId: number) => void;
 }
 
-const ForumLikes: React.FC<ForumLikesProps> = ({ 
-  postId, 
-  replyId, 
-  initialLikes, 
+const ForumLikes: React.FC<ForumLikesProps> = ({
+  postId,
+  replyId,
+  initialLikes,
   initialLikedBy,
   onLikesChange,
-  onToggleLike 
+  onToggleLike,
 }) => {
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(initialLikes);
@@ -64,10 +64,10 @@ const ForumLikes: React.FC<ForumLikesProps> = ({
     // Optimistic update - update UI immediately
     const newLiked = !liked;
     const newLikesCount = newLiked ? likesCount + 1 : likesCount - 1;
-    
+
     setLiked(newLiked);
     setLikesCount(newLikesCount);
-    
+
     // Notify parent component of the optimistic change
     if (onLikesChange) {
       onLikesChange(newLikesCount);
@@ -79,13 +79,16 @@ const ForumLikes: React.FC<ForumLikesProps> = ({
         onToggleLike(postId, replyId);
       } else {
         // Fallback for direct API call
-        const response = await fetch(`http://localhost:3001/posts/${postId}/replies/${replyId}/like`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
+        const response = await fetch(
+          `http://localhost:3001/posts/${postId}/replies/${replyId}/like`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
           }
-        });
+        );
 
         if (!response.ok) {
           throw new Error("Failed to update like status");
@@ -93,11 +96,11 @@ const ForumLikes: React.FC<ForumLikesProps> = ({
       }
     } catch (err) {
       console.error("Error updating like:", err);
-      
+
       // Revert optimistic update on error
       setLiked(!newLiked);
       setLikesCount(likesCount);
-      
+
       if (onLikesChange) {
         onLikesChange(likesCount);
       }
@@ -108,24 +111,26 @@ const ForumLikes: React.FC<ForumLikesProps> = ({
 
   return (
     <div className="forum-likes-container">
-      <div 
-        onClick={handleLikeToggle} 
-        style={{ 
-          cursor: isUpdating ? 'wait' : 'pointer',
-          opacity: isUpdating ? 0.7 : 1 
+      <div
+        onClick={handleLikeToggle}
+        style={{
+          cursor: isUpdating ? "wait" : "pointer",
+          opacity: isUpdating ? 0.7 : 1,
         }}
       >
-        <AiFillLike 
-          className={`icon ${liked ? 'liked' : 'like'}`} 
-          size={26} 
-          style={{ color: liked ? '#007bff' : '#666' }}
+        <AiFillLike
+          className={`icon ${liked ? "liked" : "like"}`}
+          size={26}
+          style={{ color: liked ? "#007bff" : "#666" }}
         />
-        <p style={{ 
-          fontWeight: "bold", 
-          fontSize: "10px",
-          color: liked ? '#007bff' : '#666'
-        }}>
-          {isUpdating ? "..." : (liked ? "Liked" : "Like")}
+        <p
+          style={{
+            fontWeight: "bold",
+            fontSize: "10px",
+            color: liked ? "#007bff" : "#666",
+          }}
+        >
+          {isUpdating ? "..." : liked ? "Liked" : "Like"}
         </p>
       </div>
       <p className="likes-count">{likesCount}</p>
