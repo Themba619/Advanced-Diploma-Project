@@ -22,7 +22,7 @@ const ChatForum = () => {
   const createChatSession = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:3001/api/private/createSessionFast", {
+      const response = await fetch("http://localhost:3001/api/private/createSession", {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -32,9 +32,9 @@ const ChatForum = () => {
       });
       
       const data = await response.json();
-      if (data.chat_session_id) {
-        setChatSessionId(data.chat_session_id);
-        console.log("✅ Chat session created:", data.chat_session_id);
+      if (data.sessionId) {
+        setChatSessionId(data.sessionId);
+        console.log("✅ Chat session created:", data.sessionId);
       }
     } catch (error) {
       console.error("❌ Failed to create chat session:", error);

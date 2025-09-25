@@ -10,29 +10,176 @@ const fetch = require("node-fetch");
 const querystring = require("querystring");
 
 let aiAuthCookie = null;
+let loginInProgress = false;
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 const FILE_PATH = path.join(__dirname, "forumData.json");
 
-// PostgreSQL connection
+// Check if AI service is enabled via environment variable
+const isAIServiceEnabled = process.env.AI_SERVICE_ENABLED !== 'false';
+
+// AI Service configuration
+const AI_SERVICE_URL = 'https://api.privatecore.app';
+
+// Function to login to AI service
+async function loginToAIService() {
+  if (loginInProgress) {
+    console.log('⏳ AI service login already in progress');
+    return;
+  }
+
+  try {
+    loginInProgress = true;
+    console.log('🔄 Logging in to AI service...');
+
+    const loginData = querystring.stringify({
+      username: "fakej710@gmail.com",
+      password: "PointBreak2014!!!!",
+    });
+
+    console.log('Trying primary endpoint...');
+    let response = await fetch('https://api.privatecore.app/auth/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'CoreCollective/1.0'
+      },
+      body: loginData,
+      timeout: 5000 // 5 second timeout
+    }).catch(async (error) => {
+      console.log('Primary endpoint failed, trying fallback...');
+      // Try fallback endpoint
+      return await fetch('https://api.privatecore.app/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'User-Agent': 'CoreCollective/1.0'
+        },
+        body: loginData,
+        timeout: 5000
+      });
+    });
+
+    // Log response headers for debugging
+    console.log('Response headers:', [...response.headers.entries()]);
+    
+    // Check for non-200 responses
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error('Error response body:', errorBody);
+      throw new Error(`AI service login failed with status ${response.status}: ${errorBody}`);
+    }
+
+    // Try multiple header variations for the cookie
+    const cookies = response.headers.get('set-cookie') || 
+                   response.headers.get('Set-Cookie') ||
+                   response.headers.get('SET-COOKIE');
+
+    if (cookies) {
+      // Extract the session cookie
+      const sessionCookie = cookies.split(';')[0];
+      console.log('Found cookie:', sessionCookie.split('=')[0]);
+      aiAuthCookie = sessionCookie;
+      console.log('✅ Successfully logged in to AI service');
+    } else {
+      // Try to get cookie from response body if not in headers
+      try {
+        const body = await response.json();
+        if (body.token || body.session) {
+          aiAuthCookie = body.token || body.session;
+          console.log('✅ Successfully logged in to AI service using response body token');
+          return;
+        }
+      } catch (e) {
+        console.log('No token in response body');
+      }
+      throw new Error('No auth cookie or token received from AI service');
+    }
+  } catch (error) {
+    console.error('❌ AI service login error:', error);
+    aiAuthCookie = null;
+  } finally {
+    loginInProgress = false;
+  }
+}
+
+// Schedule periodic AI service login to keep the session fresh
+setInterval(() => {
+  if (!aiAuthCookie) {
+    loginToAIService();
+  }
+}, 30 * 60 * 1000); // Try every 30 minutes if needed
+
+// Initial login attempt
+loginToAIService();
+
+// PostgreSQL connection with better error handling
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "corecollective",
-  password: "postgres",
-  port: 5432,
+  user: process.env.DB_USER || "postgres",
+  host: process.env.DB_HOST || "localhost",
+  database: process.env.DB_NAME || "corecollective",
+  password: process.env.DB_PASSWORD || "postgress",
+  port: process.env.DB_PORT || 5432,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000,
+});
+
+// Initialize database tables
+async function initDatabase() {
+  try {
+    // Drop existing tables if they exist to avoid conflicts
+    await pool.query(`
+      DROP TABLE IF EXISTS chat_messages;
+      DROP TABLE IF EXISTS chat_sessions;
+    `);
+
+    // Create tables with matching types
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS chat_sessions (
+        id SERIAL PRIMARY KEY,
+        user_id INT REFERENCES users(id),
+        title VARCHAR(255) DEFAULT 'New Chat',
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE TABLE IF NOT EXISTS chat_messages (
+        id SERIAL PRIMARY KEY,
+        session_id INT REFERENCES chat_sessions(id) ON DELETE CASCADE,
+        user_id INT REFERENCES users(id),
+        content TEXT NOT NULL,
+        is_ai BOOLEAN DEFAULT false,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
+      CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
+    `);
+    console.log('✅ Database tables initialized successfully');
+  } catch (error) {
+    console.error('❌ Error initializing database tables:', error);
+  }
+}
+
+// Call initialization
+initDatabase();
+
+// Handle connection errors
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
 });
 
 // Export cookie and pool for use in other modules
-module.exports.aiAuthCookie = () => aiAuthCookie;
+module.exports.aiAuthCookie = aiAuthCookie;
 module.exports.pool = pool;
 
 // Routes
 const profanityRoute = require("./routes/profanityRoute");
 const emailRoute = require("./routes/emailRoute");
-// const ollamaRoute = require("./routes/ollamaRoute");
 const privateRoute = require("./routes/privateRoute");
+const verificationRoute = require("./routes/verificationRoute");
 
 // Middleware
 app.use(cors());
@@ -62,46 +209,113 @@ const authenticateToken = (req, res, next) => {
 
 app.use("/api/profanityRoute", profanityRoute);
 app.use("/api/email", emailRoute);
-app.use("/api/private", authenticateToken, privateRoute); // Protect private routes with JWT
+app.use("/api/verify", verificationRoute); // Add verification routes
+// Use private routes - registration doesn't need authentication
+app.use("/api/private", privateRoute);
 
 async function loginAndStoreCookie() {
-  if (aiAuthCookie) {
-    console.log("AI Auth Cookie already set:", aiAuthCookie);
+  // Add a check to prevent multiple simultaneous login attempts
+  if (aiAuthCookie || loginInProgress) {
+    console.log("AI Auth Cookie already set or login in progress");
     return;
   }
-  const loginUrl = "https://api.privatecore.app/auth/login";
-  const loginData = querystring.stringify({
-    username: "fakej710@gmail.com",
-    password: "PointBreak2014!!!!",
-  });
-
-  const response = await fetch(loginUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: loginData,
-  });
-
-  if (!response.ok) {
-    throw new Error("Login failed: " + response.status);
+  
+  // Check if AI service is disabled via environment variable
+  if (!isAIServiceEnabled) {
+    aiAuthCookie = "DISABLED";
+    console.log("AI service disabled via environment variable");
+    return;
   }
+  
+  loginInProgress = true;
+  const loginUrl = "https://api.privatecore.app/auth/login";
+  
+  // Use environment variables or fallback to hardcoded values
+  const username = process.env.AI_SERVICE_USERNAME || "fakej710@gmail.com";
+  const password = process.env.AI_SERVICE_PASSWORD || "PointBreak2014!!!!";
+  
+  if (!username || !password) {
+    console.error("Missing AI service credentials");
+    aiAuthCookie = "DISABLED";
+    loginInProgress = false;
+    return;
+  }
+  
+  const loginData = querystring.stringify({
+    username: username,
+    password: password,
+  });
 
-  const setCookie = response.headers.get("set-cookie");
-  if (setCookie) {
-    aiAuthCookie = setCookie.split(";")[0];
-    console.log("AI Auth Cookie set:");
-  } else {
-    throw new Error("No cookie returned from login");
+  try {
+    console.log("Attempting login to AI service...");
+    console.log("Login URL:", loginUrl);
+    
+    const response = await fetch(loginUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "CoreCollective/1.0"
+      },
+      body: loginData,
+      timeout: 10000 // 10 second timeout
+    });
+
+    console.log("Login response status:", response.status);
+    
+    if (response.status === 400) {
+      const errorData = await response.json();
+      console.error("Login failed - bad credentials:", errorData);
+      
+      // Disable AI features permanently for this session
+      aiAuthCookie = "DISABLED";
+      loginInProgress = false;
+      console.log("AI features disabled due to authentication failure");
+      return;
+    }
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Login failed with response:", errorText);
+      throw new Error(`Login failed: ${response.status} - ${errorText}`);
+    }
+
+    const setCookie = response.headers.get("set-cookie");
+    if (setCookie) {
+      aiAuthCookie = setCookie.split(";")[0];
+      console.log("AI Auth Cookie set successfully");
+    } else {
+      console.warn("No cookie returned from login, checking response body...");
+      const responseBody = await response.text();
+      console.log("Response body:", responseBody);
+      aiAuthCookie = "DISABLED";
+    }
+  } catch (error) {
+    console.error("Login error details:", error.message);
+    // More specific error handling
+    if (error.message.includes('400')) {
+      console.error("400 Bad Request - likely invalid credentials or missing parameters");
+      console.error("Please check: username, password, and login endpoint");
+    } else if (error.message.includes('network') || error.message.includes('fetch')) {
+      console.error("Network error - check internet connection or API availability");
+    }
+    aiAuthCookie = "DISABLED";
+  } finally {
+    loginInProgress = false;
   }
 }
 
-// Call this once on server startup if cookie is not already set
-if (!aiAuthCookie) {
-  console.log("AI Auth Cookie is null, logging in...");
-  loginAndStoreCookie().catch(console.error);
-} else {
-  console.log("AI Auth Cookie already exists:");
+// Test database connection function
+async function testDatabaseConnection() {
+  try {
+    const client = await pool.connect();
+    console.log('Database connected successfully');
+    client.release();
+    return true;
+  } catch (err) {
+    console.error('Database connection failed:', err.message);
+    console.log('Application will continue but database features may not work');
+    return false;
+  }
 }
 
 // Initialize forumData.json with empty array if it doesn't exist
@@ -113,6 +327,7 @@ async function initializeFile() {
   }
 }
 
+// Database check endpoint
 app.get("/api/db-check", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -123,7 +338,7 @@ app.get("/api/db-check", async (req, res) => {
   }
 });
 
-// Add this new endpoint:
+// Database tables endpoint
 app.get("/api/db-tables", async (req, res) => {
   try {
     const result = await pool.query(`
@@ -139,7 +354,7 @@ app.get("/api/db-tables", async (req, res) => {
   }
 });
 
-// Create user_sessions table if it doesn't exist
+// Create necessary tables if they don't exist
 app.get("/api/init-db", async (req, res) => {
   try {
     // Create users table
@@ -149,6 +364,7 @@ app.get("/api/init-db", async (req, res) => {
         full_name VARCHAR(255) NOT NULL,
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
+        is_verified BOOLEAN DEFAULT FALSE,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -164,9 +380,21 @@ app.get("/api/init-db", async (req, res) => {
       )
     `);
 
+    // Create email_verifications table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS email_verifications (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        verification_code VARCHAR(10) NOT NULL,
+        expires_at TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+      )
+    `);
+
     res.json({
-      message:
-        "Database initialized successfully - users and user_sessions tables created",
+      message: "Database initialized successfully - users, user_sessions, and email_verifications tables created",
     });
   } catch (err) {
     console.error("Error initializing database:", err);
@@ -182,6 +410,28 @@ app.get("/api/test-auth", authenticateToken, (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
+
+// Email verification function (placeholder - implement with your email service)
+async function sendVerificationEmail(email, verificationCode, fullName) {
+  // This is a placeholder - implement with your actual email service
+  console.log(`Verification email would be sent to: ${email}`);
+  console.log(`Verification code: ${verificationCode}`);
+  console.log(`Recipient: ${fullName}`);
+  
+  // Example implementation with nodemailer or your email service:
+  /*
+  const transporter = nodemailer.createTransport({
+    // your email config
+  });
+  
+  await transporter.sendMail({
+    from: 'your-app@example.com',
+    to: email,
+    subject: 'Verify your email address',
+    html: `Your verification code is: <strong>${verificationCode}</strong>`
+  });
+  */
+}
 
 // --- Existing JSON file-based post and reply endpoints (untouched) ---
 app.get("/posts", async (req, res) => {
@@ -312,8 +562,8 @@ app.post(
   }
 );
 
-//Register endpoint ---
-app.post("/api/auth/register", async (req, res) => {
+// Register endpoint
+app.post("/api/private/register", async (req, res) => {
   const { fullName, name, email, password } = req.body;
 
   // Handle both fullName and name fields
@@ -358,20 +608,53 @@ app.post("/api/auth/register", async (req, res) => {
     if (existingUser.rows.length > 0) {
       return res.status(409).json({ error: "Email already registered" });
     }
+
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
+    
+    // Insert user with is_verified set to false
     const result = await pool.query(
-      "INSERT INTO users (full_name, email, password_hash) VALUES ($1, $2, $3) RETURNING id, email",
-      [finalFullName, email, passwordHash]
+      "INSERT INTO users (full_name, email, password_hash, is_verified) VALUES ($1, $2, $3, $4) RETURNING id, email, is_verified",
+      [finalFullName, email, passwordHash, false]
     );
-    res.status(201).json({ message: "User registered", user: result.rows[0] });
+
+    // Generate verification code (6-digit number)
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store verification code in database with expiration (e.g., 10 minutes)
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+    
+    await pool.query(
+      "INSERT INTO email_verifications (user_id, email, verification_code, expires_at) VALUES ($1, $2, $3, $4)",
+      [result.rows[0].id, email, verificationCode, expiresAt]
+    );
+
+    // Send verification email (you'll need to implement this function)
+    try {
+      await sendVerificationEmail(email, verificationCode, finalFullName);
+      console.log(`Verification email sent to ${email}`);
+    } catch (emailError) {
+      console.error("Failed to send verification email:", emailError);
+      // Don't fail the registration if email fails, just log it
+    }
+
+    res.status(201).json({ 
+      message: "User registered successfully. Please check your email for verification code.", 
+      user: {
+        id: result.rows[0].id,
+        email: result.rows[0].email,
+        is_verified: result.rows[0].is_verified
+      },
+      requires_verification: true
+    });
+    
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ error: "Server error during registration" });
   }
 });
 
-//Login endpoint
+// Login endpoint
 app.post("/api/auth/login", async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -409,7 +692,7 @@ app.post("/api/auth/login", async (req, res) => {
   }
 });
 
-//Change Password endpoint
+// Change Password endpoint
 app.post("/api/auth/change-password", authenticateToken, async (req, res) => {
   const { currentPassword, newPassword } = req.body;
 
@@ -502,9 +785,98 @@ app.get("/api/auth/profile", authenticateToken, async (req, res) => {
   }
 });
 
-// ...existing code...
+//Verification endpoints
+// Email verification endpoint
+app.post("/api/private/verify-email", async (req, res) => {
+  const { userId, code } = req.body;
 
-// Start server
-app.listen(PORT, () => {
+  if (!userId || !code) {
+    return res.status(400).json({ error: "User ID and verification code are required" });
+  }
+
+  try {
+    // Check if verification code is valid and not expired
+    const result = await pool.query(
+      `SELECT * FROM email_verifications 
+       WHERE user_id = $1 AND verification_code = $2 AND expires_at > NOW()`,
+      [userId, code]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(400).json({ error: "Invalid or expired verification code" });
+    }
+
+    // Update user as verified
+    await pool.query(
+      "UPDATE users SET is_verified = true WHERE id = $1",
+      [userId]
+    );
+
+    // Delete the used verification code
+    await pool.query(
+      "DELETE FROM email_verifications WHERE user_id = $1",
+      [userId]
+    );
+
+    res.json({ message: "Email verified successfully" });
+  } catch (err) {
+    console.error("Email verification error:", err);
+    res.status(500).json({ error: "Server error during email verification" });
+  }
+});
+
+// Resend verification code endpoint
+app.post("/api/private/resend-verification", async (req, res) => {
+  const { email, userId } = req.body;
+
+  try {
+    // Generate new verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    // Delete any existing verification codes for this user
+    await pool.query(
+      "DELETE FROM email_verifications WHERE user_id = $1",
+      [userId]
+    );
+
+    // Insert new verification code
+    await pool.query(
+      "INSERT INTO email_verifications (user_id, email, verification_code, expires_at) VALUES ($1, $2, $3, $4)",
+      [userId, email, verificationCode, expiresAt]
+    );
+
+    // Send new verification email
+    await sendVerificationEmail(email, verificationCode, "User"); // You might want to fetch the actual name
+
+    res.json({ message: "Verification code sent successfully" });
+  } catch (err) {
+    console.error("Resend verification error:", err);
+    res.status(500).json({ error: "Server error while resending verification code" });
+  }
+});
+
+// Start server with proper initialization sequence
+app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  
+  // Initialize file system
+  await initializeFile();
+  console.log("Forum data file initialized");
+  
+  // Test database connection
+  await testDatabaseConnection();
+  
+  // Attempt AI login (non-blocking) after a short delay
+  setTimeout(() => {
+    if (!aiAuthCookie) {
+      console.log("Starting background AI service initialization...");
+      loginAndStoreCookie().then(() => {
+        console.log("AI service initialization completed with status:", 
+                   aiAuthCookie === "DISABLED" ? "DISABLED" : aiAuthCookie ? "SUCCESS" : "FAILED");
+      }).catch(error => {
+        console.error("AI service initialization failed:", error.message);
+      });
+    }
+  }, 2000);
 });

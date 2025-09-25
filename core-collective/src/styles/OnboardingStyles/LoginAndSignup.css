@@ -56,7 +56,8 @@
   }
   
   .login-form input[type="email"],
-  .login-form input[type="password"] {
+  .login-form input[type="password"],
+  .login-form input[type="text"] {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -67,7 +68,8 @@
   }
   
   .login-form input[type="email"]::placeholder,
-  .login-form input[type="password"]::placeholder {
+  .login-form input[type="password"]::placeholder,
+  .login-form input[type="text"]::placeholder {
     color: #aaa;
   }
   
@@ -105,10 +107,78 @@
     font-size: 16px;
     cursor: pointer;
     margin-bottom: 15px;
+    transition: background-color 0.3s ease;
   }
   
-  .sign-in-btn:hover {
+  .sign-in-btn:hover:not(:disabled) {
     background-color: #e64e2d;
+  }
+  
+  .sign-in-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* Secondary Button (Resend Code) */
+  .secondary-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .secondary-btn:hover:not(:disabled) {
+    background-color: #5a6268;
+  }
+  
+  .secondary-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* Back Button */
+  .back-btn {
+    width: 100%;
+    padding: 10px;
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+  }
+  
+  .back-btn:hover:not(:disabled) {
+    background-color: #f8f9fa;
+    border-color: #999;
+  }
+  
+  .back-btn:disabled {
+    color: #cccccc;
+    border-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  /* Verification step text */
+  .login-form p {
+    margin-bottom: 15px;
+    color: #666;
+    text-align: center;
+  }
+  
+  .login-form strong {
+    color: #333;
   }
   
   /* Or Login With Text */
@@ -138,6 +208,7 @@
     font-size: 14px;
     color: #333;
     cursor: pointer;
+    transition: background-color 0.3s ease;
   }
   
   .social-btn i {
@@ -163,6 +234,16 @@
   .signup-link a:hover {
     text-decoration: underline;
     cursor: pointer;
+  }
+  
+  /* Error message styling */
+  .login-form p[style*="color: red"] {
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 5px;
+    border-left: 4px solid #ff3333;
+    margin-bottom: 15px;
+    text-align: center;
   }
   
   /* Responsive Design */
