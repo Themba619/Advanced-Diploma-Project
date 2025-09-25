@@ -95,6 +95,7 @@ import ForgotPwd from "./pages/ForgotPwd";
 import ContactUs from "./pages/ContactUs";
 import DownloadApp from "./pages/DownloadApp";
 import ChatPerformanceTest from "./pages/ChatPerformanceTest";
+import OTPPage from "./pages/OTPPage";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -110,9 +111,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotPwd" element={<ForgotPwd />} />
+          <Route path="/OTPPage" element={<OTPPage />} />
           <Route path="/" element={<LoginPage />} />
-          {/* Authenticated routes (with DrawerNavigation) */}
-          <Route element={<DrawerNavigation />}>
+          {/* Authenticated routes (with DrawerNavigation) */}"
+          {/* <Route element={<DrawerNavigation />}>
             <Route path="/home" element={<Home />} />
             <Route path="/chatforum" element={<ChatForum />} />
             <Route path="/profile" element={<Profile />} />
@@ -121,7 +123,7 @@ function App() {
             <Route path="/contactUs" element={<ContactUs />} />
             <Route path="/performance" element={<ChatPerformanceTest />} />
             <Route path="*" element={<DownloadApp />} />
-          </Route>
+          </Route> */}
         </Routes>
       </TooltipProvider>
     </QueryClientProvider>
