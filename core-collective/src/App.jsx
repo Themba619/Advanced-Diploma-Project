@@ -91,9 +91,10 @@ import Settings from "./pages/Settings";
 import ForumChat from "./pages/Forum";
 import LoginPage from "./pages/Login";
 import Signup from "./pages/Signup";
-import ForgotPwd from "./pages/ForgotPwd";
+//import ForgotPwd from "./pages/ForgotPwd";
 import ContactUs from "./pages/ContactUs";
 import DownloadApp from "./pages/DownloadApp";
+import ForgotPassword from "./pages/ForgotPassword";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -108,7 +109,7 @@ function App() {
           {/* Unauthenticated routes (no DrawerNavigation) */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/forgotPwd" element={<ForgotPwd />} />
+          <Route path="/ForgotPassword" element={<ForgotPassword />} />
           <Route path="/" element={<DrawerNavigation />} />
           {/* Authenticated routes (with DrawerNavigation) */}
           <Route element={<DrawerNavigation />}>
