@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const privateController = require("../controller/privateController");
+const privateController = require("../controller/privateController_final");
 
 // Add logging middleware
 router.use((req, res, next) => {
@@ -25,6 +25,7 @@ router.get("/getUserChatSessions", async (req, res) => {
 });
 router.get("/getChatSession/:id", privateController.getChatSessionById);
 router.post("/sendMessage", privateController.sendMessage);
+router.post("/sendMessageStream", privateController.sendMessageStream); // New streaming endpoint
 router.put("/renameChatSession", privateController.renameChatSession);
 router.post("/summarizeMessage", privateController.summarizeMessage);
 router.delete(

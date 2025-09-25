@@ -20,11 +20,15 @@ const Login = () => {
 
       console.log('Login success:', response.data);
 
-      // Store token locally (optional but common)
+      // Store token locally
       localStorage.setItem('token', response.data.token);
-
-      // Redirect to home/dashboard or wherever you want
-      navigate('/home');
+      
+      // Small delay to ensure token is saved before navigation
+      setTimeout(() => {
+        // Redirect to home/dashboard
+        navigate('/home');
+      }, 100);
+      
     } catch (err) {
       console.error('Login error:', err.response?.data);
       setError(err.response?.data?.error || 'Login failed');

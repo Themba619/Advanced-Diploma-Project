@@ -94,6 +94,7 @@ import Signup from "./pages/Signup";
 import ForgotPwd from "./pages/ForgotPwd";
 import ContactUs from "./pages/ContactUs";
 import DownloadApp from "./pages/DownloadApp";
+import ChatPerformanceTest from "./pages/ChatPerformanceTest";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -118,6 +119,7 @@ function App() {
             <Route path="/settings" element={<Settings />} />
             <Route path="/forum" element={<ForumChat />} />
             <Route path="/contactUs" element={<ContactUs />} />
+            <Route path="/performance" element={<ChatPerformanceTest />} />
             <Route path="*" element={<DownloadApp />} />
           </Route>
         </Routes>

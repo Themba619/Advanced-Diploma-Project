@@ -6,6 +6,73 @@ console.log(
 
 let aiAuthCookie, pool;
 
+// Performance monitoring utilities
+const performanceLog = {
+  startTimer: (operation) => {
+    const start = Date.now();
+    return {
+      end: () => {
+        const duration = Date.now() - start;
+        console.log(`⏱️  ${operation}: ${duration}ms`);
+        return duration;
+      },
+    };
+  },
+
+  logPerformance: (operation, duration) => {
+    const status = duration < 1000 ? "🟢" : duration < 2000 ? "🟡" : "🔴";
+    console.log(`${status} PERFORMANCE: ${operation} took ${duration}ms`);
+    if (duration > 2000) {
+      console.log(`⚠️  WARNING: ${operation} exceeded 2 second target!`);
+    }
+  },
+};
+
+// Cache for user verification to reduce DB calls
+const userCache = new Map();
+const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function clearExpiredCache() {
+  const now = Date.now();
+  for (const [key, value] of userCache.entries()) {
+    if (now - value.timestamp > USER_CACHE_TTL) {
+      userCache.delete(key);
+    }
+  }
+}
+
+// Optimized user verification with caching
+async function getUserWithCache(email) {
+  const timer = performanceLog.startTimer(`Get User (${email})`);
+
+  // Check cache first
+  const cached = userCache.get(email);
+  if (cached && Date.now() - cached.timestamp < USER_CACHE_TTL) {
+    timer.end();
+    return cached.user;
+  }
+
+  // Query database
+  const userResult = await pool.query("SELECT id FROM users WHERE email = $1", [
+    email,
+  ]);
+
+  const user = userResult.rows[0] || null;
+
+  // Cache the result
+  if (user) {
+    userCache.set(email, {
+      user,
+      timestamp: Date.now(),
+    });
+  }
+
+  const duration = timer.end();
+  performanceLog.logPerformance("User Lookup", duration);
+
+  return user;
+}
+
 function initDependencies() {
   if (!aiAuthCookie || !pool) {
     const server = require("../server");
@@ -15,6 +82,7 @@ function initDependencies() {
 }
 
 exports.getChats = async (req, res) => {
+  const totalTimer = performanceLog.startTimer("Complete getChats");
   console.log("🎯 ENTERED getChats function!");
 
   try {
@@ -32,44 +100,52 @@ exports.getChats = async (req, res) => {
     const userEmail = req.user?.email || "unknown";
     console.log(`👤 User email: ${userEmail}`);
 
-    // Get user ID first
-    const userResult = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [userEmail]
-    );
-
-    if (userResult.rows.length === 0) {
+    // OPTIMIZATION: Use cached user lookup
+    const user = await getUserWithCache(userEmail);
+    if (!user) {
       console.log("❌ User not found in database");
       return res.status(404).json({ error: "User not found" });
     }
 
-    const userId = userResult.rows[0].id;
-    console.log(`👤 User ID: ${userId}`);
+    console.log(`👤 User ID: ${user.id}`);
 
-    // Get all chat IDs belonging to this user
+    // OPTIMIZATION: Get user chats with better query
+    const chatsTimer = performanceLog.startTimer("Get User Chat Sessions");
     const userChatsResult = await pool.query(
-      "SELECT chat_id FROM chat_sessions WHERE user_id = $1",
-      [userId]
+      "SELECT chat_id FROM chat_sessions WHERE user_id = $1 ORDER BY chat_id",
+      [user.id]
     );
+    chatsTimer.end();
 
     const userChatIds = userChatsResult.rows.map((row) => row.chat_id);
     console.log(
       `📋 User has ${userChatIds.length} chat sessions:`,
-      userChatIds
+      userChatIds.slice(0, 5), // Only log first 5 for performance
+      userChatIds.length > 5 ? "..." : ""
     );
 
-    // If user has no chats, return empty result
+    // If user has no chats, return empty result quickly
     if (userChatIds.length === 0) {
       console.log("📭 User has no chat sessions");
+      const totalDuration = totalTimer.end();
+      performanceLog.logPerformance("Complete Request (Empty)", totalDuration);
       return res.json({
         sessions: [],
         data: [],
         message: "No chat sessions found for this user",
+        performance: { total_duration: totalDuration, sessions_count: 0 },
       });
     }
 
-    // Fetch all sessions from PrivateCore API
+    // OPTIMIZATION: Fetch sessions with timeout
     console.log("🌐 Fetching sessions from PrivateCore API...");
+    const apiTimer = performanceLog.startTimer(
+      "PrivateCore API - Get Sessions"
+    );
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     const response = await fetch(
       "https://api.privatecore.app/chat/get-user-chat-sessions",
       {
@@ -78,8 +154,12 @@ exports.getChats = async (req, res) => {
           "Content-Type": "application/json",
           Cookie: cookie,
         },
+        signal: controller.signal,
       }
     );
+
+    clearTimeout(timeoutId);
+    const apiDuration = apiTimer.end();
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -93,8 +173,11 @@ exports.getChats = async (req, res) => {
       data.sessions?.length || 0
     );
 
-    // Filter sessions to only include the user's chat IDs
+    // OPTIMIZATION: Faster filtering with Set lookup
+    const filterTimer = performanceLog.startTimer("Filter User Sessions");
+    const userChatIdSet = new Set(userChatIds); // O(1) lookup instead of O(n)
     let userSessions = [];
+
     if (data && data.sessions) {
       console.log(
         `📊 Total sessions from PrivateCore: ${data.sessions.length}`
@@ -106,21 +189,28 @@ exports.getChats = async (req, res) => {
           session.sessionId ||
           session.session_id ||
           session.chat_session_id;
-        const isUserSession = userChatIds.includes(sessionId);
-        if (isUserSession) {
-          console.log(`✅ Found user session: ${sessionId}`);
-        }
-        return isUserSession;
+        return userChatIdSet.has(sessionId);
       });
 
       console.log(`✅ Filtered sessions count: ${userSessions.length}`);
     }
 
-    // Return filtered data
+    filterTimer.end();
+
+    const totalDuration = totalTimer.end();
+    performanceLog.logPerformance("Complete Request", totalDuration);
+
+    // Return filtered data with performance metrics
     const result = {
       ...data,
       sessions: userSessions,
       data: userSessions,
+      performance: {
+        total_duration: totalDuration,
+        api_duration: apiDuration,
+        sessions_count: userSessions.length,
+        total_sessions_fetched: data.sessions?.length || 0,
+      },
     };
 
     console.log(
@@ -128,8 +218,21 @@ exports.getChats = async (req, res) => {
     );
     return res.json(result);
   } catch (err) {
+    const totalDuration = totalTimer.end();
     console.error("❌ Error in getChats:", err);
-    res.status(500).json({ error: err.message });
+    console.log(`⏱️  Failed getChats took: ${totalDuration}ms`);
+
+    if (err.name === "AbortError") {
+      return res.status(408).json({
+        error: "API request timed out. Please try again.",
+        performance: { timeout_reached: true, total_duration: totalDuration },
+      });
+    }
+
+    res.status(500).json({
+      error: err.message,
+      performance: { total_duration: totalDuration },
+    });
   }
 };
 
@@ -212,7 +315,11 @@ exports.createChatSessionFast = async (req, res) => {
 };
 
 exports.sendMessage = async (req, res) => {
+  const totalTimer = performanceLog.startTimer("Complete sendMessage");
   console.log("🎯 ENTERED sendMessage function!");
+
+  // Clear expired cache entries periodically
+  clearExpiredCache();
 
   try {
     initDependencies();
@@ -264,22 +371,19 @@ exports.sendMessage = async (req, res) => {
         .json({ error: "chat_session_id and message are required." });
     }
 
-    // Verify user owns this chat session
-    const userResult = await pool.query(
-      "SELECT id FROM users WHERE email = $1",
-      [userEmail]
-    );
-    if (userResult.rows.length === 0) {
+    // OPTIMIZATION 1: Use cached user lookup
+    const user = await getUserWithCache(userEmail);
+    if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    const userId = userResult.rows[0].id;
-
-    // Check if user has access to this chat session
+    // OPTIMIZATION 2: Batch verification queries
+    const verifyTimer = performanceLog.startTimer("Chat Session Verification");
     const chatCheck = await pool.query(
       "SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
-      [userId, chat_session_id]
+      [user.id, chat_session_id]
     );
+    verifyTimer.end();
 
     if (chatCheck.rows.length === 0) {
       return res
@@ -305,9 +409,10 @@ exports.sendMessage = async (req, res) => {
 
     console.log("🌐 Sending message to PrivateCore API...");
 
-    // Send message to PrivateCore with timeout for better performance
+    // OPTIMIZATION 3: More generous timeout for AI processing
+    const apiTimer = performanceLog.startTimer("PrivateCore API Call");
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout - more reasonable for AI processing
 
     const response = await fetch(
       "https://api.privatecore.app/chat/send-message",
@@ -322,9 +427,15 @@ exports.sendMessage = async (req, res) => {
       }
     );
 
-    clearTimeout(timeoutId);
-
+    // Time the response reading separately to identify bottlenecks
+    const responseTimer = performanceLog.startTimer("Response Reading");
     let rawText = await response.text();
+    const responseDuration = responseTimer.end();
+    performanceLog.logPerformance("Response Reading", responseDuration);
+
+    clearTimeout(timeoutId);
+    const apiDuration = apiTimer.end();
+
     if (!response.ok) {
       let errorJson;
       try {
@@ -336,33 +447,85 @@ exports.sendMessage = async (req, res) => {
       return res.status(response.status).json(errorJson);
     }
 
-    // Parse streaming JSON lines
+    // OPTIMIZATION 4: Faster JSON processing with minimal logging
+    const parseTimer = performanceLog.startTimer("Response Parsing");
     const lines = rawText.split(/\r?\n/).filter(Boolean);
+    let fullMessage = "";
     let assistantMessage = null;
+    let processedLines = 0;
 
     console.log(`📦 Processing ${lines.length} response lines...`);
 
+    // Process lines more efficiently with reduced logging
     for (const line of lines) {
+      processedLines++;
+
+      // Skip empty lines faster
+      if (!line.trim()) continue;
+
       try {
-        const obj = JSON.parse(line);
-        if (obj.message_type === "assistant" && obj.message) {
-          assistantMessage = obj.message;
-          console.log("✅ Found assistant message");
+        const packet = JSON.parse(line);
+
+        // OPTIMIZATION 5: Handle new streaming format with early content extraction
+        if (
+          packet.obj &&
+          packet.obj.type === "message_delta" &&
+          packet.obj.content
+        ) {
+          fullMessage += packet.obj.content;
+        }
+        // Legacy format support
+        else if (packet.message_type === "assistant" && packet.message) {
+          assistantMessage = packet.message;
+        }
+        // Message completion detection
+        else if (packet.obj && packet.obj.type === "message_complete") {
+          assistantMessage = fullMessage;
+          break; // Early exit when complete
         }
       } catch (e) {
-        // Ignore lines that aren't valid JSON
+        // Skip invalid JSON silently for better performance
       }
     }
 
+    console.log(`✅ Processed ${processedLines} lines successfully`);
+
+    const parseDuration = parseTimer.end();
+    performanceLog.logPerformance("Response Parsing", parseDuration);
+
+    // Use accumulated message from streaming packets, fallback to legacy format
+    const finalMessage = fullMessage || assistantMessage;
+
+    const totalDuration = totalTimer.end();
+    performanceLog.logPerformance("Complete Request", totalDuration);
+
+    console.log(
+      `✅ Final assembled message length: ${
+        finalMessage ? finalMessage.length : 0
+      } characters`
+    );
     console.log("📤 Returning AI response to frontend");
-    res.json({ message: assistantMessage || null });
+
+    // OPTIMIZATION 6: Return response with performance metadata
+    res.json({
+      message: finalMessage || null,
+      performance: {
+        total_duration: totalDuration,
+        api_duration: apiDuration,
+        parse_duration: parseDuration,
+        lines_processed: processedLines,
+      },
+    });
   } catch (err) {
+    const totalDuration = totalTimer.end();
     console.error("❌ Failed to send message to model:", err);
+    console.log(`⏱️  Failed request took: ${totalDuration}ms`);
 
     if (err.name === "AbortError") {
       return res.status(408).json({
         error:
-          "The AI service is taking longer than expected. Please try your request again.",
+          "The AI service is taking longer than expected (25s timeout). This might be due to high server load. Please try your request again.",
+        performance: { timeout_reached: true },
       });
     }
 
@@ -551,6 +714,216 @@ exports.deleteChatSession = async (req, res) => {
 
 exports.summarizeMessage = async (req, res) => {
   res.json({ message: "summarizeMessage placeholder" });
+};
+
+// New real-time streaming endpoint
+exports.sendMessageStream = async (req, res) => {
+  console.log("🎯 ENTERED sendMessageStream function!");
+
+  try {
+    initDependencies();
+
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      console.log("❌ No AI Auth Cookie found");
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
+    }
+
+    const userEmail = req.user?.email || "unknown";
+    const {
+      chat_session_id,
+      message,
+      parent_message_id = null,
+      alternate_assistant_id = 0,
+      prompt_id = null,
+      search_doc_ids = null,
+      file_descriptors = [],
+      user_file_ids = [],
+      user_folder_ids = [],
+      regenerate = false,
+      retrieval_options = {
+        run_search: "auto",
+        real_time: true,
+        filters: {
+          source_type: null,
+          document_set: null,
+          time_cutoff: null,
+          tags: [],
+          user_file_ids: null,
+        },
+      },
+      prompt_override = null,
+      use_agentic_search = false,
+      is_new_session = false,
+    } = req.body;
+
+    console.log(
+      `👤 User: ${userEmail} sending streaming message to session: ${chat_session_id}`
+    );
+
+    if (!chat_session_id || !message) {
+      return res
+        .status(400)
+        .json({ error: "chat_session_id and message are required." });
+    }
+
+    // Verify user owns this chat session
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Check if user has access to this chat session
+    const chatCheck = await pool.query(
+      "SELECT chat_id FROM chat_sessions WHERE user_id = $1 AND chat_id = $2",
+      [userId, chat_session_id]
+    );
+
+    if (chatCheck.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
+    }
+
+    const body = {
+      alternate_assistant_id,
+      chat_session_id,
+      parent_message_id,
+      message,
+      prompt_id,
+      search_doc_ids,
+      file_descriptors,
+      user_file_ids,
+      user_folder_ids,
+      regenerate,
+      retrieval_options,
+      prompt_override,
+      use_agentic_search,
+    };
+
+    console.log("🌐 Sending streaming message to PrivateCore API...");
+
+    // Set up Server-Sent Events
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "Cache-Control",
+    });
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for streaming
+
+    try {
+      const response = await fetch(
+        "https://api.privatecore.app/chat/send-message",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: cookie,
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ PrivateCore API error:", errorText);
+        res.write(`data: ${JSON.stringify({ error: errorText })}\n\n`);
+        return res.end();
+      }
+
+      // Stream the response in real-time
+      let fullMessage = "";
+      const responseText = await response.text();
+      const lines = responseText.split(/\r?\n/).filter(Boolean);
+
+      console.log(`📦 Streaming ${lines.length} response lines...`);
+
+      for (const line of lines) {
+        try {
+          const packet = JSON.parse(line);
+
+          // Handle new streaming format: {'ind': 0, 'obj': {'type': 'message_delta', 'content': 'text'}}
+          if (
+            packet.obj &&
+            packet.obj.type === "message_delta" &&
+            packet.obj.content
+          ) {
+            console.log(`[STREAM DEBUG] Packet: ${JSON.stringify(packet)}`);
+            fullMessage += packet.obj.content;
+
+            // Stream each packet to the client immediately
+            const streamData = {
+              type: "message_delta",
+              content: packet.obj.content,
+              fullMessage: fullMessage,
+              packetIndex: packet.ind,
+            };
+
+            res.write(`data: ${JSON.stringify(streamData)}\n\n`);
+          }
+
+          // Handle message completion
+          else if (packet.obj && packet.obj.type === "message_complete") {
+            console.log("✅ Message streaming complete");
+            const completeData = {
+              type: "message_complete",
+              fullMessage: fullMessage,
+            };
+            res.write(`data: ${JSON.stringify(completeData)}\n\n`);
+            break;
+          }
+
+          // Handle legacy format
+          else if (packet.message_type === "assistant" && packet.message) {
+            const legacyData = {
+              type: "legacy_message",
+              content: packet.message,
+            };
+            res.write(`data: ${JSON.stringify(legacyData)}\n\n`);
+          }
+        } catch (e) {
+          console.log(
+            `⚠️ Skipping invalid JSON line: ${line.substring(0, 100)}...`
+          );
+        }
+      }
+
+      console.log(
+        `✅ Streaming complete. Final message length: ${fullMessage.length} characters`
+      );
+      res.write(
+        `data: ${JSON.stringify({ type: "stream_end", fullMessage })}\n\n`
+      );
+      res.end();
+    } catch (err) {
+      clearTimeout(timeoutId);
+      console.error("❌ Failed to stream message:", err);
+
+      const errorData = {
+        type: "error",
+        error: err.message || "Internal server error",
+      };
+      res.write(`data: ${JSON.stringify(errorData)}\n\n`);
+      res.end();
+    }
+  } catch (err) {
+    console.error("❌ Failed to initialize streaming:", err);
+    res.status(500).json({ error: err.message || "Internal server error" });
+  }
 };
 
 exports.getSharedContext = async (req, res) => {

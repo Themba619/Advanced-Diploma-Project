@@ -116,16 +116,26 @@ const Home = () => {
   useEffect(() => {
     async function fetchChats() {
       try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          console.log('No token found, redirecting to login');
+          navigate('/login');
+          return;
+        }
+
         const res = await fetch("http://localhost:3001/api/private/getUserChatSessions", {
           headers: getAuthHeaders()
         });
+        
         if (!res.ok) {
           if (res.status === 401 || res.status === 403) {
+            console.log('Token invalid, redirecting to login');
             handleAuthError(new Error('Authentication failed'));
             return;
           }
           throw new Error("Failed to fetch chat sessions");
         }
+        
         const data = await res.json();
         const sessions = data.sessions || [];
         setChats(sessions);
@@ -141,12 +151,19 @@ const Home = () => {
         ]);
       } catch (err) {
         console.error("Failed to fetch chat sessions:", err);
-        if (err.message.includes('authentication')) {
+        // Only redirect to login if it's specifically an auth error
+        if (err.message.includes('authentication') || err.message.includes('token')) {
           handleAuthError(err);
+        } else {
+          // For other errors, just log them and continue
+          console.warn('Non-auth error fetching chats:', err);
         }
       }
     }
-    fetchChats();
+    
+    // Add a small delay to ensure token is available after login
+    const timeoutId = setTimeout(fetchChats, 200);
+    return () => clearTimeout(timeoutId);
   }, []);
 
   // Initialize speech recognition
