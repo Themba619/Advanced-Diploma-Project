@@ -17,10 +17,10 @@ const PORT = process.env.PORT || 3001;
 const FILE_PATH = path.join(__dirname, "forumData.json");
 
 // Check if AI service is enabled via environment variable
-const isAIServiceEnabled = process.env.AI_SERVICE_ENABLED !== 'false';
+const isAIServiceEnabled = process.env.AI_SERVICE_ENABLED !== "false";
 
 // AI Service configuration
-const AI_SERVICE_URL = 'https://api.privatecore.app';
+const AI_SERVICE_URL = "https://api.privatecore.app";
 
 // Function to login to AI service (COMMENTED OUT - using loginAndStoreCookie instead)
 /*
@@ -162,9 +162,9 @@ async function initDatabase() {
       CREATE INDEX IF NOT EXISTS idx_chat_messages_session_id ON chat_messages(session_id);
       CREATE INDEX IF NOT EXISTS idx_chat_sessions_user_id ON chat_sessions(user_id);
     `);
-    console.log('✅ Database tables initialized successfully');
+    console.log("✅ Database tables initialized successfully");
   } catch (error) {
-    console.error('❌ Error initializing database tables:', error);
+    console.error("❌ Error initializing database tables:", error);
   }
 }
 
@@ -172,8 +172,8 @@ async function initDatabase() {
 initDatabase();
 
 // Handle connection errors
-pool.on('error', (err) => {
-  console.error('Unexpected error on idle client', err);
+pool.on("error", (err) => {
+  console.error("Unexpected error on idle client", err);
 });
 
 // Export cookie and pool for use in other modules
@@ -224,28 +224,28 @@ async function loginAndStoreCookie() {
     console.log("AI Auth Cookie already set or login in progress");
     return;
   }
-  
+
   // Check if AI service is disabled via environment variable
   if (!isAIServiceEnabled) {
     aiAuthCookie = "DISABLED";
     console.log("AI service disabled via environment variable");
     return;
   }
-  
+
   loginInProgress = true;
   const loginUrl = "https://api.privatecore.app/auth/login";
-  
+
   // Use environment variables or fallback to hardcoded values
   const username = process.env.AI_SERVICE_USERNAME || "fakej710@gmail.com";
   const password = process.env.AI_SERVICE_PASSWORD || "PointBreak2014!!!!";
-  
+
   if (!username || !password) {
     console.error("Missing AI service credentials");
     aiAuthCookie = "DISABLED";
     loginInProgress = false;
     return;
   }
-  
+
   const loginData = querystring.stringify({
     username: username,
     password: password,
@@ -254,23 +254,23 @@ async function loginAndStoreCookie() {
   try {
     console.log("Attempting login to AI service...");
     console.log("Login URL:", loginUrl);
-    
+
     const response = await fetch(loginUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
-        "User-Agent": "CoreCollective/1.0"
+        "User-Agent": "CoreCollective/1.0",
       },
       body: loginData,
-      timeout: 10000 // 10 second timeout
+      timeout: 10000, // 10 second timeout
     });
 
     console.log("Login response status:", response.status);
-    
+
     if (response.status === 400) {
       const errorData = await response.json();
       console.error("Login failed - bad credentials:", errorData);
-      
+
       // Disable AI features permanently for this session
       aiAuthCookie = "DISABLED";
       loginInProgress = false;
@@ -297,11 +297,18 @@ async function loginAndStoreCookie() {
   } catch (error) {
     console.error("Login error details:", error.message);
     // More specific error handling
-    if (error.message.includes('400')) {
-      console.error("400 Bad Request - likely invalid credentials or missing parameters");
+    if (error.message.includes("400")) {
+      console.error(
+        "400 Bad Request - likely invalid credentials or missing parameters"
+      );
       console.error("Please check: username, password, and login endpoint");
-    } else if (error.message.includes('network') || error.message.includes('fetch')) {
-      console.error("Network error - check internet connection or API availability");
+    } else if (
+      error.message.includes("network") ||
+      error.message.includes("fetch")
+    ) {
+      console.error(
+        "Network error - check internet connection or API availability"
+      );
     }
     aiAuthCookie = "DISABLED";
   } finally {
@@ -313,12 +320,12 @@ async function loginAndStoreCookie() {
 async function testDatabaseConnection() {
   try {
     const client = await pool.connect();
-    console.log('Database connected successfully');
+    console.log("Database connected successfully");
     client.release();
     return true;
   } catch (err) {
-    console.error('Database connection failed:', err.message);
-    console.log('Application will continue but database features may not work');
+    console.error("Database connection failed:", err.message);
+    console.log("Application will continue but database features may not work");
     return false;
   }
 }
@@ -399,7 +406,8 @@ app.get("/api/init-db", async (req, res) => {
     `);
 
     res.json({
-      message: "Database initialized successfully - users, user_sessions, and email_verifications tables created",
+      message:
+        "Database initialized successfully - users, user_sessions, and email_verifications tables created",
     });
   } catch (err) {
     console.error("Error initializing database:", err);
@@ -422,7 +430,7 @@ async function sendVerificationEmail(email, verificationCode, fullName) {
   console.log(`Verification email would be sent to: ${email}`);
   console.log(`Verification code: ${verificationCode}`);
   console.log(`Recipient: ${fullName}`);
-  
+
   // Example implementation with nodemailer or your email service:
   /*
   const transporter = nodemailer.createTransport({
@@ -616,7 +624,7 @@ app.post("/api/private/register", async (req, res) => {
 
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
-    
+
     // Insert user with is_verified set to false
     const result = await pool.query(
       "INSERT INTO users (full_name, email, password_hash, is_verified) VALUES ($1, $2, $3, $4) RETURNING id, email, is_verified",
@@ -624,11 +632,13 @@ app.post("/api/private/register", async (req, res) => {
     );
 
     // Generate verification code (6-digit number)
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-    
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
+
     // Store verification code in database with expiration (e.g., 10 minutes)
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
-    
+
     await pool.query(
       "INSERT INTO email_verifications (user_id, email, verification_code, expires_at) VALUES ($1, $2, $3, $4)",
       [result.rows[0].id, email, verificationCode, expiresAt]
@@ -643,16 +653,16 @@ app.post("/api/private/register", async (req, res) => {
       // Don't fail the registration if email fails, just log it
     }
 
-    res.status(201).json({ 
-      message: "User registered successfully. Please check your email for verification code.", 
+    res.status(201).json({
+      message:
+        "User registered successfully. Please check your email for verification code.",
       user: {
         id: result.rows[0].id,
         email: result.rows[0].email,
-        is_verified: result.rows[0].is_verified
+        is_verified: result.rows[0].is_verified,
       },
-      requires_verification: true
+      requires_verification: true,
     });
-    
   } catch (err) {
     console.error("❌ DETAILED Registration error:", err);
     console.error("❌ Error message:", err.message);
@@ -798,7 +808,9 @@ app.post("/api/private/verify-email", async (req, res) => {
   const { userId, code } = req.body;
 
   if (!userId || !code) {
-    return res.status(400).json({ error: "User ID and verification code are required" });
+    return res
+      .status(400)
+      .json({ error: "User ID and verification code are required" });
   }
 
   try {
@@ -810,20 +822,20 @@ app.post("/api/private/verify-email", async (req, res) => {
     );
 
     if (result.rows.length === 0) {
-      return res.status(400).json({ error: "Invalid or expired verification code" });
+      return res
+        .status(400)
+        .json({ error: "Invalid or expired verification code" });
     }
 
     // Update user as verified
-    await pool.query(
-      "UPDATE users SET is_verified = true WHERE id = $1",
-      [userId]
-    );
+    await pool.query("UPDATE users SET is_verified = true WHERE id = $1", [
+      userId,
+    ]);
 
     // Delete the used verification code
-    await pool.query(
-      "DELETE FROM email_verifications WHERE user_id = $1",
-      [userId]
-    );
+    await pool.query("DELETE FROM email_verifications WHERE user_id = $1", [
+      userId,
+    ]);
 
     res.json({ message: "Email verified successfully" });
   } catch (err) {
@@ -838,14 +850,15 @@ app.post("/api/private/resend-verification", async (req, res) => {
 
   try {
     // Generate new verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000
+    ).toString();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
 
     // Delete any existing verification codes for this user
-    await pool.query(
-      "DELETE FROM email_verifications WHERE user_id = $1",
-      [userId]
-    );
+    await pool.query("DELETE FROM email_verifications WHERE user_id = $1", [
+      userId,
+    ]);
 
     // Insert new verification code
     await pool.query(
@@ -859,35 +872,45 @@ app.post("/api/private/resend-verification", async (req, res) => {
     res.json({ message: "Verification code sent successfully" });
   } catch (err) {
     console.error("Resend verification error:", err);
-    res.status(500).json({ error: "Server error while resending verification code" });
+    res
+      .status(500)
+      .json({ error: "Server error while resending verification code" });
   }
 });
 
 // Start server with proper initialization sequence
 app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  
+
   // Initialize file system
   await initializeFile();
   console.log("Forum data file initialized");
-  
+
   // Test database connection
   await testDatabaseConnection();
-  
+
   // Start AI service login immediately
   console.log("Starting AI service initialization...");
   await loginAndStoreCookie();
-  
+
   // Also set up periodic retry (non-blocking) after a short delay
   setTimeout(() => {
     if (!aiAuthCookie) {
       console.log("Starting background AI service initialization...");
-      loginAndStoreCookie().then(() => {
-        console.log("AI service initialization completed with status:", 
-                   aiAuthCookie === "DISABLED" ? "DISABLED" : aiAuthCookie ? "SUCCESS" : "FAILED");
-      }).catch(error => {
-        console.error("AI service initialization failed:", error.message);
-      });
+      loginAndStoreCookie()
+        .then(() => {
+          console.log(
+            "AI service initialization completed with status:",
+            aiAuthCookie === "DISABLED"
+              ? "DISABLED"
+              : aiAuthCookie
+              ? "SUCCESS"
+              : "FAILED"
+          );
+        })
+        .catch((error) => {
+          console.error("AI service initialization failed:", error.message);
+        });
     }
   }, 2000);
 });

@@ -1,10 +1,15 @@
 const fetch = require("node-fetch");
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { generateVerificationCode, getVerificationExpiry } = require('../utils/verificationUtilis');
-const { sendVerificationEmail } = require('./verificationController');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const {
+  generateVerificationCode,
+  getVerificationExpiry,
+} = require("../utils/verificationUtilis");
+const { sendVerificationEmail } = require("./verificationController");
 
-console.log("Loading unified privateController with complete AI functionality...");
+console.log(
+  "Loading unified privateController with complete AI functionality..."
+);
 
 let aiAuthCookie, pool;
 
@@ -84,23 +89,30 @@ function initDependencies() {
 
 // REGISTRATION FUNCTION
 exports.register = async (req, res) => {
-  const timer = performanceLog.startTimer('User Registration');
+  const timer = performanceLog.startTimer("User Registration");
   try {
     console.log("🎯 ENTERED register function!");
-    
+
     const { fullName, email, password } = req.body;
 
     if (!fullName || !email || !password) {
-      return res.status(400).json({ error: "Full name, email, and password are required" });
+      return res
+        .status(400)
+        .json({ error: "Full name, email, and password are required" });
     }
 
     initDependencies();
 
     // Check if user already exists
-    const existingUser = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    const existingUser = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [email]
+    );
     if (existingUser.rows.length > 0) {
       console.log(`❌ User already exists with email: ${email}`);
-      return res.status(400).json({ error: "User already exists with this email" });
+      return res
+        .status(400)
+        .json({ error: "User already exists with this email" });
     }
 
     // Hash password
@@ -126,32 +138,32 @@ exports.register = async (req, res) => {
     await sendVerificationEmail(email, verificationCode, fullName);
 
     const duration = timer.end();
-    performanceLog.logPerformance('User Registration', duration);
+    performanceLog.logPerformance("User Registration", duration);
 
-    res.status(201).json({ 
-      message: "Registration successful. Please check your email for verification code.",
+    res.status(201).json({
+      message:
+        "Registration successful. Please check your email for verification code.",
       user: {
         id: newUser.id,
         email: newUser.email,
         full_name: newUser.full_name,
-        is_verified: newUser.is_verified
-      }
+        is_verified: newUser.is_verified,
+      },
     });
-
   } catch (error) {
     console.error("❌ Registration error:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('User Registration (Failed)', duration);
+    performanceLog.logPerformance("User Registration (Failed)", duration);
     res.status(500).json({ error: "Registration failed" });
   }
 };
 
 // LOGIN FUNCTION
 exports.login = async (req, res) => {
-  const timer = performanceLog.startTimer('User Login');
+  const timer = performanceLog.startTimer("User Login");
   try {
     console.log("🎯 ENTERED login function!");
-    
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -161,7 +173,9 @@ exports.login = async (req, res) => {
     initDependencies();
 
     // Find user
-    const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await pool.query("SELECT * FROM users WHERE email = $1", [
+      email,
+    ]);
     if (result.rows.length === 0) {
       console.log(`❌ Login failed: User not found for email: ${email}`);
       return res.status(401).json({ error: "Invalid email or password" });
@@ -179,9 +193,9 @@ exports.login = async (req, res) => {
     // Check if email is verified
     if (!user.is_verified) {
       console.log(`❌ Login failed: Email not verified for: ${email}`);
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: "Email not verified",
-        message: "Please verify your email before logging in"
+        message: "Please verify your email before logging in",
       });
     }
 
@@ -193,7 +207,7 @@ exports.login = async (req, res) => {
     );
 
     const duration = timer.end();
-    performanceLog.logPerformance('User Login', duration);
+    performanceLog.logPerformance("User Login", duration);
 
     res.json({
       message: "Login successful",
@@ -201,57 +215,55 @@ exports.login = async (req, res) => {
         id: user.id,
         email: user.email,
         full_name: user.full_name,
-        is_verified: user.is_verified
+        is_verified: user.is_verified,
       },
-      token
+      token,
     });
-
   } catch (error) {
     console.error("❌ Login error:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('User Login (Failed)', duration);
+    performanceLog.logPerformance("User Login (Failed)", duration);
     res.status(500).json({ error: "Login failed" });
   }
 };
 
 // Chat session functions
 exports.createChatSession = async (req, res) => {
-  const timer = performanceLog.startTimer('Create Chat Session');
+  const timer = performanceLog.startTimer("Create Chat Session");
   try {
     console.log("🎯 Creating new chat session...");
-    
+
     initDependencies();
     const userId = req.user.userId;
-    
+
     // Create chat session record
     const result = await pool.query(
-      'INSERT INTO chat_sessions (user_id, title) VALUES ($1, $2) RETURNING id, title',
-      [userId, 'New Chat']
+      "INSERT INTO chat_sessions (user_id, title) VALUES ($1, $2) RETURNING id, title",
+      [userId, "New Chat"]
     );
-    
+
     const session = result.rows[0];
     const duration = timer.end();
-    performanceLog.logPerformance('Create Chat Session', duration);
+    performanceLog.logPerformance("Create Chat Session", duration);
 
     res.json({
       message: "Chat session created successfully",
       sessionId: session.id,
-      title: session.title
+      title: session.title,
     });
-
   } catch (error) {
     console.error("❌ Error creating chat session:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('Create Chat Session (Failed)', duration);
+    performanceLog.logPerformance("Create Chat Session (Failed)", duration);
     res.status(500).json({ error: "Failed to create chat session" });
   }
 };
 
 exports.getChats = async (req, res) => {
-  const totalTimer = performanceLog.startTimer('Complete Get User Chats');
+  const totalTimer = performanceLog.startTimer("Complete Get User Chats");
   try {
     console.log("🎯 Getting user chat sessions...");
-    
+
     initDependencies();
 
     const cookie = aiAuthCookie();
@@ -260,7 +272,7 @@ exports.getChats = async (req, res) => {
         .status(401)
         .json({ error: "AI Auth Cookie not set. Please login first." });
     }
-    
+
     // Debug user info
     console.log("🔍 Debug user info:", req.user);
     const userEmail = req.user.email;
@@ -268,12 +280,16 @@ exports.getChats = async (req, res) => {
 
     // Get user's session IDs from user_sessions table
     const result = await pool.query(
-      'SELECT session_id FROM user_sessions WHERE user_email = $1 ORDER BY created_at DESC',
+      "SELECT session_id FROM user_sessions WHERE user_email = $1 ORDER BY created_at DESC",
       [userEmail]
     );
 
-    const userSessionIds = result.rows.map(row => row.session_id);
-    console.log("📊 Found", userSessionIds.length, "session IDs in user_sessions table");
+    const userSessionIds = result.rows.map((row) => row.session_id);
+    console.log(
+      "📊 Found",
+      userSessionIds.length,
+      "session IDs in user_sessions table"
+    );
     console.log("🆔 Session IDs:", userSessionIds);
 
     // If user has no sessions, return empty result
@@ -283,13 +299,15 @@ exports.getChats = async (req, res) => {
       performanceLog.logPerformance("Complete Request (Empty)", totalDuration);
       return res.json({
         message: "Chat sessions retrieved successfully",
-        sessions: []
+        sessions: [],
       });
     }
 
     // Fetch sessions with actual titles from PrivateCore API
     console.log("🌐 Fetching sessions from PrivateCore API...");
-    const apiTimer = performanceLog.startTimer("PrivateCore API - Get Sessions");
+    const apiTimer = performanceLog.startTimer(
+      "PrivateCore API - Get Sessions"
+    );
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
@@ -316,7 +334,10 @@ exports.getChats = async (req, res) => {
     }
 
     const data = await response.json();
-    console.log("📦 Raw API response sessions count:", data.sessions?.length || 0);
+    console.log(
+      "📦 Raw API response sessions count:",
+      data.sessions?.length || 0
+    );
 
     // Filter to only include user's sessions with actual titles
     const filterTimer = performanceLog.startTimer("Filter User Sessions");
@@ -324,7 +345,9 @@ exports.getChats = async (req, res) => {
     let userSessions = [];
 
     if (data && data.sessions) {
-      console.log(`📊 Total sessions from PrivateCore: ${data.sessions.length}`);
+      console.log(
+        `📊 Total sessions from PrivateCore: ${data.sessions.length}`
+      );
 
       userSessions = data.sessions.filter((session) => {
         const sessionId =
@@ -341,28 +364,32 @@ exports.getChats = async (req, res) => {
     filterTimer.end();
 
     // Map sessions to the format expected by frontend
-    const sessions = userSessions.map(session => ({
+    const sessions = userSessions.map((session) => ({
       id: session.id || session.session_id || session.chat_session_id,
       chat_id: session.id || session.session_id || session.chat_session_id,
       title: session.name || session.title || "Chat Session", // Use actual title from PrivateCore
       created_at: session.created_at || session.time_created,
-      updated_at: session.updated_at || session.time_updated || session.created_at
+      updated_at:
+        session.updated_at || session.time_updated || session.created_at,
     }));
 
     console.log("📤 Sending", sessions.length, "sessions to frontend");
-    console.log("📋 Mapped sessions with titles:", sessions.map(s => ({ id: s.id, title: s.title })));
+    console.log(
+      "📋 Mapped sessions with titles:",
+      sessions.map((s) => ({ id: s.id, title: s.title }))
+    );
 
     const totalDuration = totalTimer.end();
-    performanceLog.logPerformance('Complete Get User Chats', totalDuration);
+    performanceLog.logPerformance("Complete Get User Chats", totalDuration);
 
     res.json({
       message: "Chat sessions retrieved successfully",
-      sessions: sessions
+      sessions: sessions,
     });
   } catch (error) {
     console.error("❌ Error getting chat sessions:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('Get User Chats (Failed)', duration);
+    performanceLog.logPerformance("Get User Chats (Failed)", duration);
     res.status(500).json({ error: "Failed to get chat sessions" });
   }
 };
@@ -370,7 +397,7 @@ exports.getChats = async (req, res) => {
 exports.getChatSessionById = async (req, res) => {
   try {
     console.log("🎯 Getting chat session by ID...");
-    
+
     initDependencies();
 
     const cookie = aiAuthCookie();
@@ -427,7 +454,11 @@ exports.getChatSessionById = async (req, res) => {
     }
 
     const data = await response.json();
-    console.log(`✅ Successfully fetched session ${id} with ${data.messages ? data.messages.length : 0} messages`);
+    console.log(
+      `✅ Successfully fetched session ${id} with ${
+        data.messages ? data.messages.length : 0
+      } messages`
+    );
     res.json(data);
   } catch (err) {
     console.error("❌ Failed to fetch chat session by id:", err);
@@ -438,7 +469,7 @@ exports.getChatSessionById = async (req, res) => {
 exports.renameChatSession = async (req, res) => {
   try {
     console.log("🎯 Renaming chat session...");
-    
+
     initDependencies();
 
     const cookie = aiAuthCookie();
@@ -451,7 +482,9 @@ exports.renameChatSession = async (req, res) => {
     const userEmail = req.user?.email || "unknown";
     const { chat_session_id, name } = req.body;
 
-    console.log(`🏷️ User: ${userEmail} renaming session: ${chat_session_id} to "${name}"`);
+    console.log(
+      `🏷️ User: ${userEmail} renaming session: ${chat_session_id} to "${name}"`
+    );
 
     if (!chat_session_id || !name) {
       return res
@@ -486,12 +519,17 @@ exports.renameChatSession = async (req, res) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`❌ PrivateCore API error renaming session ${chat_session_id}:`, errorText);
+      console.error(
+        `❌ PrivateCore API error renaming session ${chat_session_id}:`,
+        errorText
+      );
       return res.status(response.status).json({ error: errorText });
     }
 
     const data = await response.json();
-    console.log(`✅ Successfully renamed session ${chat_session_id} to "${name}"`);
+    console.log(
+      `✅ Successfully renamed session ${chat_session_id} to "${name}"`
+    );
     res.json(data);
   } catch (err) {
     console.error("❌ Failed to rename chat session:", err);
@@ -500,10 +538,10 @@ exports.renameChatSession = async (req, res) => {
 };
 
 exports.deleteChatSession = async (req, res) => {
-  const timer = performanceLog.startTimer('Delete Chat Session');
+  const timer = performanceLog.startTimer("Delete Chat Session");
   try {
     console.log("🎯 Deleting chat session...");
-    
+
     initDependencies();
     const userEmail = req.user.email;
     const sessionId = req.params.sessionId;
@@ -512,7 +550,7 @@ exports.deleteChatSession = async (req, res) => {
 
     // Delete from user_sessions table using user_email and session_id
     const result = await pool.query(
-      'DELETE FROM user_sessions WHERE session_id = $1 AND user_email = $2 RETURNING *',
+      "DELETE FROM user_sessions WHERE session_id = $1 AND user_email = $2 RETURNING *",
       [sessionId, userEmail]
     );
 
@@ -524,33 +562,32 @@ exports.deleteChatSession = async (req, res) => {
     console.log("✅ Chat session deleted successfully:", result.rows[0]);
 
     const duration = timer.end();
-    performanceLog.logPerformance('Delete Chat Session', duration);
+    performanceLog.logPerformance("Delete Chat Session", duration);
 
     res.json({
       message: "Chat session deleted successfully",
-      session: result.rows[0]
+      session: result.rows[0],
     });
-
   } catch (error) {
     console.error("❌ Error deleting chat session:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('Delete Chat Session (Failed)', duration);
+    performanceLog.logPerformance("Delete Chat Session (Failed)", duration);
     res.status(500).json({ error: "Failed to delete chat session" });
   }
 };
 
 exports.getChatHistory = async (req, res) => {
-  const timer = performanceLog.startTimer('Get Chat History');
+  const timer = performanceLog.startTimer("Get Chat History");
   try {
     console.log("🎯 Getting chat history...");
-    
+
     initDependencies();
     const userId = req.user.userId;
     const sessionId = req.params.sessionId;
 
     // Verify session belongs to user
     const sessionCheck = await pool.query(
-      'SELECT id FROM chat_sessions WHERE id = $1 AND user_id = $2',
+      "SELECT id FROM chat_sessions WHERE id = $1 AND user_id = $2",
       [sessionId, userId]
     );
 
@@ -559,31 +596,30 @@ exports.getChatHistory = async (req, res) => {
     }
 
     const messages = await pool.query(
-      'SELECT * FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC',
+      "SELECT * FROM chat_messages WHERE session_id = $1 ORDER BY created_at ASC",
       [sessionId]
     );
 
     const duration = timer.end();
-    performanceLog.logPerformance('Get Chat History', duration);
+    performanceLog.logPerformance("Get Chat History", duration);
 
     res.json({
       message: "Chat history retrieved successfully",
-      messages: messages.rows
+      messages: messages.rows,
     });
-
   } catch (error) {
     console.error("❌ Error getting chat history:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('Get Chat History (Failed)', duration);
+    performanceLog.logPerformance("Get Chat History (Failed)", duration);
     res.status(500).json({ error: "Failed to get chat history" });
   }
 };
 
 exports.setChatHistory = async (req, res) => {
-  const timer = performanceLog.startTimer('Set Chat History');
+  const timer = performanceLog.startTimer("Set Chat History");
   try {
     console.log("🎯 Setting chat history...");
-    
+
     initDependencies();
     const userId = req.user.userId;
     const sessionId = req.params.sessionId;
@@ -595,7 +631,7 @@ exports.setChatHistory = async (req, res) => {
 
     // Verify session belongs to user
     const sessionCheck = await pool.query(
-      'SELECT id FROM chat_sessions WHERE id = $1 AND user_id = $2',
+      "SELECT id FROM chat_sessions WHERE id = $1 AND user_id = $2",
       [sessionId, userId]
     );
 
@@ -604,27 +640,28 @@ exports.setChatHistory = async (req, res) => {
     }
 
     // Delete existing messages
-    await pool.query('DELETE FROM chat_messages WHERE session_id = $1', [sessionId]);
+    await pool.query("DELETE FROM chat_messages WHERE session_id = $1", [
+      sessionId,
+    ]);
 
     // Insert new messages
     for (const message of messages) {
       await pool.query(
-        'INSERT INTO chat_messages (session_id, user_id, content, is_ai) VALUES ($1, $2, $3, $4)',
+        "INSERT INTO chat_messages (session_id, user_id, content, is_ai) VALUES ($1, $2, $3, $4)",
         [sessionId, userId, message.content, message.isAi || false]
       );
     }
 
     const duration = timer.end();
-    performanceLog.logPerformance('Set Chat History', duration);
+    performanceLog.logPerformance("Set Chat History", duration);
 
     res.json({
-      message: "Chat history updated successfully"
+      message: "Chat history updated successfully",
     });
-
   } catch (error) {
     console.error("❌ Error setting chat history:", error);
     const duration = timer.end();
-    performanceLog.logPerformance('Set Chat History (Failed)', duration);
+    performanceLog.logPerformance("Set Chat History (Failed)", duration);
     res.status(500).json({ error: "Failed to set chat history" });
   }
 };
@@ -777,7 +814,10 @@ exports.sendMessage = async (req, res) => {
 
         // Debug: Log first few packets to understand structure
         if (processedLines <= 5) {
-          console.log(`🔍 Packet ${processedLines}:`, JSON.stringify(packet, null, 2));
+          console.log(
+            `🔍 Packet ${processedLines}:`,
+            JSON.stringify(packet, null, 2)
+          );
         }
 
         // OPTIMIZATION 5: Handle new streaming format with early content extraction
@@ -786,7 +826,9 @@ exports.sendMessage = async (req, res) => {
           packet.obj.type === "reasoning_delta" &&
           packet.obj.reasoning
         ) {
-          console.log(`📝 Adding content (${packet.obj.reasoning.length} chars): "${packet.obj.reasoning}"`);
+          console.log(
+            `📝 Adding content (${packet.obj.reasoning.length} chars): "${packet.obj.reasoning}"`
+          );
           fullMessage += packet.obj.reasoning;
         }
         // Legacy format support
@@ -796,11 +838,18 @@ exports.sendMessage = async (req, res) => {
         // Message completion detection
         else if (packet.obj && packet.obj.type === "message_complete") {
           assistantMessage = fullMessage;
-          console.log(`🏁 Message complete! Final length: ${fullMessage.length} chars`);
+          console.log(
+            `🏁 Message complete! Final length: ${fullMessage.length} chars`
+          );
           break; // Early exit when complete
         }
       } catch (e) {
-        console.log(`⚠️ Failed to parse line ${processedLines}: ${line.substring(0, 100)}...`);
+        console.log(
+          `⚠️ Failed to parse line ${processedLines}: ${line.substring(
+            0,
+            100
+          )}...`
+        );
       }
     }
 
