@@ -31,8 +31,8 @@ router.post("/register", privateController.register);
 router.post("/login", privateController.login);
 
 // Chat session routes
-// Chat session routes
 router.post("/createSession", privateController.createChatSession);
+router.post("/createSessionFast", privateController.createChatSessionFast);
 router.get("/getUserChatSessions", privateController.getChats);
 router.get("/getChatSession/:id", privateController.getChatSessionById);
 router.post("/sendMessage", privateController.sendMessage);

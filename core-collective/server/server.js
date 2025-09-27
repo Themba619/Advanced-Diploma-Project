@@ -22,7 +22,8 @@ const isAIServiceEnabled = process.env.AI_SERVICE_ENABLED !== 'false';
 // AI Service configuration
 const AI_SERVICE_URL = 'https://api.privatecore.app';
 
-// Function to login to AI service
+// Function to login to AI service (COMMENTED OUT - using loginAndStoreCookie instead)
+/*
 async function loginToAIService() {
   if (loginInProgress) {
     console.log('⏳ AI service login already in progress');
@@ -103,8 +104,10 @@ async function loginToAIService() {
     loginInProgress = false;
   }
 }
+*/
 
-// Schedule periodic AI service login to keep the session fresh
+// Schedule periodic AI service login to keep the session fresh (COMMENTED OUT)
+/*
 setInterval(() => {
   if (!aiAuthCookie) {
     loginToAIService();
@@ -113,13 +116,14 @@ setInterval(() => {
 
 // Initial login attempt
 loginToAIService();
+*/
 
 // PostgreSQL connection with better error handling
 const pool = new Pool({
   user: process.env.DB_USER || "postgres",
   host: process.env.DB_HOST || "localhost",
   database: process.env.DB_NAME || "corecollective",
-  password: process.env.DB_PASSWORD || "postgress",
+  password: process.env.DB_PASSWORD || "postgres",
   port: process.env.DB_PORT || 5432,
   max: 20,
   idleTimeoutMillis: 30000,
@@ -140,6 +144,7 @@ async function initDatabase() {
       CREATE TABLE IF NOT EXISTS chat_sessions (
         id SERIAL PRIMARY KEY,
         user_id INT REFERENCES users(id),
+        chat_id VARCHAR(255) UNIQUE,
         title VARCHAR(255) DEFAULT 'New Chat',
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -172,7 +177,7 @@ pool.on('error', (err) => {
 });
 
 // Export cookie and pool for use in other modules
-module.exports.aiAuthCookie = aiAuthCookie;
+module.exports.aiAuthCookie = () => aiAuthCookie;
 module.exports.pool = pool;
 
 // Routes
@@ -649,7 +654,9 @@ app.post("/api/private/register", async (req, res) => {
     });
     
   } catch (err) {
-    console.error("Registration error:", err);
+    console.error("❌ DETAILED Registration error:", err);
+    console.error("❌ Error message:", err.message);
+    console.error("❌ Error stack:", err.stack);
     res.status(500).json({ error: "Server error during registration" });
   }
 });
@@ -867,7 +874,11 @@ app.listen(PORT, async () => {
   // Test database connection
   await testDatabaseConnection();
   
-  // Attempt AI login (non-blocking) after a short delay
+  // Start AI service login immediately
+  console.log("Starting AI service initialization...");
+  await loginAndStoreCookie();
+  
+  // Also set up periodic retry (non-blocking) after a short delay
   setTimeout(() => {
     if (!aiAuthCookie) {
       console.log("Starting background AI service initialization...");

@@ -58,8 +58,13 @@ const ChatHistoryPopup = ({ isOpen, chats, activeChat, onSelectChat, onDeleteCha
                 className={`virtualassist-history-item${chat.id === activeChat ? " active" : ""}`}
                 onClick={() => onSelectChat(chat.id)}
               >
-                <span className="virtualassist-history-name">{chat.name || `Chat ${chat.id}`}</span>
-                <span className="virtualassist-history-date">{chat.date || chat.time_created?.slice(0, 10)}</span>
+                <span className="virtualassist-history-name">{chat.title || chat.name || `Chat ${chat.id}`}</span>
+                <span className="virtualassist-history-date">
+                  {chat.date || 
+                   (chat.created_at && new Date(chat.created_at).toLocaleDateString()) || 
+                   (chat.time_created && chat.time_created.slice(0, 10)) || 
+                   new Date().toLocaleDateString()}
+                </span>
                 <button
                   className="virtualassist-delete-btn"
                   onClick={(e) => { e.stopPropagation(); onDeleteChat(chat.id); }}

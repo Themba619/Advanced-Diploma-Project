@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const querystring = require('querystring');
 const { generateVerificationCode, getVerificationExpiry } = require('../utils/verificationUtilis');
 const { sendVerificationEmail } = require('./verificationController');
 
@@ -9,34 +8,49 @@ console.log("Loading unified privateController with complete AI functionality...
 
 let aiAuthCookie, pool;
 
-// Initialize AI service
-async function initAI() {
-  if (!aiAuthCookie) {
-    const loginData = querystring.stringify({
-      username: "fakej710@gmail.com",
-      password: "PointBreak2014!!!!",
-    });
-    
-    try {
-      const response = await fetch("https://api.privatecore.app/login", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: loginData
-      });
-      
-      if (!response.ok) {
-        throw new Error(`AI login failed: ${response.status}`);
-      }
-      
-      aiAuthCookie = response.headers.get('set-cookie');
-      console.log('✅ AI service login successful');
-    } catch (error) {
-      console.error('❌ AI service login error:', error);
-      aiAuthCookie = null;
+// Cache for user verification to reduce DB calls
+const userCache = new Map();
+const USER_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function clearExpiredCache() {
+  const now = Date.now();
+  for (const [key, value] of userCache.entries()) {
+    if (now - value.timestamp > USER_CACHE_TTL) {
+      userCache.delete(key);
     }
   }
+}
+
+// Optimized user verification with caching
+async function getUserWithCache(email) {
+  const timer = performanceLog.startTimer(`Get User (${email})`);
+
+  // Check cache first
+  const cached = userCache.get(email);
+  if (cached && Date.now() - cached.timestamp < USER_CACHE_TTL) {
+    timer.end();
+    return cached.user;
+  }
+
+  // Query database
+  const userResult = await pool.query("SELECT id FROM users WHERE email = $1", [
+    email,
+  ]);
+
+  const user = userResult.rows[0] || null;
+
+  // Cache the result
+  if (user) {
+    userCache.set(email, {
+      user,
+      timestamp: Date.now(),
+    });
+  }
+
+  const duration = timer.end();
+  performanceLog.logPerformance("User Lookup", duration);
+
+  return user;
 }
 
 // Performance monitoring utilities
@@ -60,18 +74,12 @@ const performanceLog = {
   },
 };
 
-async function initDependencies() {
-  if (!pool) {
-    console.log('🔄 Initializing dependencies...');
+function initDependencies() {
+  if (!aiAuthCookie || !pool) {
     const server = require("../server");
+    aiAuthCookie = server.aiAuthCookie;
     pool = server.pool;
   }
-  
-  if (!aiAuthCookie) {
-    await initAI();
-  }
-  
-  console.log('🔑 AI Cookie Status:', aiAuthCookie ? 'Present' : 'Missing');
 }
 
 // REGISTRATION FUNCTION
@@ -240,26 +248,117 @@ exports.createChatSession = async (req, res) => {
 };
 
 exports.getChats = async (req, res) => {
-  const timer = performanceLog.startTimer('Get User Chats');
+  const totalTimer = performanceLog.startTimer('Complete Get User Chats');
   try {
     console.log("🎯 Getting user chat sessions...");
     
     initDependencies();
-    const userId = req.user.userId;
 
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
+    }
+    
+    // Debug user info
+    console.log("🔍 Debug user info:", req.user);
+    const userEmail = req.user.email;
+    console.log("👤 Looking for chats for user email:", userEmail);
+
+    // Get user's session IDs from user_sessions table
     const result = await pool.query(
-      'SELECT * FROM chat_sessions WHERE user_id = $1 ORDER BY created_at DESC',
-      [userId]
+      'SELECT session_id FROM user_sessions WHERE user_email = $1 ORDER BY created_at DESC',
+      [userEmail]
     );
 
-    const duration = timer.end();
-    performanceLog.logPerformance('Get User Chats', duration);
+    const userSessionIds = result.rows.map(row => row.session_id);
+    console.log("📊 Found", userSessionIds.length, "session IDs in user_sessions table");
+    console.log("🆔 Session IDs:", userSessionIds);
+
+    // If user has no sessions, return empty result
+    if (userSessionIds.length === 0) {
+      console.log("📭 User has no chat sessions");
+      const totalDuration = totalTimer.end();
+      performanceLog.logPerformance("Complete Request (Empty)", totalDuration);
+      return res.json({
+        message: "Chat sessions retrieved successfully",
+        sessions: []
+      });
+    }
+
+    // Fetch sessions with actual titles from PrivateCore API
+    console.log("🌐 Fetching sessions from PrivateCore API...");
+    const apiTimer = performanceLog.startTimer("PrivateCore API - Get Sessions");
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
+    const response = await fetch(
+      "https://api.privatecore.app/chat/get-user-chat-sessions",
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+        signal: controller.signal,
+      }
+    );
+
+    clearTimeout(timeoutId);
+    const apiDuration = apiTimer.end();
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ PrivateCore API error:", errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
+
+    const data = await response.json();
+    console.log("📦 Raw API response sessions count:", data.sessions?.length || 0);
+
+    // Filter to only include user's sessions with actual titles
+    const filterTimer = performanceLog.startTimer("Filter User Sessions");
+    const userSessionIdSet = new Set(userSessionIds); // O(1) lookup
+    let userSessions = [];
+
+    if (data && data.sessions) {
+      console.log(`📊 Total sessions from PrivateCore: ${data.sessions.length}`);
+
+      userSessions = data.sessions.filter((session) => {
+        const sessionId =
+          session.id ||
+          session.sessionId ||
+          session.session_id ||
+          session.chat_session_id;
+        return userSessionIdSet.has(sessionId);
+      });
+
+      console.log(`✅ Filtered sessions count: ${userSessions.length}`);
+    }
+
+    filterTimer.end();
+
+    // Map sessions to the format expected by frontend
+    const sessions = userSessions.map(session => ({
+      id: session.id || session.session_id || session.chat_session_id,
+      chat_id: session.id || session.session_id || session.chat_session_id,
+      title: session.name || session.title || "Chat Session", // Use actual title from PrivateCore
+      created_at: session.created_at || session.time_created,
+      updated_at: session.updated_at || session.time_updated || session.created_at
+    }));
+
+    console.log("📤 Sending", sessions.length, "sessions to frontend");
+    console.log("📋 Mapped sessions with titles:", sessions.map(s => ({ id: s.id, title: s.title })));
+
+    const totalDuration = totalTimer.end();
+    performanceLog.logPerformance('Complete Get User Chats', totalDuration);
 
     res.json({
       message: "Chat sessions retrieved successfully",
-      sessions: result.rows
+      sessions: sessions
     });
-
   } catch (error) {
     console.error("❌ Error getting chat sessions:", error);
     const duration = timer.end();
@@ -269,74 +368,134 @@ exports.getChats = async (req, res) => {
 };
 
 exports.getChatSessionById = async (req, res) => {
-  const timer = performanceLog.startTimer('Get Chat Session By ID');
   try {
     console.log("🎯 Getting chat session by ID...");
     
     initDependencies();
-    const userId = req.user.userId;
-    const sessionId = req.params.id;
 
-    const result = await pool.query(
-      'SELECT * FROM chat_sessions WHERE id = $1 AND user_id = $2',
-      [sessionId, userId]
-    );
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Chat session not found" });
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
-    const duration = timer.end();
-    performanceLog.logPerformance('Get Chat Session By ID', duration);
+    const { id } = req.params;
+    const userEmail = req.user?.email || "unknown";
 
-    res.json({
-      message: "Chat session retrieved successfully",
-      session: result.rows[0]
-    });
+    console.log(`👤 User: ${userEmail} requesting session: ${id}`);
 
-  } catch (error) {
-    console.error("❌ Error getting chat session:", error);
-    const duration = timer.end();
-    performanceLog.logPerformance('Get Chat Session By ID (Failed)', duration);
-    res.status(500).json({ error: "Failed to get chat session" });
+    // Verify user owns this chat session
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userId = userResult.rows[0].id;
+
+    // Check if user has access to this chat session using user_sessions table
+    const chatCheck = await pool.query(
+      "SELECT session_id FROM user_sessions WHERE user_email = $1 AND session_id = $2",
+      [userEmail, id]
+    );
+
+    if (chatCheck.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
+    }
+
+    console.log(`🌐 Fetching chat session ${id} from PrivateCore API...`);
+    const response = await fetch(
+      `https://api.privatecore.app/chat/get-chat-session/${id}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ PrivateCore API error for session ${id}:`, errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
+
+    const data = await response.json();
+    console.log(`✅ Successfully fetched session ${id} with ${data.messages ? data.messages.length : 0} messages`);
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Failed to fetch chat session by id:", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
 exports.renameChatSession = async (req, res) => {
-  const timer = performanceLog.startTimer('Rename Chat Session');
   try {
     console.log("🎯 Renaming chat session...");
     
     initDependencies();
-    const userId = req.user.userId;
-    const { sessionId, newTitle } = req.body;
 
-    if (!newTitle) {
-      return res.status(400).json({ error: "New title is required" });
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
-    const result = await pool.query(
-      'UPDATE chat_sessions SET title = $1 WHERE id = $2 AND user_id = $3 RETURNING *',
-      [newTitle, sessionId, userId]
+    const userEmail = req.user?.email || "unknown";
+    const { chat_session_id, name } = req.body;
+
+    console.log(`🏷️ User: ${userEmail} renaming session: ${chat_session_id} to "${name}"`);
+
+    if (!chat_session_id || !name) {
+      return res
+        .status(400)
+        .json({ error: "chat_session_id and name are required." });
+    }
+
+    // Check if user has access to this chat session using user_sessions table
+    const chatCheck = await pool.query(
+      "SELECT session_id FROM user_sessions WHERE user_email = $1 AND session_id = $2",
+      [userEmail, chat_session_id]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: "Chat session not found" });
+    if (chatCheck.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
     }
 
-    const duration = timer.end();
-    performanceLog.logPerformance('Rename Chat Session', duration);
+    console.log("🌐 Calling PrivateCore API to rename session...");
+    const response = await fetch(
+      "https://api.privatecore.app/chat/rename-chat-session",
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+        body: JSON.stringify({ chat_session_id, name }),
+      }
+    );
 
-    res.json({
-      message: "Chat session renamed successfully",
-      session: result.rows[0]
-    });
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`❌ PrivateCore API error renaming session ${chat_session_id}:`, errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
 
-  } catch (error) {
-    console.error("❌ Error renaming chat session:", error);
-    const duration = timer.end();
-    performanceLog.logPerformance('Rename Chat Session (Failed)', duration);
-    res.status(500).json({ error: "Failed to rename chat session" });
+    const data = await response.json();
+    console.log(`✅ Successfully renamed session ${chat_session_id} to "${name}"`);
+    res.json(data);
+  } catch (err) {
+    console.error("❌ Failed to rename chat session:", err);
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -346,21 +505,23 @@ exports.deleteChatSession = async (req, res) => {
     console.log("🎯 Deleting chat session...");
     
     initDependencies();
-    const userId = req.user.userId;
+    const userEmail = req.user.email;
     const sessionId = req.params.sessionId;
 
-    // First delete messages
-    await pool.query('DELETE FROM chat_messages WHERE session_id = $1', [sessionId]);
+    console.log("🗑️ Deleting chat session:", { userEmail, sessionId });
 
-    // Then delete session
+    // Delete from user_sessions table using user_email and session_id
     const result = await pool.query(
-      'DELETE FROM chat_sessions WHERE id = $1 AND user_id = $2 RETURNING *',
-      [sessionId, userId]
+      'DELETE FROM user_sessions WHERE session_id = $1 AND user_email = $2 RETURNING *',
+      [sessionId, userEmail]
     );
 
     if (result.rows.length === 0) {
+      console.log("❌ Chat session not found:", { sessionId, userEmail });
       return res.status(404).json({ error: "Chat session not found" });
     }
+
+    console.log("✅ Chat session deleted successfully:", result.rows[0]);
 
     const duration = timer.end();
     performanceLog.logPerformance('Delete Chat Session', duration);
@@ -469,85 +630,302 @@ exports.setChatHistory = async (req, res) => {
 };
 
 exports.sendMessage = async (req, res) => {
-  const timer = performanceLog.startTimer('Send Message');
+  const totalTimer = performanceLog.startTimer("Complete sendMessage");
+  console.log("🎯 ENTERED sendMessage function!");
+
+  // Clear expired cache entries periodically
+  clearExpiredCache();
+
   try {
-    console.log("🎯 Sending message...");
-    
-    await initDependencies();
-    const { sessionId, message } = req.body;
-    const userId = req.user.userId;
+    initDependencies();
 
-    // Verify session belongs to user
-    const sessionCheck = await pool.query(
-      'SELECT id FROM chat_sessions WHERE id = $1 AND user_id = $2',
-      [sessionId, userId]
-    );
-
-    if (sessionCheck.rows.length === 0) {
-      return res.status(404).json({ error: "Chat session not found" });
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      console.log("❌ No AI Auth Cookie found");
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
     }
 
-    // Store message
-    await pool.query(
-      'INSERT INTO chat_messages (session_id, user_id, content) VALUES ($1, $2, $3)',
-      [sessionId, userId, message]
-    );
+    const userEmail = req.user?.email || "unknown";
+    const {
+      chat_session_id,
+      message,
+      parent_message_id = null,
+      alternate_assistant_id = 0,
+      prompt_id = null,
+      search_doc_ids = null,
+      file_descriptors = [],
+      user_file_ids = [],
+      user_folder_ids = [],
+      regenerate = false,
+      retrieval_options = {
+        run_search: "auto",
+        real_time: true,
+        filters: {
+          source_type: null,
+          document_set: null,
+          time_cutoff: null,
+          tags: [],
+          user_file_ids: null,
+        },
+      },
+      prompt_override = null,
+      use_agentic_search = false,
+      is_new_session = false,
+    } = req.body;
 
-    // Get AI response using private core API
-    let aiResponse;
-    try {
-      console.log("🔍 Attempting AI request with auth cookie:", aiAuthCookie ? "Present" : "Missing");
-      console.log("📝 Message being sent:", message);
-      
-      const endpoint = 'https://api.privatecore.app/v1/chat';
-      console.log('🔗 Using AI endpoint:', endpoint);
-      
-      const aiResult = await fetch(endpoint, {
+    console.log(
+      `👤 User: ${userEmail} sending message to session: ${chat_session_id}`
+    );
+    console.log(`💬 Message: ${message}`);
+
+    if (!chat_session_id || !message) {
+      return res
+        .status(400)
+        .json({ error: "chat_session_id and message are required." });
+    }
+
+    // OPTIMIZATION 2: Batch verification queries using user_sessions table
+    const verifyTimer = performanceLog.startTimer("Chat Session Verification");
+    const chatCheck = await pool.query(
+      "SELECT session_id FROM user_sessions WHERE user_email = $1 AND session_id = $2",
+      [userEmail, chat_session_id]
+    );
+    verifyTimer.end();
+
+    if (chatCheck.rows.length === 0) {
+      return res
+        .status(403)
+        .json({ error: "Access denied to this chat session" });
+    }
+
+    const body = {
+      alternate_assistant_id,
+      chat_session_id,
+      parent_message_id,
+      message,
+      prompt_id,
+      search_doc_ids,
+      file_descriptors,
+      user_file_ids,
+      user_folder_ids,
+      regenerate,
+      retrieval_options,
+      prompt_override,
+      use_agentic_search,
+    };
+
+    console.log("🌐 Sending message to PrivateCore API...");
+
+    // OPTIMIZATION 3: More generous timeout for AI processing
+    const apiTimer = performanceLog.startTimer("PrivateCore API Call");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout - more reasonable for AI processing
+
+    const response = await fetch(
+      "https://api.privatecore.app/chat/send-message",
+      {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Cookie": aiAuthCookie,
-          "User-Agent": "CoreCollective/1.0"
+          Cookie: cookie,
         },
-        body: JSON.stringify({ message }),
-        timeout: 10000 // 10 second timeout
-      });
-      
-      console.log("🔄 AI service status:", aiResult.status);
-      const responseText = await aiResult.text();
-      console.log("📬 Raw AI response:", responseText);
-      
-      if (!aiResult.ok) {
-        throw new Error(`AI service responded with status: ${aiResult.status}, body: ${responseText}`);
+        body: JSON.stringify(body),
+        signal: controller.signal,
       }
-      
-      const aiData = JSON.parse(responseText);
-      console.log("✨ Parsed AI response:", aiData);
-      aiResponse = aiData.response;
-      
-    } catch (aiError) {
-      console.error("❌ Error getting AI response:", aiError);
-      aiResponse = "I apologize, but I'm having trouble processing your request right now. Please try again.";
-    }
-
-    // Store AI response
-    await pool.query(
-      'INSERT INTO chat_messages (session_id, user_id, content, is_ai) VALUES ($1, $2, $3, true)',
-      [sessionId, userId, aiResponse]
     );
 
-    const duration = timer.end();
-    performanceLog.logPerformance('Send Message', duration);
+    // Time the response reading separately to identify bottlenecks
+    const responseTimer = performanceLog.startTimer("Response Reading");
+    let rawText = await response.text();
+    const responseDuration = responseTimer.end();
+    performanceLog.logPerformance("Response Reading", responseDuration);
 
+    clearTimeout(timeoutId);
+    const apiDuration = apiTimer.end();
+
+    if (!response.ok) {
+      let errorJson;
+      try {
+        errorJson = JSON.parse(rawText);
+      } catch (e) {
+        errorJson = { error: rawText };
+      }
+      console.error("❌ PrivateCore API error:", errorJson);
+      return res.status(response.status).json(errorJson);
+    }
+
+    // OPTIMIZATION 4: Faster JSON processing with minimal logging
+    const parseTimer = performanceLog.startTimer("Response Parsing");
+    const lines = rawText.split(/\r?\n/).filter(Boolean);
+    let fullMessage = "";
+    let assistantMessage = null;
+    let processedLines = 0;
+
+    console.log(`📦 Processing ${lines.length} response lines...`);
+
+    // Process lines more efficiently with detailed debugging
+    for (const line of lines) {
+      processedLines++;
+
+      // Skip empty lines faster
+      if (!line.trim()) continue;
+
+      try {
+        const packet = JSON.parse(line);
+
+        // Debug: Log first few packets to understand structure
+        if (processedLines <= 5) {
+          console.log(`🔍 Packet ${processedLines}:`, JSON.stringify(packet, null, 2));
+        }
+
+        // OPTIMIZATION 5: Handle new streaming format with early content extraction
+        if (
+          packet.obj &&
+          packet.obj.type === "reasoning_delta" &&
+          packet.obj.reasoning
+        ) {
+          console.log(`📝 Adding content (${packet.obj.reasoning.length} chars): "${packet.obj.reasoning}"`);
+          fullMessage += packet.obj.reasoning;
+        }
+        // Legacy format support
+        else if (packet.message_type === "assistant" && packet.message) {
+          assistantMessage = packet.message;
+        }
+        // Message completion detection
+        else if (packet.obj && packet.obj.type === "message_complete") {
+          assistantMessage = fullMessage;
+          console.log(`🏁 Message complete! Final length: ${fullMessage.length} chars`);
+          break; // Early exit when complete
+        }
+      } catch (e) {
+        console.log(`⚠️ Failed to parse line ${processedLines}: ${line.substring(0, 100)}...`);
+      }
+    }
+
+    console.log(`✅ Processed ${processedLines} lines successfully`);
+
+    const parseDuration = parseTimer.end();
+    performanceLog.logPerformance("Response Parsing", parseDuration);
+
+    // Use accumulated message from streaming packets, fallback to legacy format
+    const finalMessage = fullMessage || assistantMessage;
+
+    const totalDuration = totalTimer.end();
+    performanceLog.logPerformance("Complete Request", totalDuration);
+
+    console.log(
+      `✅ Final assembled message length: ${
+        finalMessage ? finalMessage.length : 0
+      } characters`
+    );
+    console.log("📤 Returning AI response to frontend");
+
+    // OPTIMIZATION 6: Return response with performance metadata
     res.json({
-      message: "Message sent successfully",
-      response: aiResponse
+      message: finalMessage || null,
+      performance: {
+        total_duration: totalDuration,
+        api_duration: apiDuration,
+        parse_duration: parseDuration,
+        lines_processed: processedLines,
+      },
     });
+  } catch (err) {
+    const totalDuration = totalTimer.end();
+    console.error("❌ Failed to send message to model:", err);
+    console.log(`⏱️  Failed request took: ${totalDuration}ms`);
 
-  } catch (error) {
-    console.error("❌ Error sending message:", error);
-    const duration = timer.end();
-    performanceLog.logPerformance('Send Message (Failed)', duration);
-    res.status(500).json({ error: "Failed to send message" });
+    if (err.name === "AbortError") {
+      return res.status(408).json({
+        error:
+          "The AI service is taking longer than expected (25s timeout). This might be due to high server load. Please try your request again.",
+        performance: { timeout_reached: true },
+      });
+    }
+
+    return res
+      .status(500)
+      .json({ error: err.message || "Internal server error" });
+  }
+};
+
+// CREATE CHAT SESSION FAST
+exports.createChatSessionFast = async (req, res) => {
+  try {
+    console.log("🎯 ENTERED createChatSessionFast function!");
+
+    initDependencies();
+
+    const cookie = aiAuthCookie();
+    if (!cookie) {
+      return res
+        .status(401)
+        .json({ error: "AI Auth Cookie not set. Please login first." });
+    }
+
+    const userEmail = req.user?.email || "unknown";
+    console.log(`👤 User creating fast chat: ${userEmail}`);
+
+    // Get user ID first
+    const userResult = await pool.query(
+      "SELECT id FROM users WHERE email = $1",
+      [userEmail]
+    );
+
+    if (userResult.rows.length === 0) {
+      console.log("❌ User not found in database");
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const userId = userResult.rows[0].id;
+    console.log(`👤 User ID: ${userId}`);
+
+    console.log("🌐 Calling PrivateCore API to create fast session...");
+    const response = await fetch(
+      "https://api.privatecore.app/chat/create-chat-session",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: cookie,
+        },
+        body: JSON.stringify({
+          persona_id: 0,
+          description: "Convo",
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("❌ PrivateCore API error:", errorText);
+      return res.status(response.status).json({ error: errorText });
+    }
+
+    const data = await response.json();
+    const newChatId = data.chat_session_id;
+
+    console.log(`🆕 PrivateCore created chat session: ${newChatId}`);
+
+    // Save the chat ID to the user in our database using user_sessions table
+    try {
+      await pool.query(
+        "INSERT INTO user_sessions (user_email, session_id) VALUES ($1, $2)",
+        [userEmail, newChatId]
+      );
+      console.log(
+        `✅ Saved chat ${newChatId} to user ${userEmail} in user_sessions table`
+      );
+    } catch (dbError) {
+      console.error("❌ Error saving chat to database:", dbError);
+    }
+
+    console.log("📤 Returning chat session ID to frontend");
+    res.json({ chat_session_id: newChatId });
+  } catch (err) {
+    console.error("❌ Failed to create PrivateCore fast chat session:", err);
+    res.status(500).json({ error: err.message });
   }
 };
