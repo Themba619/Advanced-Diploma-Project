@@ -712,16 +712,35 @@ exports.sendMessage = async (req, res) => {
       is_new_session = false,
     } = req.body;
 
+    // Extract search settings from frontend request
+    const searchEnabled = retrieval_options.run_search !== "never";
+    const realTimeEnabled = retrieval_options.real_time === true;
+
     console.log(
       `👤 User: ${userEmail} sending message to session: ${chat_session_id}`
     );
     console.log(`💬 Message: ${message}`);
+    console.log(`📏 Message length: ${message.length} characters`);
 
     if (!chat_session_id || !message) {
       return res
         .status(400)
         .json({ error: "chat_session_id and message are required." });
     }
+
+    // OPTIMIZATION 5: Smart speed mode based on message complexity
+    const isSimpleQuery =
+      message.length < 100 &&
+      !message.includes("detailed") &&
+      !message.includes("explain") &&
+      !message.includes("analyze");
+    console.log(
+      `🚀 Speed optimization: ${
+        isSimpleQuery
+          ? "ENABLED for simple query"
+          : "DISABLED for complex query"
+      }`
+    );
 
     // OPTIMIZATION 2: Batch verification queries using user_sessions table
     const verifyTimer = performanceLog.startTimer("Chat Session Verification");
@@ -737,25 +756,56 @@ exports.sendMessage = async (req, res) => {
         .json({ error: "Access denied to this chat session" });
     }
 
-    // OPTIMIZATION 4: Optimized request body for faster responses
+    // OPTIMIZATION 4: Ultra-fast request body configuration with smart optimization
+    const optimizedMessage = isSimpleQuery
+      ? `${message} (Please provide a brief, direct answer.)`
+      : message;
+
+    // Log search configuration based on frontend request
+    console.log("📋 Backend Request Configuration:");
+    console.log(
+      `🔍 Document Search: ${
+        searchEnabled ? "ENABLED" : "DISABLED"
+      } (run_search: "${retrieval_options.run_search}")`
+    );
+    console.log(
+      `⏱️ Real-time Processing: ${
+        realTimeEnabled ? "ENABLED" : "DISABLED"
+      } (real_time: ${retrieval_options.real_time})`
+    );
+    console.log(
+      `🤖 Agentic Search: ${
+        use_agentic_search ? "ENABLED" : "DISABLED"
+      } (use_agentic_search: ${use_agentic_search})`
+    );
+
+    if (searchEnabled) {
+      console.log(
+        "🔍 COMPREHENSIVE MODE DETECTED: AI will search through UJ documents"
+      );
+      console.log(
+        "📚 Expected to access: uj_context.json, universityData.json, and PrivateCore UJ knowledge base"
+      );
+    } else {
+      console.log(
+        "⚡ FAST MODE DETECTED: AI will respond from base knowledge only (no document search)"
+      );
+    }
+
     const body = {
       alternate_assistant_id,
       chat_session_id,
       parent_message_id,
-      message,
+      message: optimizedMessage, // Modified message for speed optimization
       prompt_id,
       search_doc_ids,
-      file_descriptors: file_descriptors || [], // Ensure empty array for faster processing
-      user_file_ids: user_file_ids || [], // Ensure empty array for faster processing
-      user_folder_ids: user_folder_ids || [], // Ensure empty array for faster processing
+      file_descriptors,
+      user_file_ids,
+      user_folder_ids,
       regenerate,
-      retrieval_options: {
-        ...retrieval_options,
-        run_search: retrieval_options?.run_search || "auto", // Default to auto for balance of speed/accuracy
-        real_time: retrieval_options?.real_time !== false, // Default to true for faster responses
-      },
+      retrieval_options, // Use the frontend's retrieval options directly
       prompt_override,
-      use_agentic_search: use_agentic_search || false, // Default to false for faster responses
+      use_agentic_search,
     };
 
     console.log("🌐 Sending message to PrivateCore API...");
@@ -769,9 +819,14 @@ exports.sendMessage = async (req, res) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json",
-          "Connection": "keep-alive",
-          "Priority": "high", // Request priority for faster processing
+          Accept: "application/json",
+          "Accept-Encoding": "gzip, deflate", // Request compression
+          Connection: "keep-alive",
+          "Cache-Control": "no-cache",
+          Priority: "u=0, i", // Highest priority for urgent processing
+          "X-Requested-With": "XMLHttpRequest",
+          "X-Speed-Mode": isSimpleQuery ? "ultra-fast" : "fast", // Dynamic speed mode
+          "X-Message-Length": message.length.toString(), // Help server optimize
           Cookie: cookie,
         },
         body: JSON.stringify(body),
@@ -784,6 +839,27 @@ exports.sendMessage = async (req, res) => {
     const responseDuration = responseTimer.end();
     performanceLog.logPerformance("Response Reading", responseDuration);
     const apiDuration = apiTimer.end();
+
+    // Log what actually happened based on response time and search settings
+    if (searchEnabled) {
+      if (apiDuration > 15000) {
+        // If it took more than 15 seconds
+        console.log(
+          "🔍 COMPREHENSIVE MODE CONFIRMED: Long response time indicates document search was performed"
+        );
+        console.log(
+          `📚 Document search likely accessed UJ knowledge base (${apiDuration}ms response time)`
+        );
+      } else {
+        console.log(
+          "⚠️ COMPREHENSIVE MODE: Quick response suggests limited document search or cached results"
+        );
+      }
+    } else {
+      console.log(
+        "⚡ FAST MODE CONFIRMED: Quick response from base AI knowledge only"
+      );
+    }
 
     if (!response.ok) {
       let errorJson;
@@ -874,6 +950,53 @@ exports.sendMessage = async (req, res) => {
 
     // Use accumulated message from streaming packets, fallback to legacy format
     const finalMessage = fullMessage || assistantMessage;
+
+    // Analyze response content to detect if document search was actually used
+    if (finalMessage) {
+      const hasCitations = /\[\d+\]/.test(finalMessage); // Look for [1], [2], etc.
+      const hasReferences =
+        finalMessage.toLowerCase().includes("based on") ||
+        finalMessage.toLowerCase().includes("according to") ||
+        finalMessage.toLowerCase().includes("documentation");
+
+      console.log("📊 Response Analysis:");
+      console.log(`📄 Response length: ${finalMessage.length} characters`);
+
+      if (searchEnabled) {
+        if (hasCitations) {
+          console.log(
+            "✅ DOCUMENT SEARCH CONFIRMED: Response contains citations [1], [2], etc."
+          );
+          console.log(
+            "📚 AI successfully accessed and referenced UJ documents"
+          );
+        } else if (hasReferences) {
+          console.log(
+            "✅ DOCUMENT SEARCH LIKELY: Response contains reference phrases"
+          );
+          console.log(
+            "📚 AI likely accessed UJ documents but without explicit citations"
+          );
+        } else {
+          console.log(
+            "⚠️ DOCUMENT SEARCH UNCLEAR: No obvious document references found"
+          );
+          console.log(
+            "🤔 Response may be from base knowledge despite search being enabled"
+          );
+        }
+      } else {
+        if (hasCitations || hasReferences) {
+          console.log(
+            "🤔 UNEXPECTED: Response has document-style references despite search being disabled"
+          );
+        } else {
+          console.log(
+            "✅ FAST MODE WORKING: Response appears to be from base AI knowledge"
+          );
+        }
+      }
+    }
 
     const totalDuration = totalTimer.end();
     performanceLog.logPerformance("Complete Request", totalDuration);

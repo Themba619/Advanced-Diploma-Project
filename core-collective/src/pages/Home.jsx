@@ -83,6 +83,7 @@ const Home = () => {
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [performance, setPerformance] = useState(null);
+  const [speedMode, setSpeedMode] = useState(true); // Default to fast mode
 
   const chatEndRef = useRef(null);
   const userInputRef = useRef(null);
@@ -111,7 +112,10 @@ const Home = () => {
     "Where can I find information on all the programs and courses offered at UJ?",
     "What are the admission requirements for UJ?",
     "How much are the tuition fees at UJ?",
-    "What is the academic calendar for UJ?"
+    "What is the academic calendar for UJ?",
+    "Where is APB campus",
+    "Where is APKcampus",
+    "Where is DFC campus",
   ];
 
   // Fetch chat sessions on initial load
@@ -586,15 +590,31 @@ const Home = () => {
       // Performance monitoring - track request timing
       const requestStartTime = Date.now();
       
+      // Dynamic message optimization based on speed mode
+      const optimizedMessage = speedMode && originalInput.length < 100 
+        ? `${originalInput} (Please provide a brief, concise answer.)` 
+        : originalInput;
+      
       // Send message to PrivateCore AI - no timeout, let AI take as long as needed
       console.log("🚀 Sending message to backend...");
-      console.log("📤 Message body:", { chat_session_id: sessionId, message: originalInput });
+      console.log(`⚡ Speed mode: ${speedMode ? 'ENABLED' : 'DISABLED'}`);
+      console.log("📤 Message body:", { chat_session_id: sessionId, message: optimizedMessage });
+      console.log(`🔍 Document search: ${speedMode ? 'DISABLED (never)' : 'ENABLED (auto)'}`);
+      console.log(`⏱️ Real-time processing: ${speedMode ? 'DISABLED' : 'ENABLED'}`);
+      console.log(`🤖 Agentic search: ${speedMode ? 'DISABLED' : 'DISABLED (kept off)'}`);
+      console.log(`📏 Message length: ${originalInput.length} characters`);
+      
+      if (!speedMode) {
+        console.log("🔍 COMPREHENSIVE MODE: AI will search through UJ documents for accurate information");
+      } else {
+        console.log("⚡ FAST MODE: AI will respond from base knowledge only (no document search)");
+      }
 
       const messageBody = {
         alternate_assistant_id: 0,
         chat_session_id: sessionId,
         parent_message_id: null,
-        message: originalInput, // Use original input
+        message: optimizedMessage, // Speed-optimized message
         prompt_id: null,
         search_doc_ids: null,
         file_descriptors: [],
@@ -602,8 +622,8 @@ const Home = () => {
         user_folder_ids: [],
         regenerate: false,
         retrieval_options: {
-          run_search: "auto",
-          real_time: true,
+          run_search: speedMode ? "never" : "auto", // Fast mode disables search
+          real_time: speedMode ? false : true, // Fast mode disables real-time
           filters: {
             source_type: null,
             document_set: null,
@@ -612,8 +632,8 @@ const Home = () => {
             user_file_ids: null,
           },
         },
-        prompt_override: null,
-        use_agentic_search: false,
+        prompt_override: null, // API expects object, not string
+        use_agentic_search: speedMode ? false : false, // Keep disabled for now
         is_new_session: newSessionCreated,
       };
 
@@ -843,7 +863,26 @@ const Home = () => {
           cursorCharacter="_"
           className="virtualassist-title"
         />
-        <div style={{ display: "flex", gap: "12px" }}>
+        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+          <button
+            className={`virtualassist-speed-toggle ${speedMode ? 'speed-fast' : 'speed-comprehensive'}`}
+            onClick={() => setSpeedMode(!speedMode)}
+            aria-label={`Switch to ${speedMode ? 'comprehensive' : 'fast'} mode`}
+            title={speedMode ? 'Fast Mode (Quick responses, no search)' : 'Comprehensive Mode (Detailed responses with search)'}
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              border: "none",
+              fontSize: "12px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              backgroundColor: speedMode ? "#4CAF50" : "#FF9800",
+              color: "white",
+              transition: "all 0.3s ease"
+            }}
+          >
+            {speedMode ? "⚡ FAST" : "🔍 COMPREHENSIVE"}
+          </button>
           <button
             className="virtualassist-newchat-btn"
             onClick={handleNewChat}
@@ -1004,6 +1043,23 @@ const Home = () => {
           )}
 
           <div ref={chatEndRef} />
+        </div>
+
+        {/* Speed Mode Indicator */}
+        <div className="virtualassist-speed-indicator" style={{
+          position: "absolute",
+          top: "10px",
+          left: "880px", // Moved further to the right
+          padding: "4px 8px",
+          backgroundColor: speedMode ? "rgba(76, 175, 80, 0.1)" : "rgba(255, 152, 0, 0.1)",
+          color: speedMode ? "#4CAF50" : "#FF9800",
+          borderRadius: "4px",
+          fontSize: "11px",
+          fontWeight: "bold",
+          width: "140px",
+          zIndex: 10
+        }}>
+          {speedMode ? "⚡ FAST MODE" : "🔍 COMPREHENSIVE MODE"}
         </div>
 
         {/* Listening Status Indicator */}
