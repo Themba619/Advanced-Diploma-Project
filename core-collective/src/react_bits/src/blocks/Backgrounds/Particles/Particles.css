@@ -1,0 +1,15 @@
+/*
+	Installed from https://reactbits.dev/default/
+*/
+
+/* Particles.css */
+.particles-container {
+  position: fixed;   /* lock to viewport */
+  top: 0;
+  left: 0;
+  width: 100vw;      /* full width */
+  height: 100vh;     /* full height */
+  z-index: -1;       /* sit behind homepage content */
+  pointer-events: none; /* particles don't block clicks */
+}
+

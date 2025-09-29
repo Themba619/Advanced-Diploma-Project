@@ -9,6 +9,7 @@ import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
 import TextType from "../react_bits/src/blocks/TextAnimations/TextType/TextType";
+import Particles from "../react_bits/src/blocks/Backgrounds/Particles/Particles";
 
 // Animated 3-dot waiting indicator with processing text
 const VirtualAssistWaiting = () => (
@@ -753,6 +754,18 @@ const Home = () => {
 
   return (
     <div className="virtualassist-bg">
+
+      <Particles
+    particleColors={['#ffffffff', '#ffffffff']}
+    particleCount={200}
+    particleSpread={10}
+    speed={0.2}
+    particleBaseSize={150}
+    moveParticlesOnHover={true}
+    alphaParticles={false}
+    disableRotation={false}
+  />
+
       <div className="virtualassist-header">
         <TextType
           text={["VirtualAssist", "I'm here to help!!"]}

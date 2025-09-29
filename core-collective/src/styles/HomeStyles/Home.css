@@ -1,7 +1,6 @@
 /* Container */
 .virtualassist-bg {
   height: 100vh;
-  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #f7971e 100%);
   display: flex;
   flex-direction: column;
   position: relative;
