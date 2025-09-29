@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import ChatHistoryPopup from "../components/ChatHistoryPopup";
+import PerformanceMonitor from "../components/PerformanceMonitor";
 import { AlertDialog } from "../components/ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
 import "../styles/HomeStyles/Home.css";
@@ -81,6 +82,7 @@ const Home = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
+  const [performance, setPerformance] = useState(null);
 
   const chatEndRef = useRef(null);
   const userInputRef = useRef(null);
@@ -479,38 +481,18 @@ const Home = () => {
       setWaitingForBot(true);
       setDisplayedBotMsg("");
 
-    // Add a processing message for longer requests with timeout reference
-    const processingTimeout = setTimeout(() => {
-      if (waitingForBot) {
-        setDisplayedBotMsg("Processing your complex query... This may take longer than usual, but I'm working on providing you with detailed and relevant information. Please wait while I analyze your request.");
-      }
-    }, 5000); // Show message after 5 seconds
-
-    // Add an additional message for very complex queries
-    const extendedProcessingTimeout = setTimeout(() => {
-      if (waitingForBot) {
-        setDisplayedBotMsg("Still processing your detailed query... I'm analyzing multiple sources and preparing a comprehensive response with the most relevant and accurate information for your specific question. Thank you for your patience.");
-      }
-    }, 15000); // Show extended message after 15 seconds
-
     let sessionId = chatSessionId;
     let newSessionCreated = false;
 
     if (!sessionId) {
       newSessionCreated = true;
       try {
-        // Use fast session creation with timeout
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout for session creation
-
+        // Use fast session creation - no timeout
         const response = await fetch("http://localhost:3001/api/private/createSessionFast", {
           method: "POST",
           headers: authHeaders,
           body: JSON.stringify({ persona_id: 0, description: "Convo" }),
-          signal: controller.signal,
         });
-
-        clearTimeout(timeoutId);
 
         if (!response.ok) throw new Error("Failed to create chat session");
         const data = await response.json();
@@ -531,26 +513,14 @@ const Home = () => {
         };
         setChats((prev) => [newChat, ...prev]);
       } catch (err) {
-        clearTimeout(processingTimeout);
-        if (err.name === 'AbortError') {
-          setMessages((prev) => [
-            ...prev,
-            {
-              text: "Session creation timed out. Please try again.",
-              sender: "bot",
-              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            },
-          ]);
-        } else {
-          setMessages((prev) => [
-            ...prev,
-            {
-              text: "Failed to create chat session.",
-              sender: "bot",
-              time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-            },
-          ]);
-        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            text: "Failed to create chat session.",
+            sender: "bot",
+            time: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+          },
+        ]);
         setWaitingForBot(false);
         setIsTyping(false);
         return;
@@ -613,9 +583,12 @@ const Home = () => {
     }
 
     try {
-      // Send message to PrivateCore AI with timeout for better performance
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout for complex queries
+      // Performance monitoring - track request timing
+      const requestStartTime = Date.now();
+      
+      // Send message to PrivateCore AI - no timeout, let AI take as long as needed
+      console.log("🚀 Sending message to backend...");
+      console.log("📤 Message body:", { chat_session_id: sessionId, message: originalInput });
 
       const messageBody = {
         alternate_assistant_id: 0,
@@ -648,12 +621,21 @@ const Home = () => {
         method: "POST",
         headers: authHeaders,
         body: JSON.stringify(messageBody),
-        signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
-      clearTimeout(processingTimeout);
-      clearTimeout(extendedProcessingTimeout);
+      const requestEndTime = Date.now();
+      const requestDuration = requestEndTime - requestStartTime;
+      
+      console.log("✅ Received response from backend, status:", response.status);
+      console.log(`⏱️ Request completed in ${requestDuration}ms`);
+      
+      // Performance feedback with color coding
+      if (requestDuration < 2000) {
+        console.log("🟢 FAST response - under 2 seconds!");
+      } else if (requestDuration < 5000) {
+        console.log("🟡 ACCEPTABLE response - under 5 seconds");
+      } else {
+        console.log("🔴 SLOW response - over 5 seconds");
+      }
 
       let data;
       let botReply = "";
@@ -675,12 +657,21 @@ const Home = () => {
         ]);
         setWaitingForBot(false);
         setIsTyping(false);
+        setDisplayedBotMsg(""); // Clear any processing messages
         return;
       }
       data = await response.json();
       botReply = data.message || "Sorry, I didn't get a response.";
 
+      // Capture performance data from backend
+      const performanceData = data.performance || {
+        total_duration: requestDuration,
+        frontend_only: true
+      };
+      setPerformance(performanceData);
+
       setWaitingForBot(false);
+      setDisplayedBotMsg(""); // Clear any processing messages before showing response
 
       const botMsg = {
         text: botReply,
@@ -720,16 +711,13 @@ const Home = () => {
       };
       typeBotMessage();
     } catch (error) {
-      clearTimeout(processingTimeout);
-      clearTimeout(extendedProcessingTimeout);
+      console.error("❌ Error in sendMessage:", error);
       let errorMsg = "Sorry, there was an error.";
-      if (error.name === 'AbortError') {
-        errorMsg = "Your query is taking longer than expected due to its complexity. I'm still processing your request and will provide a comprehensive response shortly. The system is analyzing relevant information to give you the most accurate answer possible.";
-      } else if (error.response) {
+      if (error.response) {
         if (error.response.status === 500) {
           errorMsg = "Server error, please try again later.";
         } else if (error.response.status === 408) {
-          errorMsg = "Request timed out due to the complexity of your query. I'm working on providing you with detailed information. Please wait a moment and try again.";
+          errorMsg = "Request timed out. Please try again.";
         } else {
           errorMsg = "Unexpected error occurred.";
         }
@@ -767,6 +755,7 @@ const Home = () => {
       ]);
       setWaitingForBot(false);
       setIsTyping(false);
+      setDisplayedBotMsg(""); // Clear any processing messages
     }
   };
 
@@ -1140,6 +1129,8 @@ const Home = () => {
         confirmText="Delete"
         cancelText="Cancel"
       />
+
+      <PerformanceMonitor performance={performance} />
     </div>
   );
 };

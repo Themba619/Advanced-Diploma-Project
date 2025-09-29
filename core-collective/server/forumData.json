@@ -52,12 +52,13 @@
             "likedBy": []
           }
         ],
-        "likes": 4,
+        "likes": 5,
         "likedBy": [
           "user4@example.com",
           "user5@example.com",
           "frank@foot.com",
-          "Peter@smith.com"
+          "Peter@smith.com",
+          "gabberspeter@gmail.com"
         ]
       }
     ]

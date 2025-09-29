@@ -737,6 +737,7 @@ exports.sendMessage = async (req, res) => {
         .json({ error: "Access denied to this chat session" });
     }
 
+    // OPTIMIZATION 4: Optimized request body for faster responses
     const body = {
       alternate_assistant_id,
       chat_session_id,
@@ -744,21 +745,23 @@ exports.sendMessage = async (req, res) => {
       message,
       prompt_id,
       search_doc_ids,
-      file_descriptors,
-      user_file_ids,
-      user_folder_ids,
+      file_descriptors: file_descriptors || [], // Ensure empty array for faster processing
+      user_file_ids: user_file_ids || [], // Ensure empty array for faster processing
+      user_folder_ids: user_folder_ids || [], // Ensure empty array for faster processing
       regenerate,
-      retrieval_options,
+      retrieval_options: {
+        ...retrieval_options,
+        run_search: retrieval_options?.run_search || "auto", // Default to auto for balance of speed/accuracy
+        real_time: retrieval_options?.real_time !== false, // Default to true for faster responses
+      },
       prompt_override,
-      use_agentic_search,
+      use_agentic_search: use_agentic_search || false, // Default to false for faster responses
     };
 
     console.log("🌐 Sending message to PrivateCore API...");
 
-    // OPTIMIZATION 3: More generous timeout for AI processing
+    // No timeout - let AI take as long as needed for complex queries
     const apiTimer = performanceLog.startTimer("PrivateCore API Call");
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 25000); // 25 second timeout - more reasonable for AI processing
 
     const response = await fetch(
       "https://api.privatecore.app/chat/send-message",
@@ -766,10 +769,12 @@ exports.sendMessage = async (req, res) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Connection": "keep-alive",
+          "Priority": "high", // Request priority for faster processing
           Cookie: cookie,
         },
         body: JSON.stringify(body),
-        signal: controller.signal,
       }
     );
 
@@ -778,8 +783,6 @@ exports.sendMessage = async (req, res) => {
     let rawText = await response.text();
     const responseDuration = responseTimer.end();
     performanceLog.logPerformance("Response Reading", responseDuration);
-
-    clearTimeout(timeoutId);
     const apiDuration = apiTimer.end();
 
     if (!response.ok) {
@@ -820,16 +823,27 @@ exports.sendMessage = async (req, res) => {
           );
         }
 
-        // OPTIMIZATION 5: Handle new streaming format with early content extraction
+        // OPTIMIZATION 5: Handle both reasoning and message content packets
         if (
+          packet.obj &&
+          packet.obj.type === "message_delta" &&
+          packet.obj.content
+        ) {
+          console.log(
+            `📝 Adding message content (${packet.obj.content.length} chars): "${packet.obj.content}"`
+          );
+          fullMessage += packet.obj.content;
+        }
+        // Also capture reasoning for debugging (but don't include in final message)
+        else if (
           packet.obj &&
           packet.obj.type === "reasoning_delta" &&
           packet.obj.reasoning
         ) {
           console.log(
-            `📝 Adding content (${packet.obj.reasoning.length} chars): "${packet.obj.reasoning}"`
+            `🧠 Reasoning (${packet.obj.reasoning.length} chars): "${packet.obj.reasoning}"`
           );
-          fullMessage += packet.obj.reasoning;
+          // Don't add reasoning to fullMessage - only log it
         }
         // Legacy format support
         else if (packet.message_type === "assistant" && packet.message) {
@@ -885,14 +899,6 @@ exports.sendMessage = async (req, res) => {
     const totalDuration = totalTimer.end();
     console.error("❌ Failed to send message to model:", err);
     console.log(`⏱️  Failed request took: ${totalDuration}ms`);
-
-    if (err.name === "AbortError") {
-      return res.status(408).json({
-        error:
-          "The AI service is taking longer than expected (25s timeout). This might be due to high server load. Please try your request again.",
-        performance: { timeout_reached: true },
-      });
-    }
 
     return res
       .status(500)
