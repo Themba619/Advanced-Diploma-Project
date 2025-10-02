@@ -95,6 +95,7 @@ import ForgotPwd from "./pages/ForgotPwd";
 import ContactUs from "./pages/ContactUs";
 import DownloadApp from "./pages/DownloadApp";
 import ChatPerformanceTest from "./pages/ChatPerformanceTest";
+import LandingPage from "./pages/LandingPage";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -113,6 +114,7 @@ function App() {
           <Route path="/" element={<LoginPage />} />
           {/* Authenticated routes (with DrawerNavigation) */}
           <Route element={<DrawerNavigation />}>
+            <Route path="/landing" element={<LandingPage />} />
             <Route path="/home" element={<Home />} />
             <Route path="/chatforum" element={<ChatForum />} />
             <Route path="/profile" element={<Profile />} />

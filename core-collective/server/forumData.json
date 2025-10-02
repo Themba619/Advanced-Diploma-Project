@@ -9,17 +9,27 @@
       "Academic Support",
       "General"
     ],
-    "chatCount": 5,
+    "chatCount": 6,
     "replies": [
+      {
+        "id": 1759349261278,
+        "user": "Anonymous",
+        "content": "Try going to CBE they might be able to help you",
+        "timeAgo": "2025-10-01T20:07:41.278Z",
+        "replies": [],
+        "likes": 0,
+        "likedBy": []
+      },
       {
         "id": 1755952762019,
         "user": "Anonymous",
         "content": "Test",
         "timeAgo": "2025-08-23T12:39:22.019Z",
         "replies": [],
-        "likes": 1,
+        "likes": 2,
         "likedBy": [
-          "frank@foot.com"
+          "frank@foot.com",
+          "gabberspeter@gmail.com"
         ]
       },
       {
@@ -187,5 +197,17 @@
         "replies": []
       }
     ]
+  },
+  {
+    "id": 1759349614500,
+    "title": "Testing for demo",
+    "description": "Testing hello world",
+    "user": "Anonymous",
+    "timeAgo": "2025-10-01T20:13:34.500Z",
+    "tags": [
+      "General"
+    ],
+    "chatCount": 0,
+    "replies": []
   }
 ]
