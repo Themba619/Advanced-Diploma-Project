@@ -6,16 +6,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
 
   const handleRouteToHome = () => {
-    // Check if user is logged in
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      // User is logged in, route to home
-      navigate('/home');
-    } else {
-      // User is not logged in, route to login page
-      navigate('/login');
-    }
+    navigate('/login');
   };
 
   return (
@@ -27,7 +18,7 @@ const LandingPage = () => {
         Your AI-powered assistant for University of Johannesburg
       </div>
       <button className="downloadapp-btn" onClick={handleRouteToHome}>
-        Click me to route to home btn
+        Click me to get started
       </button>
     </div>
   );

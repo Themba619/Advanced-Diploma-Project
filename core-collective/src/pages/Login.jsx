@@ -26,7 +26,7 @@ const Login = () => {
       // Small delay to ensure token is saved before navigation
       setTimeout(() => {
         // Redirect to home/dashboard
-        navigate('/landing');
+        navigate('/home');
       }, 100);
       
     } catch (err) {

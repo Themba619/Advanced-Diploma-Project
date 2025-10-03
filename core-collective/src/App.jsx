@@ -111,10 +111,10 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotPwd" element={<ForgotPwd />} />
-          <Route path="/" element={<LoginPage />} />
+          {/* <Route path="/" element={<LoginPage />} /> */}
+          <Route path="/" element={<LandingPage />} />
           {/* Authenticated routes (with DrawerNavigation) */}
           <Route element={<DrawerNavigation />}>
-            <Route path="/landing" element={<LandingPage />} />
             <Route path="/home" element={<Home />} />
             <Route path="/chatforum" element={<ChatForum />} />
             <Route path="/profile" element={<Profile />} />
