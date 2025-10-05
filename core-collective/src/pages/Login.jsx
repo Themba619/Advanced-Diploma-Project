@@ -33,6 +33,9 @@ const Login = () => {
 
   return (
     <div className="login-container slide-in">
+
+      
+
       {/* Left half - Image Placeholder */}
       <div className="image-placeholder">
         <img src={Logo} alt="Logo image" className="logo-image" />

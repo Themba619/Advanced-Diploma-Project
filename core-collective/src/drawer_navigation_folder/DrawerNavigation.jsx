@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Menu } from "lucide-react";
 import { Outlet } from "react-router-dom";
-import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun } from "react-icons/fa";
+import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun, FaBell } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 import SplitText from "../react_bits/src/blocks/TextAnimations/SplitText/SplitText";
@@ -75,7 +75,7 @@ const DrawerNavigation = () => {
             title="Announcements"
             onClick={() => setShowAnnouncements(true)}
           >
-            <FaGift size={24} />
+            <FaBell size={24} />
           </button>
           <button
             className="icon-btn"
