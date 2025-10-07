@@ -1,0 +1,218 @@
+.plasma-fallback {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #0a0a0f;
+}
+
+/* Authentic React Bits plasma base layers */
+.plasma-fallback::before {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: -100%;
+  width: 300%;
+  height: 300%;
+  background: 
+    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(147, 51, 234, 0.4) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 80% at 80% 60%, rgba(168, 85, 247, 0.3) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 60% at 40% 80%, rgba(139, 92, 246, 0.25) 0%, transparent 70%);
+  animation: plasma-drift 25s ease-in-out infinite;
+  filter: blur(60px);
+}
+
+.plasma-fallback::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: 
+    radial-gradient(ellipse 70% 40% at 60% 30%, rgba(196, 181, 253, 0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 70% at 30% 70%, rgba(147, 51, 234, 0.15) 0%, transparent 60%);
+  animation: plasma-drift-2 20s ease-in-out infinite reverse;
+  filter: blur(40px);
+}
+
+/* Subtle flowing waves */
+.plasma-wave {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(30px);
+  animation-fill-mode: both;
+  will-change: transform;
+}
+
+.plasma-wave-1 {
+  width: 400px;
+  height: 300px;
+  top: 10%;
+  left: 5%;
+  background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.3) 0%, rgba(147, 51, 234, 0.1) 40%, transparent 70%);
+  animation: gentle-flow-1 30s ease-in-out infinite;
+}
+
+.plasma-wave-2 {
+  width: 350px;
+  height: 250px;
+  top: 40%;
+  right: 10%;
+  background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.25) 0%, rgba(168, 85, 247, 0.08) 50%, transparent 80%);
+  animation: gentle-flow-2 35s ease-in-out infinite -5s;
+}
+
+.plasma-wave-3 {
+  width: 300px;
+  height: 200px;
+  bottom: 20%;
+  left: 20%;
+  background: radial-gradient(ellipse at center, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.06) 45%, transparent 75%);
+  animation: gentle-flow-3 28s ease-in-out infinite -10s;
+}
+
+.plasma-wave-4 {
+  width: 250px;
+  height: 180px;
+  top: 60%;
+  right: 30%;
+  background: radial-gradient(ellipse at center, rgba(196, 181, 253, 0.15) 0%, rgba(196, 181, 253, 0.05) 55%, transparent 85%);
+  animation: gentle-flow-4 32s ease-in-out infinite -15s;
+}
+
+.plasma-wave-5 {
+  width: 200px;
+  height: 150px;
+  top: 20%;
+  left: 50%;
+  background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.18) 0%, rgba(147, 51, 234, 0.04) 60%, transparent 90%);
+  animation: gentle-flow-5 26s ease-in-out infinite -20s;
+}
+
+.plasma-wave-6 {
+  width: 180px;
+  height: 140px;
+  bottom: 40%;
+  right: 15%;
+  background: radial-gradient(ellipse at center, rgba(168, 85, 247, 0.12) 0%, rgba(168, 85, 247, 0.03) 65%, transparent 95%);
+  animation: gentle-flow-6 24s ease-in-out infinite -25s;
+}
+
+/* Gentle, smooth animations matching React Bits style */
+@keyframes plasma-drift {
+  0%, 100% { 
+    transform: rotate(0deg) translate(0, 0) scale(1);
+  }
+  25% { 
+    transform: rotate(90deg) translate(20px, -15px) scale(1.05);
+  }
+  50% { 
+    transform: rotate(180deg) translate(-10px, 20px) scale(0.95);
+  }
+  75% { 
+    transform: rotate(270deg) translate(15px, 5px) scale(1.02);
+  }
+}
+
+@keyframes plasma-drift-2 {
+  0%, 100% { 
+    transform: rotate(0deg) translate(0, 0) scale(1);
+  }
+  33% { 
+    transform: rotate(120deg) translate(-15px, 10px) scale(0.98);
+  }
+  66% { 
+    transform: rotate(240deg) translate(18px, -12px) scale(1.04);
+  }
+}
+
+@keyframes gentle-flow-1 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  25% { 
+    transform: translate(30px, -20px) scale(1.1);
+    border-radius: 60% 40% 50% 50%;
+  }
+  50% { 
+    transform: translate(-15px, 25px) scale(0.9);
+    border-radius: 40% 60% 40% 60%;
+  }
+  75% { 
+    transform: translate(20px, 15px) scale(1.05);
+    border-radius: 50% 50% 60% 40%;
+  }
+}
+
+@keyframes gentle-flow-2 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  30% { 
+    transform: translate(-25px, 18px) scale(1.08);
+    border-radius: 55% 45% 45% 55%;
+  }
+  60% { 
+    transform: translate(22px, -25px) scale(0.92);
+    border-radius: 45% 55% 55% 45%;
+  }
+  90% { 
+    transform: translate(-12px, 30px) scale(1.03);
+    border-radius: 60% 40% 50% 50%;
+  }
+}
+
+@keyframes gentle-flow-3 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  40% { 
+    transform: translate(35px, -15px) scale(1.12);
+    border-radius: 40% 60% 60% 40%;
+  }
+  80% { 
+    transform: translate(-20px, 35px) scale(0.88);
+    border-radius: 60% 40% 40% 60%;
+  }
+}
+
+@keyframes gentle-flow-4 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  35% { 
+    transform: translate(-30px, -18px) scale(1.06);
+    border-radius: 65% 35% 45% 55%;
+  }
+  70% { 
+    transform: translate(25px, 25px) scale(0.94);
+    border-radius: 35% 65% 55% 45%;
+  }
+}
+
+@keyframes gentle-flow-5 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  50% { 
+    transform: translate(-18px, 15px) scale(1.15);
+    border-radius: 45% 55% 50% 50%;
+  }
+}
+
+@keyframes gentle-flow-6 {
+  0%, 100% { 
+    transform: translate(0, 0) scale(1);
+    border-radius: 50%;
+  }
+  50% { 
+    transform: translate(15px, -22px) scale(1.09);
+    border-radius: 55% 45% 40% 60%;
+  }
+}
