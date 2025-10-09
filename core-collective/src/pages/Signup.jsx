@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import Logo from '../assets/Logo.png';
+import Logo from '../assets/VA-3.png';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -100,6 +100,12 @@ const Signup = () => {
   if (verificationSent) {
     return (
       <div className="login-container slide-in">
+        {/* Left half - Image Placeholder */}
+        <div className="image-placeholder">
+          <img src={Logo} alt="Logo image" width={500} />
+        </div>
+
+        {/* Right half - Verification Form */}
         <div className="login-form-container">
           <div className="login-form">
             <h2>Verify Your Email</h2>
@@ -166,10 +172,6 @@ const Signup = () => {
             </p>
           </div>
         </div>
-        
-        <div className="image-placeholder">
-          <img src={Logo} alt="Logo image" className="logo-image" />
-        </div>
       </div>
     );
   }
@@ -177,7 +179,12 @@ const Signup = () => {
   // Regular signup form
   return (
     <div className="login-container slide-in">
-      {/* Left half - Signup Form */}
+      {/* Left half - Image Placeholder */}
+      <div className="image-placeholder">
+        <img src={Logo} alt="Logo image" width={500} />
+      </div>
+
+      {/* Right half - Signup Form */}
       <div className="login-form-container">
         <div className="login-form">
           <h2>Sign up for Core Collective</h2>
@@ -243,11 +250,6 @@ const Signup = () => {
             </a>
           </p>
         </div>
-      </div>
-      
-      {/* Right half - Image Placeholder */}
-      <div className="image-placeholder">
-        <img src={Logo} alt="Logo image" className="logo-image" />
       </div>
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import Logo from '../assets/Logo.png';
+import Logo from '../assets/VA-3.png';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const Login = () => {
     <div className="login-container slide-in">
       {/* Left half - Image Placeholder */}
       <div className="image-placeholder">
-        <img src={Logo} alt="Logo image" className="logo-image" />
+        <img src={Logo} alt="Logo image" width={500} />
       </div>
 
       {/* Right half - Login Form */}
