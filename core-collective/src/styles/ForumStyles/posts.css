@@ -63,6 +63,27 @@
   .reply-button:hover {
     background: #e0e0e0;
   }
+
+  .report-button {
+    background: #ff6b6b;
+    color: white;
+    border: 1px solid #ff5252;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.2s ease;
+  }
+
+  .report-button:hover {
+    background: #ff5252;
+    transform: translateY(-1px);
+  }
+
+  .report-button:active {
+    background: #e53e3e;
+  }
   
   .reply-form {
     margin: 10px 0;

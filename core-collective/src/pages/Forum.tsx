@@ -1,4 +1,5 @@
-import React, { useState, JSX } from "react";
+import React, { useState, useEffect, JSX } from "react";
+import { jwtDecode } from "jwt-decode";
 import {
   useQuery,
   useMutation,
@@ -8,6 +9,7 @@ import {
 import { toast } from "../components/ui/ForumUi/sonner";
 import ForumQuestion from "../components/ForumQuestion";
 import ReplyForm from "../components/ReplyForm";
+import ReportModal from "../components/ReportModal";
 import { profanityChecker } from "../../server/profanityChecker";
 import "../styles/ForumStyles/layout.css";
 import "../styles/ForumStyles/sidebar.css";
@@ -32,6 +34,7 @@ interface Post {
   title: string;
   description: string;
   user: string;
+  userEmail?: string; // Optional email field
   timeAgo: Date;
   tags: string[];
   chatCount: number;
@@ -370,6 +373,28 @@ const toggleLike = async ({
   return res.json();
 };
 
+const submitReport = async (reportData: {
+  postId: number;
+  reason: string;
+  description: string;
+  reportedBy: string;
+}) => {
+  const res = await fetch("/api/email/report-post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(reportData),
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error || "Failed to submit report");
+  }
+
+  return res.json();
+};
+
 const Forum: React.FC = () => {
   const topics = [
     "All Topics",
@@ -385,6 +410,32 @@ const Forum: React.FC = () => {
     Record<string, boolean>
   >({});
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [reportModal, setReportModal] = useState<{
+    isOpen: boolean;
+    postId: number | null;
+    postTitle: string;
+    postUser: string;
+  }>({
+    isOpen: false,
+    postId: null,
+    postTitle: "",
+    postUser: "",
+  });
+
+  const [userEmail, setUserEmail] = useState<string>("");
+
+  // Extract user email from JWT token
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token);
+        setUserEmail(decoded.email || "");
+      } catch (error) {
+        console.error("Failed to decode token:", error);
+      }
+    }
+  }, []);
 
   const queryClient = useQueryClient();
 
@@ -438,6 +489,25 @@ const Forum: React.FC = () => {
     },
   });
 
+  // Submit report
+  const reportMutation = useMutation({
+    mutationFn: submitReport,
+    onSuccess: () => {
+      toast.success(
+        "Report submitted successfully. Thank you for helping keep our community safe."
+      );
+      setReportModal({
+        isOpen: false,
+        postId: null,
+        postTitle: "",
+        postUser: "",
+      });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || "Failed to submit report");
+    },
+  });
+
   const handleTopicClick = (topic: string) => {
     setSelectedTopic(topic);
   };
@@ -482,6 +552,7 @@ const Forum: React.FC = () => {
       title: newPost.title,
       description: newPost.description,
       user: newPost.user || "Anonymous",
+      userEmail: userEmail || undefined, // Include user email if available
       timeAgo: new Date(),
       tags: newPost.tags,
       chatCount: 0,
@@ -510,6 +581,46 @@ const Forum: React.FC = () => {
       ...prev,
       [id]: !prev[id],
     }));
+  };
+
+  const handleReportPost = (
+    postId: number,
+    postTitle: string,
+    postUser: string
+  ) => {
+    setReportModal({
+      isOpen: true,
+      postId,
+      postTitle,
+      postUser,
+    });
+  };
+
+  const handleCloseReportModal = () => {
+    setReportModal({
+      isOpen: false,
+      postId: null,
+      postTitle: "",
+      postUser: "",
+    });
+  };
+
+  const handleSubmitReport = async (reportData: {
+    postId: number;
+    reason: string;
+    description: string;
+    reportedBy: string;
+  }) => {
+    // Find the post to get title and user info
+    const post = posts.find((p) => p.id === reportData.postId);
+    if (post) {
+      const fullReportData = {
+        ...reportData,
+        postTitle: post.title,
+        postUser: post.user,
+      };
+      reportMutation.mutate(fullReportData);
+    }
   };
 
   const filteredPosts = React.useMemo(() => {
@@ -701,6 +812,15 @@ const Forum: React.FC = () => {
                     ? "Cancel Reply"
                     : "Reply"}
                 </button>
+                <button
+                  className="report-button"
+                  onClick={() =>
+                    handleReportPost(post.id, post.title, post.user)
+                  }
+                  title="Report this post"
+                >
+                  ⚠️ Report
+                </button>
                 {expandedReplies[`form-post-${post.id}`] && (
                   <ReplyForm
                     onSubmit={(content: string) =>
@@ -719,6 +839,16 @@ const Forum: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={reportModal.isOpen}
+        onClose={handleCloseReportModal}
+        onSubmit={handleSubmitReport}
+        postId={reportModal.postId}
+        postTitle={reportModal.postTitle}
+        postUser={reportModal.postUser}
+      />
     </div>
   );
 };

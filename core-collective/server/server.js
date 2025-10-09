@@ -185,6 +185,7 @@ const profanityRoute = require("./routes/profanityRoute");
 const emailRoute = require("./routes/emailRoute");
 const privateRoute = require("./routes/privateRoute");
 const verificationRoute = require("./routes/verificationRoute");
+const adminRoute = require("./routes/adminRoute");
 
 // Middleware
 app.use(cors());
@@ -215,6 +216,7 @@ const authenticateToken = (req, res, next) => {
 app.use("/api/profanityRoute", profanityRoute);
 app.use("/api/email", emailRoute);
 app.use("/api/verify", verificationRoute); // Add verification routes
+app.use("/api/admin", adminRoute); // Admin routes for management
 // Use private routes - registration doesn't need authentication
 app.use("/api/private", privateRoute);
 

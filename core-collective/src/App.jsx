@@ -92,10 +92,12 @@ import ForumChat from "./pages/Forum";
 import LoginPage from "./pages/Login";
 import Signup from "./pages/Signup";
 import ForgotPwd from "./pages/ForgotPwd";
+import OTP from "./pages/OTP";
 import ContactUs from "./pages/ContactUs";
 import DownloadApp from "./pages/DownloadApp";
 import ChatPerformanceTest from "./pages/ChatPerformanceTest";
 import LandingPage from "./pages/LandingPage";
+import AdminPanel from "./pages/AdminPanel";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -111,6 +113,9 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgotPwd" element={<ForgotPwd />} />
+          <Route path="/forgot-password" element={<ForgotPwd />} />
+          <Route path="/otp" element={<OTP />} />
+          <Route path="/admin" element={<AdminPanel />} />
           {/* <Route path="/" element={<LoginPage />} /> */}
           <Route path="/" element={<LandingPage />} />
           {/* Authenticated routes (with DrawerNavigation) */}
