@@ -1,0 +1,17 @@
+{
+  "notifications": [
+    {
+      "id": "0dcd2bc1-91a3-4388-84b1-63abfcd35557",
+      "user_email": "thembabiyela20@gmail.com",
+      "user_name": "Testing",
+      "title": "⚠️ Community Guidelines Warning",
+      "message": "Your post \"Test\" has been reviewed and found to potentially violate our community guidelines. Reason: warning. This serves as an official warning. The reported post has been removed from the forum. Future violations may result in temporary or permanent account suspension. We encourage you to review our community guidelines.",
+      "type": "warning",
+      "post_title": "Test",
+      "reason": "warning",
+      "is_read": true,
+      "created_at": "2025-10-10T16:38:25.277Z",
+      "read_at": "2025-10-10T16:39:41.942Z"
+    }
+  ]
+}

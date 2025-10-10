@@ -11,8 +11,8 @@ router.get("/search-post/:postId", adminController.searchPostById);
 // Delete post
 router.delete("/delete-post/:postId", adminController.deletePost);
 
-// Send warning email
-router.post("/send-warning", adminController.sendWarningEmail);
+// Send warning notification
+router.post("/send-warning", adminController.sendWarningNotification);
 
 // Delete user account
 router.delete("/delete-user", adminController.deleteUserAccount);

@@ -6,6 +6,7 @@ import { jwtDecode } from "jwt-decode";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 import SplitText from "../react_bits/src/blocks/TextAnimations/SplitText/SplitText";
 import VALogo from "../assets/Logo.png";
+import NotificationList from "../components/NotificationList";
 
 const DrawerNavigation = () => {
   const [isOpen, setIsOpen] = useState(true);
@@ -16,6 +17,7 @@ const DrawerNavigation = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [userName, setUserName] = useState("User");
   const [userEmail, setUserEmail] = useState("");
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -35,6 +37,8 @@ const DrawerNavigation = () => {
         }
         if (decoded.email) {
           setUserEmail(decoded.email);
+          // Fetch initial notification count
+          fetchUnreadNotificationCount(decoded.email);
         }
       } catch (err) {
         console.error("Failed to decode token:", err);
@@ -57,6 +61,24 @@ const DrawerNavigation = () => {
 
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  // Fetch unread notification count
+  const fetchUnreadNotificationCount = async (email) => {
+    try {
+      const response = await fetch(`http://localhost:3001/api/notifications/unread-count/${encodeURIComponent(email)}`);
+      if (response.ok) {
+        const data = await response.json();
+        setUnreadNotificationCount(data.unreadCount || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching unread notification count:', error);
+    }
+  };
+
+  // Handle notification count updates
+  const handleNotificationUpdate = (newCount) => {
+    setUnreadNotificationCount(newCount);
+  };
 
   return (
     <div className={`drawer-container ${darkMode ? 'dark-mode' : 'light-mode'}`}>
@@ -90,11 +112,16 @@ const DrawerNavigation = () => {
             <FaEnvelope size={24} />
           </button>
           <button
-            className="icon-btn"
+            className="icon-btn notification-btn"
             title="Announcements"
             onClick={() => setShowAnnouncements(true)}
           >
             <FaGift size={24} />
+            {unreadNotificationCount > 0 && (
+              <span className="notification-badge">
+                {unreadNotificationCount > 99 ? '99+' : unreadNotificationCount}
+              </span>
+            )}
           </button>
           <button
             className="icon-btn"
@@ -212,15 +239,14 @@ const DrawerNavigation = () => {
           <div className="right-sidebar-overlay" onClick={() => setShowAnnouncements(false)} />
           <div className="right-sidebar">
             <div className="right-sidebar-header">
-              <span>Announcements</span>
+              <span>Notifications</span>
               <button className="close-button" onClick={() => setShowAnnouncements(false)}>×</button>
             </div>
             <div className="right-sidebar-content">
-              <strong className="sidebar-content-title">What's new 🎁</strong>
-              <ul className="sidebar-list">
-                <li>Welcome to Core Collective!</li>
-                <li>New features coming soon.</li>
-              </ul>
+              <NotificationList 
+                userEmail={userEmail} 
+                onNotificationUpdate={handleNotificationUpdate}
+              />
             </div>
           </div>
         </>
@@ -233,7 +259,7 @@ const DrawerNavigation = () => {
               <span>Help</span>
               <button className="close-button" onClick={() => setShowHelp(false)}>×</button>
             </div>
-            <div className="right-sidebar-content">
+            <div className="right-sidebar-content traditional">
               <p className="sidebar-content-title">Useful UJ Links:</p>
               <ul className="uj-help-links">
                 <li>
