@@ -154,8 +154,8 @@ const deletePost = async (req, res) => {
   }
 };
 
-// Send warning email to user
-const sendWarningEmail = async (req, res) => {
+// Send warning notification to user (replaces email system)
+const sendWarningNotification = async (req, res) => {
   try {
     const { userEmail, userName, postTitle, reason } = req.body;
 
@@ -163,87 +163,59 @@ const sendWarningEmail = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
-    const warningEmailHtml = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #ff6b6b; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-          .warning-box { background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0; }
-          .footer { text-align: center; margin-top: 20px; font-size: 0.9em; color: #666; }
-          .button { display: inline-block; background: #007bff; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin: 10px 0; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>⚠️ Community Guidelines Warning</h1>
-          </div>
-          <div class="content">
-            <h2>Hello ${userName},</h2>
-            <p>We hope this message finds you well. We're writing to inform you about a concern regarding your recent post on the Core Collective forum.</p>
-            
-            <div class="warning-box">
-              <h3>Post Details:</h3>
-              <p><strong>Title:</strong> "${postTitle}"</p>
-              <p><strong>Reason for Warning:</strong> ${reason}</p>
-            </div>
-            
-            <p>We want to maintain a positive and respectful community for all our users. Your post has been reviewed and found to potentially violate our community guidelines.</p>
-            
-            <h3>What happens next?</h3>
-            <ul>
-              <li>This serves as an official warning</li>
-              <li>The reported post has been removed from the forum</li>
-              <li>Future violations may result in temporary or permanent account suspension</li>
-              <li>We encourage you to review our community guidelines</li>
-            </ul>
-            
-            <p>We believe everyone deserves a second chance and hope you'll continue to contribute positively to our community. If you have any questions about this warning or our community guidelines, please don't hesitate to reach out.</p>
-            
-            <p>Thank you for your understanding and cooperation.</p>
-            
-            <div class="footer">
-              <p>Best regards,<br>
-              <strong>Core Collective Moderation Team</strong><br>
-              University of Johannesburg</p>
-              <p><em>This is an automated message. Please do not reply directly to this email.</em></p>
-            </div>
-          </div>
-        </div>
-      </body>
-      </html>
-    `;
+    // Use the notification controller to create the notification
+    const notificationController = require("./notificationController");
 
-    const mailOptions = {
-      from: process.env.GMAIL_USER,
-      to: userEmail,
-      subject: "⚠️ Core Collective - Community Guidelines Warning",
-      html: warningEmailHtml,
+    const notificationData = {
+      body: {
+        userEmail,
+        userName,
+        title: "⚠️ Community Guidelines Warning",
+        message: `Your post "${postTitle}" has been reviewed and found to potentially violate our community guidelines. Reason: ${reason}. This serves as an official warning. The reported post has been removed from the forum. Future violations may result in temporary or permanent account suspension. We encourage you to review our community guidelines.`,
+        type: "warning",
+        postTitle,
+        reason,
+      },
     };
 
-    await transporter.sendMail(mailOptions);
-
-    // Log the warning for admin records
-    console.log(
-      `Warning email sent to ${userEmail} for post "${postTitle}" - Reason: ${reason}`
-    );
-
-    res.json({
-      success: true,
-      message: "Warning email sent successfully",
-      details: {
-        recipient: userEmail,
-        postTitle: postTitle,
-        reason: reason,
+    // Create a mock response object to capture the notification creation result
+    let notificationResult = null;
+    const mockRes = {
+      json: (data) => {
+        notificationResult = data;
       },
-    });
+      status: (code) => ({
+        json: (data) => {
+          notificationResult = { ...data, statusCode: code };
+        },
+      }),
+    };
+
+    // Create the notification
+    await notificationController.createNotification(notificationData, mockRes);
+
+    if (notificationResult && notificationResult.success) {
+      // Log the warning for admin records
+      console.log(
+        `Warning notification created for ${userEmail} for post "${postTitle}" - Reason: ${reason}`
+      );
+
+      res.json({
+        success: true,
+        message: "Warning notification sent successfully",
+        details: {
+          recipient: userEmail,
+          postTitle: postTitle,
+          reason: reason,
+        },
+        notification: notificationResult.notification,
+      });
+    } else {
+      throw new Error("Failed to create notification");
+    }
   } catch (error) {
-    console.error("Send warning email error:", error);
-    res.status(500).json({ error: "Failed to send warning email" });
+    console.error("Send warning notification error:", error);
+    res.status(500).json({ error: "Failed to send warning notification" });
   }
 };
 
@@ -337,6 +309,6 @@ module.exports = {
   authenticateAdmin,
   searchPostById,
   deletePost,
-  sendWarningEmail,
+  sendWarningNotification,
   deleteUserAccount,
 };
