@@ -5,7 +5,7 @@ import PerformanceMonitor from "../components/PerformanceMonitor";
 import { AlertDialog } from "../components/ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
 import "../styles/HomeStyles/Home.css";
-import { FaHistory, FaUserCircle, FaRobot, FaTrash, FaVolumeUp, FaVolumeMute, FaStop, FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
+import { FaHistory, FaUserCircle, FaRobot, FaTrash, FaVolumeUp, FaVolumeMute, FaStop, FaMicrophone, FaMicrophoneSlash, FaPlus } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -856,47 +856,74 @@ const Home = () => {
     <div className="virtualassist-bg">
       <div className="virtualassist-header">
         <TextType
-          text={["VirtualAssist", "I'm here to help!!"]}
+          // 
           typingSpeed={75}
           pauseDuration={1500}
           showCursor={true}
-          cursorCharacter="_"
+          cursorCharacter=""
           className="virtualassist-title"
         />
-        <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-end" }}>
           <button
-            className={`virtualassist-speed-toggle ${speedMode ? 'speed-fast' : 'speed-comprehensive'}`}
+            className={`virtualassist-speed-toggle icon-only-btn ${speedMode ? 'speed-fast' : 'speed-comprehensive'}`}
             onClick={() => setSpeedMode(!speedMode)}
             aria-label={`Switch to ${speedMode ? 'comprehensive' : 'fast'} mode`}
             title={speedMode ? 'Fast Mode (Quick responses, no search)' : 'Comprehensive Mode (Detailed responses with search)'}
             style={{
-              padding: "8px 12px",
-              borderRadius: "6px",
+              padding: "10px",
+              borderRadius: "8px",
               border: "none",
-              fontSize: "12px",
-              fontWeight: "bold",
+              fontSize: "16px",
               cursor: "pointer",
               backgroundColor: speedMode ? "#4CAF50" : "#FF9800",
               color: "white",
+              transition: "all 0.3s ease",
+              position: "relative"
+            }}
+          >
+            {speedMode ? "⚡" : "🔍"}
+            <span className="icon-tooltip">
+              {speedMode ? "Fast Mode" : "Comprehensive Mode"}
+            </span>
+          </button>
+          <button
+            className="virtualassist-newchat-btn icon-only-btn"
+            onClick={handleNewChat}
+            aria-label="Start new chat"
+            title="New Chat"
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: "#1976d2",
+              color: "white",
+              cursor: "pointer",
+              position: "relative",
               transition: "all 0.3s ease"
             }}
           >
-            {speedMode ? "⚡ FAST" : "🔍 COMPREHENSIVE"}
+            <FaPlus size={16} />
+            <span className="icon-tooltip">New Chat</span>
           </button>
           <button
-            className="virtualassist-newchat-btn"
-            onClick={handleNewChat}
-            aria-label="Start new chat"
-          >
-            New Chat
-          </button>
-          <button
-            className="virtualassist-history-btn"
+            className="virtualassist-history-btn icon-only-btn"
             onClick={handleShowHistory}
             aria-label="Show chat history"
+            title="Chat History"
             disabled={showHistory}
+            style={{
+              padding: "10px",
+              borderRadius: "8px",
+              border: "none",
+              backgroundColor: showHistory ? "#ccc" : "#666",
+              color: "white",
+              cursor: showHistory ? "not-allowed" : "pointer",
+              position: "relative",
+              transition: "all 0.3s ease"
+            }}
           >
-            <FaHistory size={22} />
+            <FaHistory size={16} />
+            <span className="icon-tooltip">Chat History</span>
           </button>
         </div>
       </div>
@@ -1043,23 +1070,6 @@ const Home = () => {
           )}
 
           <div ref={chatEndRef} />
-        </div>
-
-        {/* Speed Mode Indicator */}
-        <div className="virtualassist-speed-indicator" style={{
-          position: "absolute",
-          top: "10px",
-          left: "880px", // Moved further to the right
-          padding: "4px 8px",
-          backgroundColor: speedMode ? "rgba(76, 175, 80, 0.1)" : "rgba(255, 152, 0, 0.1)",
-          color: speedMode ? "#4CAF50" : "#FF9800",
-          borderRadius: "4px",
-          fontSize: "11px",
-          fontWeight: "bold",
-          width: "140px",
-          zIndex: 10
-        }}>
-          {speedMode ? "⚡ FAST MODE" : "🔍 COMPREHENSIVE MODE"}
         </div>
 
         {/* Listening Status Indicator */}

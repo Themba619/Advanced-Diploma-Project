@@ -1,7 +1,7 @@
 /* Container */
 .virtualassist-bg {
   height: 100vh;
-  background: linear-gradient(135deg, #7f7fd5 0%, #86a8e7 50%, #f7971e 100%);
+  background: #91a3c2;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -19,7 +19,6 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(10px);
 }
 
 .virtualassist-title {
@@ -847,4 +846,49 @@
     width: 5px;
     height: 5px;
   }
+}
+
+/* Icon-only button tooltips */
+.icon-only-btn {
+  position: relative;
+  width: 44px !important;
+  height: 44px !important;
+  padding: 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 8px !important;
+  border: none !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  background-color: #666 !important;
+  color: white !important;
+}
+
+.icon-tooltip {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%) translateX(-10px);
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  margin-right: 0.5rem;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.icon-only-btn:hover .icon-tooltip {
+  opacity: 1;
+  transform: translateY(-50%) translateX(0);
+}
+
+.icon-only-btn:hover {
+  transform: scale(1.05);
 }

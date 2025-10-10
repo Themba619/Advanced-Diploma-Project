@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Menu } from "lucide-react";
 import { Outlet } from "react-router-dom";
-import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun } from "react-icons/fa";
+import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun, FaHome, FaComments, FaUser, FaCog, FaPhoneAlt } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 import SplitText from "../react_bits/src/blocks/TextAnimations/SplitText/SplitText";
+import VALogo from "../assets/Logo.png";
 
 const DrawerNavigation = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -39,22 +40,36 @@ const DrawerNavigation = () => {
         console.error("Failed to decode token:", err);
       }
     }
+
+    // Handle responsive behavior
+    const handleResize = () => {
+      if (window.innerWidth <= 600) {
+        setIsOpen(false);
+        setIsCollapsed(false);
+      } else {
+        setIsOpen(true);
+        setIsCollapsed(true);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Call on mount
+
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
     <div className={`drawer-container ${darkMode ? 'dark-mode' : 'light-mode'}`}>
       {/* Top Nav */}
       <div className="top-nav">
-        <button
-          onClick={() => setIsOpen(true)}
-          className="menu-button"
-          aria-label="Open menu"
-          aria-expanded={isOpen}
-        >
-          <Menu size={26} />
-        </button>
+        <img 
+          src={VALogo} 
+          alt="VirtualAssist Logo" 
+          className="logo-image"
+          onClick={() => navigate("/home")}
+        />
         <SplitText
-          text="Core Collective"
+          text="Virtual Assist"
           className="top-nav-title"
           delay={100}
           duration={0.6}
@@ -99,16 +114,9 @@ const DrawerNavigation = () => {
       </div>
 
       {/* Drawer */}
-      <div className={`drawer ${isOpen ? "drawer-open" : "drawer-closed"}`}>
+      <div className={`drawer ${isOpen ? "drawer-open" : "drawer-closed"} ${isCollapsed ? "drawer-collapsed" : "drawer-expanded"}`}>
         <div className="drawer-header">
-          <span className="drawer-title">Hey there, {userName}!</span>
-          <button
-            onClick={() => setIsOpen(false)}
-            className="close-button"
-            aria-label="Close menu"
-          >
-            ×
-          </button>
+          {!isCollapsed && <span className="drawer-title">Hey there, {userName}!</span>}
         </div>
 
         {/* Links */}
@@ -117,54 +125,74 @@ const DrawerNavigation = () => {
             to="/home"
             className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
+            title="Home"
           >
-            Home
+            <FaHome size={20} />
+            <span className="nav-text">Home</span>
           </Link>
           <Link
             to="/forum"
             className={`nav-link ${location.pathname === '/forum' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
+            title="Chat Forum"
           >
-            Chat Forum
+            <FaComments size={20} />
+            <span className="nav-text">Chat Forum</span>
           </Link>
           <Link
             to="/profile"
             className={`nav-link ${location.pathname === '/profile' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
+            title="Profile"
           >
-            Profile
+            <FaUser size={20} />
+            <span className="nav-text">Profile</span>
           </Link>
           <Link
             to="/settings"
             className={`nav-link ${location.pathname === '/settings' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
+            title="Settings"
           >
-            Settings
+            <FaCog size={20} />
+            <span className="nav-text">Settings</span>
           </Link>
           <Link
             to="/contactUs"
             className={`nav-link ${location.pathname === '/contactUs' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
+            title="Contact Us"
           >
-            Contact-us
+            <FaPhoneAlt size={20} />
+            <span className="nav-text">Contact Us</span>
           </Link>
         </nav>
-        <div className="drawer-theme-toggle">
+        <div className="drawer-bottom-controls">
           <button
-            onClick={handleThemeToggle}
-            className="theme-button"
-            aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="collapse-toggle-button"
+            aria-label={isCollapsed ? "Expand menu" : "Collapse menu"}
+            title={isCollapsed ? "Expand menu" : "Collapse menu"}
           >
-            {darkMode ? <FaSun size={24} className="theme-icon" /> : <FaMoon size={24} className="theme-icon" />}
+            {isCollapsed ? ">" : "<"}
           </button>
+          <div className="drawer-theme-toggle">
+            <button
+              onClick={handleThemeToggle}
+              className="theme-button"
+              aria-label={darkMode ? "Switch to light mode" : "Switch to dark mode"}
+            >
+              {darkMode ? <FaSun size={24} className="theme-icon" /> : <FaMoon size={24} className="theme-icon" />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Overlay */}
+      {/* Overlay for mobile */}
       {isOpen && (
         <div
           onClick={() => setIsOpen(false)}
-          className="overlay"
+          className="overlay mobile-only"
         />
       )}
 

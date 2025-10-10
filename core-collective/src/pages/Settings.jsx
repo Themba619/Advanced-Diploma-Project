@@ -77,7 +77,7 @@ const Settings = () => {
   return (
     <div className="settings-bg">
       <div className="settings-header">
-        <FaUserCog className="settings-header-icon" />
+        {/* <FaUserCog className="settings-header-icon" /> */}
         <div>
           <h2 className="settings-title">Settings</h2>
           <div className="settings-subtitle">Manage your account and preferences</div>
