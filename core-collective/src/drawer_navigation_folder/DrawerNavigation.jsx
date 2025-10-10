@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Outlet } from "react-router-dom";
-import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun, FaHome, FaComments, FaUser, FaCog, FaPhoneAlt } from "react-icons/fa";
+import { FaEnvelope, FaGift, FaQuestionCircle, FaUserCircle, FaExternalLinkAlt, FaMoon, FaSun, FaHome, FaComments, FaUser, FaCog, FaPhoneAlt, FaRocket } from "react-icons/fa";
 import { jwtDecode } from "jwt-decode";
 import "../styles/drawerNavStyles/DrawerNavigation.css";
 import SplitText from "../react_bits/src/blocks/TextAnimations/SplitText/SplitText";
@@ -122,6 +122,15 @@ const DrawerNavigation = () => {
         {/* Links */}
         <nav className="drawer-nav">
           <Link
+            to="/homeLanding"
+            className={`nav-link ${location.pathname === '/homeLanding' ? 'active' : ''}`}
+            onClick={() => setIsOpen(false)}
+            title="Home Landing"
+          >
+            <FaRocket size={20} />
+            <span className="nav-text">Home Landing</span>
+          </Link>
+          <Link
             to="/home"
             className={`nav-link ${location.pathname === '/home' ? 'active' : ''}`}
             onClick={() => setIsOpen(false)}
@@ -130,6 +139,7 @@ const DrawerNavigation = () => {
             <FaHome size={20} />
             <span className="nav-text">Home</span>
           </Link>
+          
           <Link
             to="/forum"
             className={`nav-link ${location.pathname === '/forum' ? 'active' : ''}`}

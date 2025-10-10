@@ -98,6 +98,7 @@ import DownloadApp from "./pages/DownloadApp";
 import ChatPerformanceTest from "./pages/ChatPerformanceTest";
 import LandingPage from "./pages/LandingPage";
 import AdminPanel from "./pages/AdminPanel";
+import HomeLanding from "./pages/HomeLanding";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
 const queryClient = new QueryClient();
@@ -127,6 +128,7 @@ function App() {
             <Route path="/forum" element={<ForumChat />} />
             <Route path="/contactUs" element={<ContactUs />} />
             <Route path="/performance" element={<ChatPerformanceTest />} />
+            <Route path="/homeLanding" element={<HomeLanding />} />
             <Route path="*" element={<DownloadApp />} />
           </Route>
         </Routes>
