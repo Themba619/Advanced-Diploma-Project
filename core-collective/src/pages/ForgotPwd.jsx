@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import '../styles/OnboardingStyles/forgotPwd.css';
-import Logo from '../assets/Logo.png'; // Adjust the path as needed
+import '../styles/OnboardingStyles/LoginAndSignup.css';
+import BackgroundImage from '../assets/login background.png';
+import LogoMark from '../assets/VA-3.png';
 
 function ForgotPwd() {
   const [email, setEmail] = useState('');
@@ -52,46 +53,79 @@ function ForgotPwd() {
   };
 
   return (
-    <div className="login-container">
-      {/* Left half - Image Placeholder */}
-      <div className="image-placeholder">
-        <img src={Logo} alt="Logo" className="logo-image" />
+    <div className="new-login-container">
+      {/* Background Image */}
+      <div className="login-background">
+        <img src={BackgroundImage} alt="Background" className="background-image" />
       </div>
 
-      {/* Right half - Forgot Password Form */}
-      <div className="login-form-container">
-        <div className="login-form">
-          <h2>Reset Your Password</h2>
-          <p>Please enter your email address to receive an OTP. You'll then be able to set a new password.</p>
-          
-          <form onSubmit={handleSubmit}>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={loading}
-            />
-            
-            {error && <p className="error-message" style={{ color: 'red', fontSize: '14px', margin: '10px 0' }}>{error}</p>}
-            {message && <p className="success-message" style={{ color: 'green', fontSize: '14px', margin: '10px 0' }}>{message}</p>}
-            
-            <button 
-              type="submit" 
-              className="sign-in-btn"
-              disabled={loading}
-            >
-              {loading ? 'Sending...' : 'Send OTP'}
-            </button>
-          </form>
-          
-          <p className="signup-link">
-            Remembered your password?{' '}
-            <a href="/login" className="signup-link-text">
-              Sign In
-            </a>
+      {/* Foreground Overlay */}
+      <div className="login-overlay">
+        {/* Hero logo in the white space */}
+        <img src={LogoMark} alt="VirtualAssist Logo" className="hero-logo" />
+
+        <div className="login-card">
+          <div className="welcome-section">
+            <div className="welcome-header">
+              <h1 className="welcome-title">
+                <span className="welcome-line-1">Reset Your</span>
+                <span className="welcome-line-2">Password</span>
+              </h1>
+            </div>
+          </div>
+
+          <p style={{ color: '#666', marginTop: '4px' }}>
+            Please enter your email address to receive an OTP. You'll then be able to set a new password.
           </p>
+
+          <form className="login-form-new" onSubmit={handleSubmit}>
+            {error && <div className="error-message">{error}</div>}
+            {message && <div className="success-message" style={{ color: 'green' }}>{message}</div>}
+
+            <div className="input-group">
+              <label htmlFor="email" className="input-label">EMAIL</label>
+              <input
+                id="email"
+                type="email"
+                placeholder="Enter your email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="login-input"
+                required
+                disabled={loading}
+              />
+            </div>
+
+            <button type="submit" className="login-button" disabled={loading}>
+              {loading ? 'Sending…' : 'Send OTP'}
+            </button>
+
+            <div className="form-links">
+              <a href="/login" className="signup-link-new">Remembered your password? Sign In</a>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {/* Optional Social Section for consistency */}
+      <div className="social-login-section">
+        <p className="social-login-text">Sign in with</p>
+        <div className="social-icons">
+          <div className="social-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none" />
+            </svg>
+          </div>
+          <div className="social-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+            </svg>
+          </div>
+          <div className="social-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>

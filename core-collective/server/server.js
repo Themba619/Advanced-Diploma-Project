@@ -617,6 +617,7 @@ app.post("/api/private/register", async (req, res) => {
     });
   }
 
+  const startTs = Date.now();
   try {
     const existingUser = await pool.query(
       "SELECT * FROM users WHERE email = $1",
@@ -648,15 +649,7 @@ app.post("/api/private/register", async (req, res) => {
       [result.rows[0].id, email, verificationCode, expiresAt]
     );
 
-    // Send verification email (you'll need to implement this function)
-    try {
-      await sendVerificationEmail(email, verificationCode, finalFullName);
-      console.log(`Verification email sent to ${email}`);
-    } catch (emailError) {
-      console.error("Failed to send verification email:", emailError);
-      // Don't fail the registration if email fails, just log it
-    }
-
+    // Respond to client immediately (do not await email send)
     res.status(201).json({
       message:
         "User registered successfully. Please check your email for verification code.",
@@ -667,6 +660,29 @@ app.post("/api/private/register", async (req, res) => {
       },
       requires_verification: true,
     });
+
+    // Fire-and-forget email sending to avoid delaying the response
+    setImmediate(() => {
+      const emailStart = Date.now();
+      sendVerificationEmail(email, verificationCode, finalFullName)
+        .then(() => {
+          console.log(
+            `📧 Verification email sent to ${email} in ${
+              Date.now() - emailStart
+            }ms`
+          );
+        })
+        .catch((emailError) => {
+          console.error(
+            "Failed to send verification email (async):",
+            emailError
+          );
+        });
+    });
+
+    console.log(
+      `✅ Registration handled in ${Date.now() - startTs}ms before async email`
+    );
   } catch (err) {
     console.error("❌ DETAILED Registration error:", err);
     console.error("❌ Error message:", err.message);

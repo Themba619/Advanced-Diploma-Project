@@ -116,12 +116,22 @@ body {
 
 .login-card {
   position: absolute;
-  top: 120px;
+  top: 100px;
   left: 420px; /* nudge into the sweet spot */
   background: transparent;
   border-radius: 0;
   padding: 0 10px; /* minimal padding to mimic direct-on-background form */
   width: clamp(420px, 36vw, 640px); /* allow longer underlines like mockup */
+}
+
+/* Slight upward offset ONLY on the OTP page */
+.otp-page .login-card {
+  top: 20px;
+}
+
+/* Nudge hero logo as well on OTP page for better balance */
+.otp-page .hero-logo {
+  top: 50px;
 }
 
 .welcome-section {
@@ -168,6 +178,7 @@ body {
 
 .login-form-new {
   width: 100%;
+  position: absolute;
 }
 
 .error-message {
@@ -227,27 +238,7 @@ input.login-input:-webkit-autofill:focus {
   transition: background-color 9999s ease-in-out 0s;
 }
 
-.password-input-wrapper {
-  position: relative;
-}
-
-.password-toggle {
-  position: absolute;
-  right: 0;
-  bottom: 6px; /* align to baseline like mockup */
-  transform: none;
-  background: none;
-  border: none;
-  color: #22c55e; /* green eye */
-  cursor: pointer;
-  padding: 2px;
-  border-radius: 4px;
-  transition: color 0.2s ease;
-}
-
-.password-toggle:hover {
-  color: #16a34a;
-}
+.password-input-wrapper { position: relative; }
 
 .login-button {
   width: 180px; /* fixed width like mockup */
@@ -287,6 +278,16 @@ input.login-input:-webkit-autofill:focus {
   font-size: 13px;
   font-weight: 500;
   transition: color 0.3s ease;
+}
+
+.backToLogin {
+  color: #6366F1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: absolute;
+  right: 280px;
 }
 
 .signup-link-new:hover,

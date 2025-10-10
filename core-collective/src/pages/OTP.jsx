@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import '../styles/OnboardingStyles/forgotPwd.css'; // Reusing the same styles
-import Logo from '../assets/Logo.png';
+import '../styles/OnboardingStyles/LoginAndSignup.css';
+import BackgroundImage from '../assets/login background.png';
+import LogoMark from '../assets/VA-3.png';
 
 function OTP() {
   const [otp, setOtp] = useState('');
@@ -11,7 +12,7 @@ function OTP() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes countdown
-  const [showPasswords, setShowPasswords] = useState(false);
+  // No password eye toggle to keep UI consistent with Login/Signup
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -21,9 +22,7 @@ function OTP() {
 
   // Redirect if no email provided
   useEffect(() => {
-    if (!email) {
-      navigate('/forgot-password');
-    }
+    if (!email) navigate('/forgotPwd');
   }, [email, navigate]);
 
   // Countdown timer
@@ -147,146 +146,104 @@ function OTP() {
   }
 
   return (
-    <div className="login-container">
-      {/* Left half - Image Placeholder */}
-      <div className="image-placeholder">
-        <img src={Logo} alt="Logo" className="logo-image" />
+    <div className="new-login-container otp-page">
+      {/* Background Image */}
+      <div className="login-background">
+        <img src={BackgroundImage} alt="Background" className="background-image" />
       </div>
 
-      {/* Right half - OTP Verification Form */}
-      <div className="login-form-container">
-        <div className="login-form">
-          <h2>Verify OTP & Set New Password</h2>
-          <p>We've sent a 6-digit verification code to:</p>
+      {/* Foreground Overlay */}
+      <div className="login-overlay">
+        {/* Hero logo in the white space */}
+        <img src={LogoMark} alt="VirtualAssist Logo" className="hero-logo" />
+
+        <div className="login-card">
+          <div className="welcome-section">
+            <div className="welcome-header">
+              <h1 className="welcome-title">
+                <span className="welcome-line-1">Verify OTP &</span>
+                <span className="welcome-line-2">Set New Password</span>
+              </h1>
+            </div>
+          </div>
+
+          <p style={{ color: '#666', marginTop: '4px' }}>We've sent a 6-digit verification code to:</p>
           <p style={{ fontWeight: 'bold', color: '#666', marginBottom: '20px' }}>{email}</p>
-          
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              placeholder="Enter 6-digit OTP"
-              value={otp}
-              onChange={handleOtpChange}
-              maxLength="6"
-              style={{ 
-                textAlign: 'center', 
-                fontSize: '18px', 
-                letterSpacing: '3px',
-                fontWeight: 'bold',
-                marginBottom: '15px'
-              }}
-              required
-              disabled={loading}
-            />
-            
-            <div style={{ position: 'relative', marginBottom: '15px' }}>
+
+          <form className="login-form-new" onSubmit={handleSubmit}>
+            <div className="input-group">
+              <label htmlFor="otp" className="input-label">ENTER 6-DIGIT OTP</label>
               <input
-                type={showPasswords ? "text" : "password"}
+                id="otp"
+                type="text"
+                placeholder="Enter 6-digit OTP"
+                value={otp}
+                onChange={handleOtpChange}
+                maxLength={6}
+                className="login-input"
+                required
+                disabled={loading}
+                style={{ textAlign: 'center', letterSpacing: '2px', fontWeight: '600' }}
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="newPassword" className="input-label">NEW PASSWORD</label>
+              <input
+                id="newPassword"
+                type="password"
                 placeholder="New Password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                className="login-input"
                 required
                 disabled={loading}
-                style={{ paddingRight: '40px' }}
               />
-              <button
-                type="button"
-                onClick={() => setShowPasswords(!showPasswords)}
-                style={{
-                  position: 'absolute',
-                  right: '10px',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '16px'
-                }}
-                disabled={loading}
-              >
-                {showPasswords ? '👁️' : '👁️‍🗨️'}
-              </button>
             </div>
-            
-            <div style={{ position: 'relative', marginBottom: '15px' }}>
+
+            <div className="input-group">
+              <label htmlFor="confirmPassword" className="input-label">CONFIRM NEW PASSWORD</label>
               <input
-                type={showPasswords ? "text" : "password"}
+                id="confirmPassword"
+                type="password"
                 placeholder="Confirm New Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                className="login-input"
                 required
                 disabled={loading}
-                style={{ paddingRight: '40px' }}
               />
             </div>
-            
-            <div style={{ fontSize: '12px', color: '#666', textAlign: 'left', marginBottom: '15px' }}>
-              Password must be at least 8 characters long and include:
-              <ul style={{ margin: '5px 0', paddingLeft: '20px' }}>
-                <li>One uppercase letter (A-Z)</li>
-                <li>One lowercase letter (a-z)</li>
-                <li>One number (0-9)</li>
-                <li>One special character (@$!%*?&#)</li>
-              </ul>
+
+            <div style={{ fontSize: '12px', color: '#666', textAlign: 'left', marginTop: '6px', marginBottom: '12px' }}>
+              Password must be at least 8 characters long and include uppercase, lowercase, number, and special character (@$!%*?&#).
             </div>
-            
+
             {timeLeft > 0 && (
               <p style={{ color: '#666', fontSize: '14px', margin: '10px 0' }}>
                 Time remaining: {formatTime(timeLeft)}
               </p>
             )}
-            
-            {error && <p className="error-message" style={{ color: 'red', fontSize: '14px', margin: '10px 0' }}>{error}</p>}
-            {message && <p className="success-message" style={{ color: 'green', fontSize: '14px', margin: '10px 0' }}>{message}</p>}
-            
-            <button 
-              type="submit" 
-              className="sign-in-btn"
-              disabled={loading || timeLeft === 0}
-            >
-              {loading ? 'Changing Password...' : 'Change Password'}
+
+            {error && <div className="error-message">{error}</div>}
+            {message && <div className="success-message" style={{ color: 'green' }}>{message}</div>}
+
+            <button type="submit" className="login-button" disabled={loading || timeLeft === 0}>
+              {loading ? 'Changing Password…' : 'Change Password'}
             </button>
+
+            <div className="form-links">
+              <button
+                type="button"
+                onClick={handleResendOTP}
+                disabled={loading}
+                style={{ background: 'none', border: 'none', color: '#646cff', textDecoration: 'underline', cursor: 'pointer' }}
+              >
+                {timeLeft === 0 ? 'Resend OTP' : "Didn't receive OTP? Resend"}
+              </button>
+              <a href="/login" className="backToLogin">Back to Login</a>
+            </div>
           </form>
-          
-          <div style={{ marginTop: '20px' }}>
-            {timeLeft === 0 ? (
-              <button 
-                onClick={handleResendOTP}
-                disabled={loading}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#646cff',
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Resend OTP
-              </button>
-            ) : (
-              <button 
-                onClick={handleResendOTP}
-                disabled={loading}
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#646cff',
-                  textDecoration: 'underline',
-                  cursor: 'pointer',
-                  fontSize: '14px'
-                }}
-              >
-                Didn't receive OTP? Resend
-              </button>
-            )}
-          </div>
-          
-          <p className="signup-link">
-            Remember your password?{' '}
-            <a href="/login" className="signup-link-text">
-              Back to Login
-            </a>
-          </p>
         </div>
       </div>
     </div>
