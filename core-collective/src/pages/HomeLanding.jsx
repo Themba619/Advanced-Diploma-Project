@@ -481,7 +481,7 @@ const HomeLanding = () => {
           <p style={styles.heroDescription}>
             VirtualAssist combines advanced AI, voice technology, community forums, and smart navigation to create the ultimate communication platform. Connect, communicate, and collaborate like never before.
           </p>
-          <button style={styles.btn}>Get Started</button>
+          {/* <button style={styles.btn}>Get Started</button> */}
         </section>
       </div>
 
