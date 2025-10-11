@@ -5,7 +5,7 @@ import PerformanceMonitor from "../components/PerformanceMonitor";
 import { AlertDialog } from "../components/ui/alert-dialog";
 import { useToast } from "../hooks/use-toast";
 import "../styles/HomeStyles/Home.css";
-import { FaHistory, FaUserCircle, FaRobot, FaTrash, FaVolumeUp, FaVolumeMute, FaStop, FaMicrophone, FaMicrophoneSlash, FaPlus } from "react-icons/fa";
+import { FaHistory, FaUserCircle, FaRobot, FaTrash, FaVolumeUp, FaVolumeMute, FaStop, FaMicrophone, FaMicrophoneSlash, FaPlus, FaPaperclip } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
@@ -853,98 +853,56 @@ const Home = () => {
   };
 
   return (
-    <div className="virtualassist-bg">
-      <div className="virtualassist-header">
-        <TextType
-          // 
-          typingSpeed={75}
-          pauseDuration={1500}
-          showCursor={true}
-          cursorCharacter=""
-          className="virtualassist-title"
-        />
-        <div style={{ display: "flex", flexDirection: "column", gap: "8px", alignItems: "flex-end" }}>
+    <div className="min-h-screen bg-gradient-chat flex flex-col">
+      {/* Chat Header */}
+      <div className="chat-header">
+        <div className="chat-header-icon">
+          <FaRobot />
+        </div>
+        <div className="chat-header-content">
+          <h1 className="chat-header-title">AI Assistant</h1>
+          <p className="chat-header-subtitle">Ask me anything, I'm here to help</p>
+        </div>
+        
+        {/* Floating action buttons */}
+        <div className="floating-actions">
           <button
-            className={`virtualassist-speed-toggle icon-only-btn ${speedMode ? 'speed-fast' : 'speed-comprehensive'}`}
+            className={`floating-action-btn ${speedMode ? 'fast' : 'comprehensive'}`}
             onClick={() => setSpeedMode(!speedMode)}
             aria-label={`Switch to ${speedMode ? 'comprehensive' : 'fast'} mode`}
             title={speedMode ? 'Fast Mode (Quick responses, no search)' : 'Comprehensive Mode (Detailed responses with search)'}
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              fontSize: "16px",
-              cursor: "pointer",
-              backgroundColor: speedMode ? "#4CAF50" : "#FF9800",
-              color: "white",
-              transition: "all 0.3s ease",
-              position: "relative"
-            }}
           >
             {speedMode ? "⚡" : "🔍"}
-            <span className="icon-tooltip">
-              {speedMode ? "Fast Mode" : "Comprehensive Mode"}
-            </span>
           </button>
           <button
-            className="virtualassist-newchat-btn icon-only-btn"
+            className="floating-action-btn"
             onClick={handleNewChat}
             aria-label="Start new chat"
             title="New Chat"
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: "#1976d2",
-              color: "white",
-              cursor: "pointer",
-              position: "relative",
-              transition: "all 0.3s ease"
-            }}
           >
             <FaPlus size={16} />
-            <span className="icon-tooltip">New Chat</span>
           </button>
           <button
-            className="virtualassist-history-btn icon-only-btn"
+            className="floating-action-btn"
             onClick={handleShowHistory}
             aria-label="Show chat history"
             title="Chat History"
             disabled={showHistory}
-            style={{
-              padding: "10px",
-              borderRadius: "8px",
-              border: "none",
-              backgroundColor: showHistory ? "#ccc" : "#666",
-              color: "white",
-              cursor: showHistory ? "not-allowed" : "pointer",
-              position: "relative",
-              transition: "all 0.3s ease"
-            }}
           >
             <FaHistory size={16} />
-            <span className="icon-tooltip">Chat History</span>
           </button>
         </div>
       </div>
 
-      <div className={`virtualassist-main${showHistory ? " virtualassist-blur" : ""}`}>
-        <div className="virtualassist-messages" aria-live="polite">
+      {/* Main Chat Area */}
+      <main className={`flex-1 w-full max-w-4xl mx-auto px-4 pb-4 overflow-y-auto ${showHistory ? "virtualassist-blur" : ""}`}>
+        <div className="space-y-6">
           {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`virtualassist-msg-row ${
-                msg.sender === "user" ? "virtualassist-msg-user" : "virtualassist-msg-bot"
-              }`}
-            >
-              <span className={`virtualassist-${msg.sender}-icon`}>
+            <div key={idx} className={`chat-message ${msg.sender === "user" ? "chat-message-user" : "chat-message-ai"}`}>
+              <div className="chat-message-avatar">
                 {msg.sender === "bot" ? <FaRobot /> : <FaUserCircle />}
-              </span>
-              <div
-                className={`virtualassist-msg-bubble${
-                  msg.sender === "user" ? " virtualassist-msg-bubble-user" : ""
-                }`}
-              >
+              </div>
+              <div className="chat-message-content">
                 <ReactMarkdown
                   remarkPlugins={[remarkMath]}
                   rehypePlugins={[rehypeKatex]}
@@ -965,57 +923,55 @@ const Home = () => {
                   {msg.text}
                 </ReactMarkdown>
                 {msg.sender === "bot" && (
-                  <div className="virtualassist-msg-actions">
-                    <button
-                      className={`virtualassist-tts-btn ${
-                        isSpeaking && currentSpeechIndex === idx ? 'speaking' : ''
-                      }`}
-                      onClick={() => 
-                        isSpeaking && currentSpeechIndex === idx 
-                          ? stopSpeech() 
-                          : speakText(msg.text, idx)
-                      }
-                      aria-label={
-                        isSpeaking && currentSpeechIndex === idx 
-                          ? "Stop reading message" 
-                          : "Read message aloud"
-                      }
-                      title={
-                        isSpeaking && currentSpeechIndex === idx 
-                          ? "Stop reading" 
-                          : "Read aloud"
-                      }
-                    >
-                      {isSpeaking && currentSpeechIndex === idx ? (
-                        <FaStop />
-                      ) : (
-                        <FaVolumeUp />
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    className={`chat-tts-btn ${
+                      isSpeaking && currentSpeechIndex === idx ? 'speaking' : ''
+                    }`}
+                    onClick={() => 
+                      isSpeaking && currentSpeechIndex === idx 
+                        ? stopSpeech() 
+                        : speakText(msg.text, idx)
+                    }
+                    aria-label={
+                      isSpeaking && currentSpeechIndex === idx 
+                        ? "Stop reading message" 
+                        : "Read message aloud"
+                    }
+                    title={
+                      isSpeaking && currentSpeechIndex === idx 
+                        ? "Stop reading" 
+                        : "Read aloud"
+                    }
+                  >
+                    {isSpeaking && currentSpeechIndex === idx ? (
+                      <FaStop />
+                    ) : (
+                      <FaVolumeUp />
+                    )}
+                  </button>
                 )}
-                <div className="virtualassist-msg-time">{msg.time}</div>
+                <div className="chat-message-time">{msg.time}</div>
               </div>
             </div>
           ))}
 
           {isTyping && waitingForBot && (
-            <div className="virtualassist-msg-row virtualassist-msg-bot">
-              <span className="virtualassist-bot-icon">
+            <div className="chat-message chat-message-ai">
+              <div className="chat-message-avatar">
                 <FaRobot />
-              </span>
-              <div className="virtualassist-msg-bubble">
+              </div>
+              <div className="chat-message-content loading">
                 <VirtualAssistWaiting />
               </div>
             </div>
           )}
 
           {isTyping && displayedBotMsg && !waitingForBot && (
-            <div className="virtualassist-msg-row virtualassist-msg-bot">
-              <span className="virtualassist-bot-icon">
+            <div className="chat-message chat-message-ai">
+              <div className="chat-message-avatar">
                 <FaRobot />
-              </span>
-              <div className="virtualassist-msg-bubble">
+              </div>
+              <div className="chat-message-content">
                 <ReactMarkdown
                   remarkPlugins={[remarkMath]}
                   rehypePlugins={[rehypeKatex]}
@@ -1036,11 +992,10 @@ const Home = () => {
                   {displayedBotMsg}
                 </ReactMarkdown>
                 {displayedBotMsg && (
-                  <div className="virtualassist-msg-actions">
-                    <button
-                      className={`virtualassist-tts-btn ${
-                        isSpeaking && currentSpeechIndex === 'typing' ? 'speaking' : ''
-                      }`}
+                  <button
+                    className={`chat-tts-btn ${
+                      isSpeaking && currentSpeechIndex === 'typing' ? 'speaking' : ''
+                    }`}
                       onClick={() => 
                         isSpeaking && currentSpeechIndex === 'typing' 
                           ? stopSpeech() 
@@ -1063,34 +1018,37 @@ const Home = () => {
                         <FaVolumeUp />
                       )}
                     </button>
-                  </div>
                 )}
               </div>
             </div>
           )}
 
           <div ref={chatEndRef} />
-        </div>
-
-        {/* Listening Status Indicator */}
-        {isListening && (
-          <div className="virtualassist-listening-indicator">
-            <div className="listening-animation">
-              <span className="listening-dot"></span>
-              <span className="listening-dot"></span>
-              <span className="listening-dot"></span>
+          
+          {/* Listening Status Indicator */}
+          {isListening && (
+            <div className="virtualassist-listening-indicator">
+              <div className="listening-animation">
+                <span className="listening-dot"></span>
+                <span className="listening-dot"></span>
+                <span className="listening-dot"></span>
+              </div>
+              <span className="listening-text">Listening... Speak now</span>
             </div>
-            <span className="listening-text">Listening... Speak now</span>
-          </div>
-        )}
+          )}
+        </div>
+      </main>
 
-        <form className="virtualassist-input-row" onSubmit={handleSend}>
-          <div className="virtualassist-input-container">
+      {/* Chat Input */}
+      <div className="chat-input-container">
+        <form className="chat-input-form" onSubmit={handleSend}>
+          <div className="chat-input-wrapper">
+            <FaPaperclip className="chat-input-icon" />
             <input
               ref={userInputRef}
-              className="virtualassist-input"
+              className="chat-input"
               type="text"
-              placeholder={isRecognitionSupported ? "Type your message or click the microphone to speak..." : "Type your message here..."}
+              placeholder="What do you want to know?"
               value={input}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
@@ -1108,14 +1066,14 @@ const Home = () => {
             
             {/* Auto-suggest Dropdown */}
             {showSuggestions && filteredSuggestions.length > 0 && (
-              <div ref={suggestionsRef} className="virtualassist-suggestions-dropdown">
+              <div ref={suggestionsRef} className="chat-suggestions-dropdown">
                 {filteredSuggestions.map((suggestion, index) => (
                   <div
                     key={index}
-                    className={`virtualassist-suggestion-item ${
+                    className={`chat-suggestion-item ${
                       index === selectedSuggestionIndex ? 'selected' : ''
                     }`}
-                    onMouseDown={(e) => e.preventDefault()} // Prevent blur
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => selectSuggestion(suggestion)}
                     onMouseEnter={() => setSelectedSuggestionIndex(index)}
                   >
@@ -1123,9 +1081,6 @@ const Home = () => {
                     <span className="suggestion-text">{suggestion}</span>
                   </div>
                 ))}
-                <div className="suggestion-footer">
-                  <span>Press ↑↓ to navigate, Enter to select, Esc to close</span>
-                </div>
               </div>
             )}
           </div>
@@ -1134,7 +1089,7 @@ const Home = () => {
           {isRecognitionSupported && (
             <button
               type="button"
-              className={`virtualassist-mic-btn ${isListening ? 'listening' : ''}`}
+              className={`chat-mic-btn ${isListening ? 'listening' : ''}`}
               onClick={isListening ? stopListening : startListening}
               disabled={waitingForBot}
               aria-label={isListening ? "Stop listening" : "Start voice input"}
@@ -1144,11 +1099,11 @@ const Home = () => {
             </button>
           )}
           
-          {/* Clear Transcript Button (shown when there's transcribed text) */}
+          {/* Clear Transcript Button */}
           {transcript && !isListening && (
             <button
               type="button"
-              className="virtualassist-clear-btn"
+              className="chat-clear-btn"
               onClick={clearTranscript}
               disabled={waitingForBot}
               aria-label="Clear transcribed text"
@@ -1158,16 +1113,20 @@ const Home = () => {
             </button>
           )}
           
-          <button className="virtualassist-send-btn" type="submit" disabled={waitingForBot || isListening} aria-label="Send message">
+          <button 
+            className="chat-send-btn" 
+            type="submit" 
+            disabled={waitingForBot || isListening} 
+            aria-label="Send message"
+          >
             <svg
-              width="24"
-              height="24"
+              width="20"
+              height="20"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="feather feather-send"
             >
               <line x1="22" y1="2" x2="11" y2="13" />
               <polygon points="22 2 15 22 11 13 2 9 22 2" />

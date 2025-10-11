@@ -624,22 +624,40 @@ const Forum: React.FC = () => {
   };
 
   const filteredPosts = React.useMemo(() => {
-    return posts
-      .filter((post) => {
-        if (selectedTopic !== "All Topics") {
-          return post.tags.includes(selectedTopic);
-        }
-        return true;
-      })
-      .filter((post) => {
-        if (!searchQuery.trim()) return true;
-        const query = searchQuery.toLowerCase();
-        return (
-          post.title.toLowerCase().includes(query) ||
-          post.description.toLowerCase().includes(query)
-        );
-      });
+    return (
+      posts
+        .filter((post) => {
+          if (selectedTopic !== "All Topics") {
+            return post.tags.includes(selectedTopic);
+          }
+          return true;
+        })
+        .filter((post) => {
+          if (!searchQuery.trim()) return true;
+          const query = searchQuery.toLowerCase();
+          return (
+            post.title.toLowerCase().includes(query) ||
+            post.description.toLowerCase().includes(query)
+          );
+        })
+        // Ensure newest posts appear first
+        .sort((a, b) => b.timeAgo.getTime() - a.timeAgo.getTime())
+    );
   }, [posts, selectedTopic, searchQuery]);
+
+  // Helpers for UI metrics
+  const countAllReplies = (replies: Reply[]): number => {
+    return replies.reduce(
+      (acc, r) => acc + 1 + countAllReplies(r.replies || []),
+      0
+    );
+  };
+
+  const getInitials = (name: string) => {
+    const parts = name.split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  };
 
   const renderReplies = (
     replies: Reply[],
@@ -708,18 +726,19 @@ const Forum: React.FC = () => {
     <div className="forum-container">
       <div className="topics-sidebar">
         <h3>Filter by Topic</h3>
-        <div className="topic-buttons">
-          {topics.map((topic) => (
-            <button
-              key={topic}
-              className={`topic-button ${
-                selectedTopic === topic ? "active" : ""
-              }`}
-              onClick={() => handleTopicClick(topic)}
-            >
-              {topic}
-            </button>
-          ))}
+        <div className="topic-dropdown">
+          <select
+            className="topic-select"
+            value={selectedTopic}
+            aria-label="Filter posts by topic"
+            onChange={(e) => setSelectedTopic(e.target.value)}
+          >
+            {topics.map((topic) => (
+              <option value={topic} key={topic}>
+                {topic}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
@@ -761,82 +780,144 @@ const Forum: React.FC = () => {
         )}
 
         <div className="posts-list">
-          {filteredPosts.map((post) => (
-            <div key={post.id} className="post-card">
-              <h2 className="post-title">{post.title}</h2>
-              <p className="post-description">{post.description}</p>
-              <div className="post-meta">
-                <div className="post-tags">
-                  {post.tags.map((tag) => (
+          {filteredPosts.map((post) => {
+            const totalReplies = countAllReplies(post.replies || []);
+            const primaryTag = post.tags[0] || "General";
+            return (
+              <div key={post.id} className="post-card">
+                {/* Header with tag and counts */}
+                <div className="post-card-header">
+                  <span
+                    className={`tag ${primaryTag
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {primaryTag}
+                  </span>
+                  <div className="post-meta-right">
                     <span
-                      key={tag}
-                      className={`tag ${tag.toLowerCase().replace(" ", "-")}`}
+                      className="meta-badge"
+                      title={`${totalReplies} Replies`}
                     >
-                      {tag}
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      {totalReplies} Replies
                     </span>
-                  ))}
+                    <span
+                      className="meta-badge"
+                      title={`${post.chatCount} Views`}
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        aria-hidden="true"
+                      >
+                        <path d="M12 5c-7.633 0-11 7-11 7s3.367 7 11 7 11-7 11-7-3.367-7-11-7Zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z" />
+                      </svg>
+                      {post.chatCount} Views
+                    </span>
+                  </div>
                 </div>
-                <div className="post-info">
-                  <span className="post-user">
-                    Asked by {post.user} {formatTimeAgo(post.timeAgo)}
-                  </span>
-                  <span className="chat-count">
-                    {post.chatCount === 0
-                      ? "No chats"
-                      : `${post.chatCount} ${
-                          post.chatCount === 1 ? "chat" : "chats"
-                        }`}
-                  </span>
-                </div>
-              </div>
-              <div className="replies-section">
-                <button
-                  className="reply-button"
-                  onClick={() => toggleReplies(`post-${post.id}`)}
-                  aria-expanded={
-                    expandedReplies[`post-${post.id}`] ? "true" : "false"
-                  }
-                  aria-controls={`replies-post-${post.id}`}
-                >
-                  {expandedReplies[`post-${post.id}`]
-                    ? "Hide Replies"
-                    : `Show ${post.replies.length} ${
-                        post.replies.length === 1 ? "Reply" : "Replies"
-                      }`}
-                </button>
-                <button
-                  className="reply-button"
-                  onClick={() => toggleReplies(`form-post-${post.id}`)}
-                >
-                  {expandedReplies[`form-post-${post.id}`]
-                    ? "Cancel Reply"
-                    : "Reply"}
-                </button>
-                <button
-                  className="report-button"
-                  onClick={() =>
-                    handleReportPost(post.id, post.title, post.user)
-                  }
-                  title="Report this post"
-                >
-                  ⚠️ Report
-                </button>
-                {expandedReplies[`form-post-${post.id}`] && (
-                  <ReplyForm
-                    onSubmit={(content: string) =>
-                      handleSubmitReply(post.id, content)
-                    }
-                  />
-                )}
-                {expandedReplies[`post-${post.id}`] &&
-                  post.replies.length > 0 && (
-                    <div className="replies-list">
-                      {renderReplies(post.replies, post.id)}
+
+                <h2 className="post-title">{post.title}</h2>
+                <p className="post-description">{post.description}</p>
+
+                {/* Footer with actions and author */}
+                <div className="post-footer">
+                  <div className="post-actions">
+                    <button
+                      className="action"
+                      onClick={() => toggleReplies(`form-post-${post.id}`)}
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                      </svg>
+                      Reply
+                    </button>
+                    <button
+                      className="action"
+                      onClick={() => toggleReplies(`post-${post.id}`)}
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M12 21.35 10.55 20.03C5.4 15.36 2 12.28 2 8.5A4.5 4.5 0 0 1 6.5 4 5.07 5.07 0 0 1 12 6.09 5.07 5.07 0 0 1 17.5 4 4.5 4.5 0 0 1 22 8.5c0 3.78-3.4 6.86-8.55 11.53Z" />
+                      </svg>
+                      {expandedReplies[`post-${post.id}`]
+                        ? "Hide Replies"
+                        : `Show Replies`}
+                    </button>
+                    {/* <button className="action" onClick={() => navigator.clipboard?.writeText(window.location.href)}>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 3h-2v2H7v2H5v12h14V7h-2V5h-4V3ZM7 9h10v8H7V9Z"/></svg>
+                      Share
+                    </button> */}
+                    <button
+                      className="action danger"
+                      onClick={() =>
+                        handleReportPost(post.id, post.title, post.user)
+                      }
+                    >
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M1 21h22L12 2 1 21Zm12-3h-2v-2h2v2Zm0-4h-2v-4h2v4Z" />
+                      </svg>
+                      Report
+                    </button>
+                  </div>
+
+                  <div className="post-author">
+                    <div className="avatar" aria-hidden="true">
+                      {getInitials(post.user)}
                     </div>
+                    <div className="author-meta">
+                      <div className="author-name">{post.user}</div>
+                      <div className="author-time">
+                        {formatTimeAgo(post.timeAgo)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Collapsible composer + replies */}
+                <div className="replies-section">
+                  {expandedReplies[`form-post-${post.id}`] && (
+                    <ReplyForm
+                      onSubmit={(content: string) =>
+                        handleSubmitReply(post.id, content)
+                      }
+                    />
                   )}
+                  {expandedReplies[`post-${post.id}`] &&
+                    post.replies.length > 0 && (
+                      <div className="replies-list">
+                        {renderReplies(post.replies, post.id)}
+                      </div>
+                    )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

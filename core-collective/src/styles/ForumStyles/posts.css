@@ -1,36 +1,71 @@
 .post-card {
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .post-title {
-    font-size: 1.5em;
-    margin: 0 0 10px;
-  }
-  
-  .post-description {
-    margin: 0 0 15px;
-  }
-  
-  .post-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .post-tags {
-    display: flex;
-    gap: 5px;
-  }
-  
-  .tag {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 0.9em;
-  }
+  background: #ffffff;
+  border: 1px solid #eef2f7;
+  border-radius: 18px;
+  padding: 22px;
+  margin-bottom: 24px;
+  box-shadow: 0 16px 34px rgba(2, 6, 23, 0.08);
+  position: relative;
+}
+
+.post-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 18px;
+  bottom: 18px;
+  width: 6px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #6a5af9 0%, #7c3aed 100%);
+}
+
+/* header area with tag + meta badges */
+.post-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.post-meta-right { display: flex; align-items: center; gap: 10px; }
+
+.meta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #4b5563;
+  background: #f5f7ff;
+  border: 1px solid #e5e8ff;
+  padding: 6px 10px;
+  border-radius: 999px;
+}
+
+.post-title {
+  font-size: 1.6rem;
+  margin: 0 0 10px 0;
+  font-weight: 800;
+  color: #111827;
+}
+
+.post-description { margin: 0 0 15px; color: #4b5563; }
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.post-tags { display: flex; gap: 8px; align-items: center; }
+
+.tag {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+}
   
   .tag.math { background: #e3f2fd; }
   .tag.housing { background: #fce4ec; }
@@ -38,48 +73,35 @@
   .tag.social { background: #fff3e0; }
   .tag.general { background: #f3e5f5; }
   
-  .post-info {
-    display: flex;
-    gap: 15px;
-    font-size: 0.9em;
-    color: #666;
-  }
+  .post-info { display: flex; gap: 16px; font-size: 0.92em; color: #6b7280; }
   
-  .replies-section {
-    margin-top: 15px;
-    border-top: 1px solid #eee;
-    padding-top: 15px;
-  }
+  .replies-section { margin-top: 16px; border-top: 1px solid #eef2f7; padding-top: 16px; }
   
   .reply-button {
-    background: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 5px 10px;
+    background: #f8faff;
+    border: 1px solid #e6e8f0;
+    border-radius: 10px;
+    padding: 8px 14px;
     margin-right: 10px;
     cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.2s ease;
   }
   
-  .reply-button:hover {
-    background: #e0e0e0;
-  }
+  .reply-button:hover { background: #eef2ff; box-shadow: 0 6px 14px rgba(99, 102, 241, 0.18); }
 
   .report-button {
-    background: #ff6b6b;
-    color: white;
-    border: 1px solid #ff5252;
-    border-radius: 4px;
-    padding: 5px 10px;
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    padding: 8px 14px;
     margin-left: 10px;
     cursor: pointer;
     font-size: 0.9em;
-    transition: background-color 0.2s ease;
+    transition: transform 0.12s ease, background 0.2s ease;
   }
 
-  .report-button:hover {
-    background: #ff5252;
-    transform: translateY(-1px);
-  }
+  .report-button:hover { background: #fecaca; transform: translateY(-1px); }
 
   .report-button:active {
     background: #e53e3e;
@@ -91,20 +113,22 @@
   
   .reply-form textarea {
     width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
+    padding: 10px 12px;
+    border: 1px solid #e6e8f0;
+    border-radius: 12px;
     resize: vertical;
+    background: #f8fafc;
   }
   
   .reply-form button {
-    background: #007bff;
+    background: linear-gradient(135deg, #6a5af9 0%, #7c3aed 100%);
     color: white;
     border: none;
-    border-radius: 4px;
-    padding: 8px 16px;
+    border-radius: 999px;
+    padding: 10px 16px;
     cursor: pointer;
-    margin-top: 5px;
+    margin-top: 8px;
+    box-shadow: 0 10px 24px rgba(124,58,237,0.28);
   }
   
   .reply-form button:hover {
@@ -115,12 +139,7 @@
     margin-top: 10px;
   }
   
-  .reply {
-    margin: 10px 0;
-    padding: 10px;
-    background: #f9f9f9;
-    border-radius: 4px;
-  }
+  .reply { margin: 10px 0; padding: 12px; background: #f8fafc; border-radius: 12px; }
   
   .reply.level-1 {
     margin-left: 20px;
@@ -140,16 +159,47 @@
     gap: 5px;
   }
   
-  .reply-user {
-    font-weight: bold;
-    color: #333;
-  }
+  .reply-user { font-weight: 700; color: #111827; }
   
-  .reply-time {
-    font-size: 0.8em;
-    color: #666;
-  }
+  .reply-time { font-size: 0.8em; color: #6b7280; }
   
   .nested-replies {
     margin-top: 10px;
   }
+
+/* footer with actions and author chip */
+.post-footer {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.post-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.post-actions .action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  border: 1px solid #e6e8f0;
+  background: #fff;
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.post-actions .action:hover { transform: translateY(-1px); box-shadow: 0 6px 14px rgba(2,6,23,0.08); }
+.post-actions .action.danger { border-color: #fecaca; background: #fff7f7; color: #b42318; }
+
+.post-author { display: flex; align-items: center; gap: 10px; }
+.post-author .avatar {
+  width: 36px; height: 36px; border-radius: 999px; display: grid; place-items: center;
+  background: linear-gradient(135deg, #6a5af9 0%, #7c3aed 100%);
+  color: #fff; font-weight: 800; font-size: 12px; box-shadow: 0 10px 22px rgba(124,58,237,0.25);
+}
+.post-author .author-name { font-weight: 700; color: #111827; }
+.post-author .author-time { font-size: 0.8rem; color: #6b7280; }
