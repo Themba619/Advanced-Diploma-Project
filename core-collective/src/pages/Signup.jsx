@@ -279,7 +279,7 @@ const Signup = () => {
       </div>
 
       {/* Social Login Section */}
-      <div className="social-login-section">
+      {/* <div className="social-login-section">
         <p className="social-login-text">Sign up with</p>
         <div className="social-icons">
           <div className="social-icon">
@@ -298,7 +298,7 @@ const Signup = () => {
             </svg>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

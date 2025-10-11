@@ -49,10 +49,10 @@ const Login = () => {
           {/* <img src={LogoMark} alt="VirtualAssist" className="nav-logo-img" /> */}
           {/* <span className="nav-logo-text">VIRTUALASSIST</span> */}
         </div>
-        <div className="nav-tabs">
+        {/* <div className="nav-tabs">
           <span className="nav-tab">Option</span>
           <span className="nav-tab active">Login</span>
-        </div>
+        </div> */}
       </div>
 
       {/* Form Overlay */}
@@ -115,7 +115,7 @@ const Login = () => {
       </div>
 
       {/* Social Login Section */}
-      <div className="social-login-section">
+      {/* <div className="social-login-section">
         <p className="social-login-text">Sign in with</p>
         <div className="social-icons">
           <div className="social-icon">
@@ -134,7 +134,7 @@ const Login = () => {
             </svg>
           </div>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

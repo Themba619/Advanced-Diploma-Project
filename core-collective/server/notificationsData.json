@@ -12,6 +12,19 @@
       "is_read": true,
       "created_at": "2025-10-10T16:38:25.277Z",
       "read_at": "2025-10-10T16:39:41.942Z"
+    },
+    {
+      "id": "64cd7f36-3bcc-44c4-9234-7c6c6271e278",
+      "user_email": "thembabiyela20@gmail.com",
+      "user_name": "Testing",
+      "title": "⚠️ Community Guidelines Warning",
+      "message": "Your post \"test\" has been reviewed and found to potentially violate our community guidelines. Reason: Sending warning. This serves as an official warning. The reported post has been removed from the forum. Future violations may result in temporary or permanent account suspension. We encourage you to review our community guidelines.",
+      "type": "warning",
+      "post_title": "test",
+      "reason": "Sending warning",
+      "is_read": true,
+      "created_at": "2025-10-11T03:34:41.730Z",
+      "read_at": "2025-10-11T03:35:39.244Z"
     }
   ]
 }
