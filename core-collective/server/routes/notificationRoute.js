@@ -7,6 +7,10 @@ const {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  createAdminReportNotification,
+  getAdminReportNotifications,
+  updateReportStatus,
+  createUserWarning,
 } = require("../controller/notificationController");
 
 // Create a new notification
@@ -26,5 +30,13 @@ router.put("/read-all", markAllAsRead);
 
 // Delete a notification
 router.delete("/:notificationId", deleteNotification);
+
+// Admin report notification routes
+router.post("/admin/report", createAdminReportNotification);
+router.get("/admin/reports", getAdminReportNotifications);
+router.put("/admin/report/:reportId", updateReportStatus);
+
+// Admin warning notification route
+router.post("/admin/warning", createUserWarning);
 
 module.exports = router;

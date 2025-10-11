@@ -399,86 +399,40 @@ exports.reportPost = async (req, res) => {
         .json({ error: "Post ID, title, and reason are required" });
     }
 
-    const transporter = createTransporter();
+    // Create admin notification instead of sending email
+    const fetch = require("node-fetch");
 
-    const reportDate = new Date().toLocaleString("en-ZA", {
-      timeZone: "Africa/Johannesburg",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
+    const notificationResponse = await fetch(
+      "http://localhost:3001/api/notifications/admin/report",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          postId,
+          postTitle,
+          postUser,
+          reason,
+          description,
+          reportedBy,
+        }),
+      }
+    );
 
-    const info = await transporter.sendMail({
-      from: `"Core Collective Reports" <${process.env.GMAIL_USER}>`,
-      to: "thembabiyela20@gmail.com",
-      subject: `🚨 Forum Post Report - ${reason}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px;">
-          <div style="background-color: #dc3545; color: white; padding: 20px; border-radius: 8px 8px 0 0;">
-            <h1 style="margin: 0; font-size: 24px;">🚨 Forum Post Report</h1>
-          </div>
-          
-          <div style="padding: 25px;">
-            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-              <h2 style="color: #495057; margin: 0 0 10px 0;">Report Details</h2>
-              <p style="margin: 5px 0;"><strong>Report Date:</strong> ${reportDate}</p>
-              <p style="margin: 5px 0;"><strong>Reported By:</strong> ${
-                reportedBy || "Anonymous"
-              }</p>
-              <p style="margin: 5px 0;"><strong>Reason:</strong> <span style="color: #dc3545; font-weight: bold;">${reason}</span></p>
-            </div>
+    if (!notificationResponse.ok) {
+      throw new Error("Failed to create admin notification");
+    }
 
-            <div style="background-color: #fff3cd; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; margin-bottom: 20px;">
-              <h2 style="color: #856404; margin: 0 0 10px 0;">Reported Post Information</h2>
-              <p style="margin: 5px 0;"><strong>Post ID:</strong> ${postId}</p>
-              <p style="margin: 5px 0;"><strong>Post Title:</strong> "${postTitle}"</p>
-              <p style="margin: 5px 0;"><strong>Post Author:</strong> ${
-                postUser || "Unknown"
-              }</p>
-            </div>
-
-            ${
-              description
-                ? `
-            <div style="background-color: #e7f3ff; padding: 15px; border-radius: 6px; border-left: 4px solid #007bff; margin-bottom: 20px;">
-              <h2 style="color: #004085; margin: 0 0 10px 0;">Additional Details</h2>
-              <p style="margin: 0; color: #004085; line-height: 1.5;">${description}</p>
-            </div>
-            `
-                : ""
-            }
-
-            <div style="background-color: #d1ecf1; padding: 15px; border-radius: 6px; border-left: 4px solid #17a2b8;">
-              <h2 style="color: #0c5460; margin: 0 0 10px 0;">Next Steps</h2>
-              <ul style="color: #0c5460; margin: 0; padding-left: 20px;">
-                <li>Review the reported post in the forum</li>
-                <li>Investigate the claim based on community guidelines</li>
-                <li>Take appropriate action (warning, content removal, user suspension, etc.)</li>
-                <li>Consider reaching out to both the reporter and the post author if needed</li>
-              </ul>
-            </div>
-
-            <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #dee2e6; text-align: center; color: #6c757d;">
-              <p style="margin: 0; font-size: 14px;">
-                This report was automatically generated from the Core Collective Forum.<br>
-                Please review and take appropriate action as soon as possible.
-              </p>
-            </div>
-          </div>
-        </div>
-      `,
-    });
+    const notificationResult = await notificationResponse.json();
 
     res.status(200).json({
       message:
         "Report submitted successfully. Thank you for helping keep our community safe.",
-      messageId: info.messageId,
+      reportId: notificationResult.notification.id,
     });
   } catch (error) {
-    console.error("Error sending post report:", error);
+    console.error("Error submitting post report:", error);
     res.status(500).json({ error: "Failed to submit report" });
   }
 };

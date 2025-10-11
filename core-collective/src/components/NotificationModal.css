@@ -44,6 +44,17 @@
   background: #f8fafc;
 }
 
+/* Warning modal header styling */
+.notification-modal.warning .notification-modal-header {
+  background: linear-gradient(135deg, #fef3c7 0%, #fbbf24 100%);
+  border-bottom: 1px solid #f59e0b;
+}
+
+.notification-modal.warning {
+  border: 2px solid #f59e0b;
+  box-shadow: 0 10px 40px rgba(245, 158, 11, 0.2);
+}
+
 .notification-header-content {
   display: flex;
   align-items: center;
@@ -58,6 +69,13 @@
 
 .notification-icon.warning {
   color: #f59e0b;
+  filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4));
+  animation: warningGlow 2s infinite;
+}
+
+@keyframes warningGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.7)); }
 }
 
 .notification-icon.info {

@@ -43,11 +43,9 @@ const createNotification = async (req, res) => {
     } = req.body;
 
     if (!userEmail || !userName || !title || !message) {
-      return res
-        .status(400)
-        .json({
-          error: "Required fields: userEmail, userName, title, message",
-        });
+      return res.status(400).json({
+        error: "Required fields: userEmail, userName, title, message",
+      });
     }
 
     const data = await readNotificationsFile();
@@ -261,6 +259,161 @@ const deleteNotification = async (req, res) => {
   }
 };
 
+// Create an admin report notification
+const createAdminReportNotification = async (req, res) => {
+  try {
+    const { postId, postTitle, postUser, reason, description, reportedBy } =
+      req.body;
+
+    if (!postId || !postTitle || !reason) {
+      return res.status(400).json({
+        error: "Required fields: postId, postTitle, reason",
+      });
+    }
+
+    const data = await readNotificationsFile();
+
+    const reportNotification = {
+      id: crypto.randomUUID(),
+      type: "admin_report",
+      post_id: postId,
+      post_title: postTitle,
+      post_user: postUser || "Unknown",
+      reason: reason,
+      description: description || "",
+      reported_by: reportedBy || "Anonymous",
+      status: "pending", // pending, investigating, resolved, dismissed
+      is_read: false,
+      created_at: new Date().toISOString(),
+      admin_notes: "",
+    };
+
+    data.notifications.unshift(reportNotification);
+    await writeNotificationsFile(data);
+
+    res.status(201).json({
+      message: "Report notification created successfully",
+      notification: reportNotification,
+    });
+  } catch (error) {
+    console.error("Error creating admin report notification:", error);
+    res.status(500).json({ error: "Failed to create report notification" });
+  }
+};
+
+// Get admin report notifications
+const getAdminReportNotifications = async (req, res) => {
+  try {
+    const data = await readNotificationsFile();
+    const reportNotifications = data.notifications.filter(
+      (notification) => notification.type === "admin_report"
+    );
+
+    res.json({
+      success: true,
+      reports: reportNotifications,
+    });
+  } catch (error) {
+    console.error("Error getting admin report notifications:", error);
+    res.status(500).json({ error: "Failed to get report notifications" });
+  }
+};
+
+// Update report status
+const updateReportStatus = async (req, res) => {
+  try {
+    const { reportId } = req.params;
+    const { status, adminNotes } = req.body;
+
+    if (!reportId) {
+      return res.status(400).json({ error: "Report ID is required" });
+    }
+
+    const validStatuses = ["pending", "investigating", "resolved", "dismissed"];
+    if (status && !validStatuses.includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+
+    const data = await readNotificationsFile();
+    const reportIndex = data.notifications.findIndex(
+      (notification) =>
+        notification.id === reportId && notification.type === "admin_report"
+    );
+
+    if (reportIndex === -1) {
+      return res.status(404).json({ error: "Report notification not found" });
+    }
+
+    // Update the report
+    if (status) data.notifications[reportIndex].status = status;
+    if (adminNotes !== undefined)
+      data.notifications[reportIndex].admin_notes = adminNotes;
+    data.notifications[reportIndex].updated_at = new Date().toISOString();
+
+    await writeNotificationsFile(data);
+
+    res.json({
+      message: "Report status updated successfully",
+      report: data.notifications[reportIndex],
+    });
+  } catch (error) {
+    console.error("Error updating report status:", error);
+    res.status(500).json({ error: "Failed to update report status" });
+  }
+};
+
+// Create a warning notification for a user
+const createUserWarning = async (req, res) => {
+  try {
+    const {
+      userEmail,
+      userName,
+      warningTitle,
+      warningMessage,
+      postTitle,
+      reason,
+      adminName,
+    } = req.body;
+
+    if (!userEmail || !userName || !warningTitle || !warningMessage) {
+      return res.status(400).json({
+        error:
+          "Required fields: userEmail, userName, warningTitle, warningMessage",
+      });
+    }
+
+    const data = await readNotificationsFile();
+
+    const warningNotification = {
+      id: crypto.randomUUID(),
+      user_email: userEmail,
+      user_name: userName,
+      title: warningTitle,
+      message: warningMessage,
+      type: "warning",
+      post_title: postTitle || null,
+      reason: reason || null,
+      admin_name: adminName || "Admin",
+      is_read: false,
+      created_at: new Date().toISOString(),
+      read_at: null,
+      severity: "warning", // warning, caution, notice
+    };
+
+    data.notifications.unshift(warningNotification);
+    await writeNotificationsFile(data);
+
+    res.status(201).json({
+      success: true,
+      message: "Warning notification sent successfully",
+      notification: warningNotification,
+    });
+  } catch (error) {
+    console.error("Error creating user warning:", error);
+    res.status(500).json({ error: "Failed to send warning notification" });
+  }
+};
+
 module.exports = {
   createNotification,
   getUserNotifications,
@@ -268,4 +421,8 @@ module.exports = {
   markAsRead,
   markAllAsRead,
   deleteNotification,
+  createAdminReportNotification,
+  getAdminReportNotifications,
+  updateReportStatus,
+  createUserWarning,
 };

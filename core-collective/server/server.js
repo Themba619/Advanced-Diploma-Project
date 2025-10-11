@@ -194,7 +194,10 @@ app.use(cors());
 app.use(express.json());
 
 // Serve static files for profile images
-app.use('/profile-images', express.static(path.join(__dirname, 'public/profile-images')));
+app.use(
+  "/profile-images",
+  express.static(path.join(__dirname, "public/profile-images"))
+);
 
 // JWT Authentication middleware
 const authenticateToken = (req, res, next) => {
