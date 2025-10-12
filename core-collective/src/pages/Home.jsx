@@ -93,25 +93,21 @@ const Home = () => {
 
   // FAQ suggestions for auto-complete
   const faqSuggestions = [
-    "When do I apply?",
-    "How many choices of study may I apply for?",
-    "When and how will I receive the outcome of my application?",
-    "Can I apply without a copy of my ID/Passport?",
-    "Can I apply via email?",
-    "Can I apply with my mid-year Grade 12 results?",
-    "Do I get credits for courses taken at other colleges?",
+    "How do I apply for UJ on-campus residence as a first-year, including deadlines? ?",
+    "What’s the process for getting my UJ student card and where do I go? ",
+    "Who’s the Dean of the College of Business and Economics at UJ, and how can I contact their office? ",
+    "How do I deregister a module after add/drop, and what are the financial impacts? ",
+    "What’s the UJenius Club, how do I join, and what activities are for first-years? ",
     "Does UJ offer financial assistance (bursaries, loans)?",
-    "What should I do if I have not received a response after applying?",
-    "Do I need to apply again if I previously applied and was not accepted?",
-    "How do I qualify for a mature-age exemption?",
-    "Can I apply for undergraduate studies if I am writing the National Senior Certificate through IEB or SACAI?",
-    "How can I check my application or admission status online?",
-    "What documents must I present as an international (non–South African) student at UJ?",
+    "What are the library hours and services available at UJ?",
+    "How can I access online learning resources and support at UJ?",
+    "Which engineering student societies at UJ are popular, and how do I join them?",
     "How do I apply for on-campus residence (student housing) at UJ?",
     "What student clubs and societies are available at UJ?",
     "Where can I find information on all the programs and courses offered at UJ?",
-    "What are the admission requirements for UJ?",
-    "How much are the tuition fees at UJ?",
+    "How do I use the virtual tour to find the Bunting Road library if the app fails?",
+    "What are key first-year module registration deadlines, and what’s a backup plan if I miss one? ",
+    "I’m a diploma in Business Information Technology first-year interested in hackathons and bootcamps—recommend electives and explain why",
     "What is the academic calendar for UJ?",
     "Where is APB campus",
     "Where is APKcampus",
@@ -860,7 +856,7 @@ const Home = () => {
           <FaRobot />
         </div>
         <div className="chat-header-content">
-          <h1 className="chat-header-title">AI Assistant</h1>
+          <h1 className="chat-header-title"> UJ Virtual Assistant</h1>
           <p className="chat-header-subtitle">Ask me anything, I'm here to help</p>
         </div>
         
