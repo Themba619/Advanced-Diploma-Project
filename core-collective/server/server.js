@@ -187,10 +187,17 @@ const privateRoute = require("./routes/privateRoute");
 const verificationRoute = require("./routes/verificationRoute");
 const adminRoute = require("./routes/adminRoute");
 const notificationRoute = require("./routes/notificationRoute");
+const profileImageRoute = require("./routes/profileImageRoute");
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Serve static files for profile images
+app.use(
+  "/profile-images",
+  express.static(path.join(__dirname, "public/profile-images"))
+);
 
 // JWT Authentication middleware
 const authenticateToken = (req, res, next) => {
@@ -219,6 +226,7 @@ app.use("/api/email", emailRoute);
 app.use("/api/verify", verificationRoute); // Add verification routes
 app.use("/api/admin", adminRoute); // Admin routes for management
 app.use("/api/notifications", notificationRoute); // Notification routes
+app.use("/api/profile-image", profileImageRoute); // Profile image routes
 // Use private routes - registration doesn't need authentication
 app.use("/api/private", privateRoute);
 

@@ -37,7 +37,7 @@ const NotificationModal = ({ notification, isOpen, onClose, onMarkAsRead }) => {
 
   return (
     <div className="notification-modal-overlay" onClick={onClose}>
-      <div className="notification-modal" onClick={(e) => e.stopPropagation()}>
+      <div className={`notification-modal ${notification.type === 'warning' ? 'warning' : ''}`} onClick={(e) => e.stopPropagation()}>
         <div className="notification-modal-header">
           <div className="notification-header-content">
             {getNotificationIcon(notification.type)}

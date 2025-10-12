@@ -513,11 +513,28 @@ const Forum: React.FC = () => {
   };
 
   const handleSearch = () => {
-    console.log("Search query:", searchQuery);
+    if (searchQuery.trim()) {
+      console.log("Search query:", searchQuery);
+      // Optional: Show search results count
+      const resultCount = filteredPosts.length;
+      toast.success(
+        `Found ${resultCount} ${
+          resultCount === 1 ? "result" : "results"
+        } for "${searchQuery}"`
+      );
+    } else {
+      toast.info("Please enter a search term");
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleSearchKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
   };
 
   const handleAskQuestion = () => {
@@ -635,9 +652,30 @@ const Forum: React.FC = () => {
         .filter((post) => {
           if (!searchQuery.trim()) return true;
           const query = searchQuery.toLowerCase();
+
+          // Search in post title, description, user name, and tags
+          const matchesTitle = post.title.toLowerCase().includes(query);
+          const matchesDescription = post.description
+            .toLowerCase()
+            .includes(query);
+          const matchesUser = post.user.toLowerCase().includes(query);
+          const matchesTags = post.tags.some((tag) =>
+            tag.toLowerCase().includes(query)
+          );
+
+          // Also search in replies content
+          const matchesReplies = post.replies.some(
+            (reply) =>
+              reply.content.toLowerCase().includes(query) ||
+              reply.user.toLowerCase().includes(query)
+          );
+
           return (
-            post.title.toLowerCase().includes(query) ||
-            post.description.toLowerCase().includes(query)
+            matchesTitle ||
+            matchesDescription ||
+            matchesUser ||
+            matchesTags ||
+            matchesReplies
           );
         })
         // Ensure newest posts appear first
@@ -747,10 +785,11 @@ const Forum: React.FC = () => {
           <div className="search-container">
             <input
               type="text"
-              placeholder="Search questions..."
+              placeholder="Search questions, replies, users, or tags..."
               className="search-input"
               value={searchQuery}
               onChange={handleSearchChange}
+              onKeyPress={handleSearchKeyPress}
               aria-label="Search forum questions"
             />
             <button className="search-button" onClick={handleSearch}>

@@ -1,6 +1,51 @@
 {
   "notifications": [
     {
+      "id": "d34de247-04b5-4685-86f1-39866f5174d7",
+      "type": "admin_report",
+      "post_id": 1760153604266,
+      "post_title": "test",
+      "post_user": "Testing",
+      "reason": "Other",
+      "description": "test",
+      "reported_by": "Authenticated User",
+      "status": "investigating",
+      "is_read": false,
+      "created_at": "2025-10-11T14:42:33.530Z",
+      "admin_notes": "",
+      "updated_at": "2025-10-11T14:43:16.435Z"
+    },
+    {
+      "id": "78fb55d0-8371-4ee1-8546-8d369bf54b56",
+      "user_email": "thembabiyela20@gmail.com",
+      "user_name": "Testing",
+      "title": "⚠️ Post Warning",
+      "message": "You have received a warning regarding your post \"test\". Reason: Bad words",
+      "type": "warning",
+      "post_title": "test",
+      "reason": "Bad words",
+      "admin_name": "Administrator",
+      "is_read": true,
+      "created_at": "2025-10-11T14:41:53.930Z",
+      "read_at": "2025-10-11T14:45:34.856Z",
+      "severity": "warning"
+    },
+    {
+      "id": "c9265056-0ed0-4afd-ba68-2f581c6d08c8",
+      "type": "admin_report",
+      "post_id": 1760153604266,
+      "post_title": "test",
+      "post_user": "Testing",
+      "reason": "Racism/Discrimination",
+      "description": "Racism/Discrimination",
+      "reported_by": "Authenticated User",
+      "status": "investigating",
+      "is_read": false,
+      "created_at": "2025-10-11T14:33:11.759Z",
+      "admin_notes": "test",
+      "updated_at": "2025-10-11T14:33:32.639Z"
+    },
+    {
       "id": "0dcd2bc1-91a3-4388-84b1-63abfcd35557",
       "user_email": "thembabiyela20@gmail.com",
       "user_name": "Testing",
@@ -12,6 +57,32 @@
       "is_read": true,
       "created_at": "2025-10-10T16:38:25.277Z",
       "read_at": "2025-10-10T16:39:41.942Z"
+    },
+    {
+      "id": "64cd7f36-3bcc-44c4-9234-7c6c6271e278",
+      "user_email": "thembabiyela20@gmail.com",
+      "user_name": "Testing",
+      "title": "⚠️ Community Guidelines Warning",
+      "message": "Your post \"test\" has been reviewed and found to potentially violate our community guidelines. Reason: Sending warning. This serves as an official warning. The reported post has been removed from the forum. Future violations may result in temporary or permanent account suspension. We encourage you to review our community guidelines.",
+      "type": "warning",
+      "post_title": "test",
+      "reason": "Sending warning",
+      "is_read": true,
+      "created_at": "2025-10-11T03:34:41.730Z",
+      "read_at": "2025-10-11T03:35:39.244Z"
+    },
+    {
+      "id": "577fd7a1-ab6e-468c-be9d-726d6b87b0bc",
+      "user_email": "thembabiyela20@gmail.com",
+      "user_name": "Testing",
+      "title": "⚠️ Community Guidelines Warning",
+      "message": "Your post \"test\" has been reviewed and found to potentially violate our community guidelines. Reason: this is your first warning from admin regarding your recent post. This serves as an official warning. The reported post has been removed from the forum. Future violations may result in temporary or permanent account suspension. We encourage you to review our community guidelines.",
+      "type": "warning",
+      "post_title": "test",
+      "reason": "this is your first warning from admin regarding your recent post",
+      "is_read": true,
+      "created_at": "2025-10-11T14:34:05.879Z",
+      "read_at": "2025-10-11T14:45:57.962Z"
     }
   ]
 }

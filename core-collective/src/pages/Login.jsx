@@ -103,7 +103,7 @@ const Login = () => {
             <span className="waitlist-back-text">Back</span>
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

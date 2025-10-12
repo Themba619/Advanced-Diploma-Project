@@ -1043,7 +1043,6 @@ const Home = () => {
       <div className="chat-input-container">
         <form className="chat-input-form" onSubmit={handleSend}>
           <div className="chat-input-wrapper">
-            <FaPaperclip className="chat-input-icon" />
             <input
               ref={userInputRef}
               className="chat-input"

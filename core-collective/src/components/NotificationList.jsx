@@ -208,7 +208,7 @@ const NotificationList = ({ userEmail, onNotificationUpdate }) => {
           {notifications.map((notification) => (
             <div
               key={notification.id}
-              className={`notification-item ${!notification.is_read ? 'unread' : ''}`}
+              className={`notification-item ${!notification.is_read ? 'unread' : ''} ${notification.type === 'warning' ? 'warning' : ''}`}
               onClick={() => handleNotificationClick(notification)}
             >
               <div className="notification-item-content">

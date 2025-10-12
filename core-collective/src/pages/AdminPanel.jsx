@@ -10,6 +10,10 @@ const AdminPanel = () => {
   const [adminPassword, setAdminPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [warningReason, setWarningReason] = useState('');
+  const [activeTab, setActiveTab] = useState('posts'); // posts, reports
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [reportAction, setReportAction] = useState('');
+  const [adminNotes, setAdminNotes] = useState('');
   const queryClient = useQueryClient();
 
   // Admin authentication
@@ -114,27 +118,27 @@ const AdminPanel = () => {
     },
   });
 
-  // Send warning email
-  const sendWarningEmail = async (data) => {
-    const response = await fetch('/api/admin/send-warning', {
+  // Send warning notification
+  const sendWarningNotification = async (data) => {
+    const response = await fetch('/api/notifications/admin/warning', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
     
     if (!response.ok) {
-      throw new Error('Failed to send warning email');
+      throw new Error('Failed to send warning notification');
     }
     
     return response.json();
   };
 
   const warningMutation = useMutation({
-    mutationFn: sendWarningEmail,
+    mutationFn: sendWarningNotification,
     onSuccess: () => {
       toast({
         title: "Warning Sent",
-        description: "Warning email has been sent to the user",
+        description: "Warning notification has been sent to the user",
         variant: "default",
       });
       setWarningReason('');
@@ -187,6 +191,59 @@ const AdminPanel = () => {
     },
   });
 
+  // Fetch admin reports
+  const fetchAdminReports = async () => {
+    const response = await fetch('/api/notifications/admin/reports');
+    if (!response.ok) {
+      throw new Error('Failed to fetch reports');
+    }
+    return response.json();
+  };
+
+  const { data: reportsData, isLoading: reportsLoading } = useQuery({
+    queryKey: ['admin-reports'],
+    queryFn: fetchAdminReports,
+    enabled: isAuthenticated,
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  // Update report status
+  const updateReportStatus = async ({ reportId, status, adminNotes }) => {
+    const response = await fetch(`/api/notifications/admin/report/${reportId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, adminNotes }),
+    });
+    
+    if (!response.ok) {
+      throw new Error('Failed to update report status');
+    }
+    
+    return response.json();
+  };
+
+  const updateReportMutation = useMutation({
+    mutationFn: updateReportStatus,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['admin-reports']);
+      setSelectedReport(null);
+      setReportAction('');
+      setAdminNotes('');
+      toast({
+        title: "Success",
+        description: "Report status updated successfully",
+        variant: "default",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleAuth = (e) => {
     e.preventDefault();
     authMutation.mutate(adminPassword);
@@ -224,8 +281,11 @@ const AdminPanel = () => {
     warningMutation.mutate({
       userEmail: selectedPost.userEmail,
       userName: selectedPost.user,
+      warningTitle: "⚠️ Post Warning",
+      warningMessage: `You have received a warning regarding your post "${selectedPost.title}". Reason: ${warningReason}`,
       postTitle: selectedPost.title,
       reason: warningReason,
+      adminName: "Administrator"
     });
   };
 
@@ -246,6 +306,49 @@ const AdminPanel = () => {
 
     if (confirmed) {
       deleteUserMutation.mutate({ userEmail: userToDelete });
+    }
+  };
+
+  const handleReportAction = (report) => {
+    setSelectedReport(report);
+    setAdminNotes(report.admin_notes || '');
+  };
+
+  const handleUpdateReport = (e) => {
+    e.preventDefault();
+    if (!reportAction) {
+      toast({
+        title: "Action Required",
+        description: "Please select an action for this report.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    updateReportMutation.mutate({
+      reportId: selectedReport.id,
+      status: reportAction,
+      adminNotes
+    });
+  };
+
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'pending': return '#fbbf24';
+      case 'investigating': return '#3b82f6';
+      case 'resolved': return '#10b981';
+      case 'dismissed': return '#6b7280';
+      default: return '#fbbf24';
+    }
+  };
+
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'pending': return '⏳';
+      case 'investigating': return '🔍';
+      case 'resolved': return '✅';
+      case 'dismissed': return '❌';
+      default: return '⏳';
     }
   };
 
@@ -281,7 +384,7 @@ const AdminPanel = () => {
     <div className="admin-panel-container">
       <div className="admin-header">
         <h1>🛡️ Admin Control Panel</h1>
-        <p>Manage forum posts and user accounts</p>
+        <p>Manage forum posts, user accounts, and reports</p>
         <button 
           onClick={() => setIsAuthenticated(false)}
           className="logout-button"
@@ -290,7 +393,27 @@ const AdminPanel = () => {
         </button>
       </div>
 
-      {/* Post Search Section */}
+      {/* Tab Navigation */}
+      <div className="admin-tabs">
+        <button 
+          className={`tab-button ${activeTab === 'posts' ? 'active' : ''}`}
+          onClick={() => setActiveTab('posts')}
+        >
+          📝 Posts & Users
+        </button>
+        <button 
+          className={`tab-button ${activeTab === 'reports' ? 'active' : ''}`}
+          onClick={() => setActiveTab('reports')}
+        >
+          🚨 Reports {reportsData?.reports?.filter(r => r.status === 'pending').length > 0 && 
+            <span className="notification-badge">{reportsData.reports.filter(r => r.status === 'pending').length}</span>
+          }
+        </button>
+      </div>
+
+      {activeTab === 'posts' && (
+        <>
+          {/* Post Search Section */}
       <div className="admin-section">
         <h2>🔍 Search Post by ID</h2>
         <form onSubmit={handleSearch} className="search-form">
@@ -406,6 +529,142 @@ const AdminPanel = () => {
           ⚠️ Warning: Deleting a user account is permanent and cannot be undone!
         </p>
       </div>
+        </>
+      )}
+
+      {activeTab === 'reports' && (
+        <div className="reports-section">
+          <h2>🚨 Post Reports</h2>
+          
+          {reportsLoading ? (
+            <div className="loading">Loading reports...</div>
+          ) : reportsData?.reports?.length === 0 ? (
+            <div className="no-reports">
+              <p>✅ No reports found. All good!</p>
+            </div>
+          ) : (
+            <div className="reports-grid">
+              {reportsData?.reports?.map((report) => (
+                <div key={report.id} className="report-card">
+                  <div className="report-header">
+                    <div className="report-status">
+                      <span 
+                        className="status-indicator"
+                        style={{ backgroundColor: getStatusColor(report.status) }}
+                      >
+                        {getStatusIcon(report.status)}
+                      </span>
+                      <span className="status-text">{report.status}</span>
+                    </div>
+                    <div className="report-date">
+                      {new Date(report.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                  
+                  <div className="report-content">
+                    <h3 className="reported-post-title">"{report.post_title}"</h3>
+                    <div className="report-details">
+                      <p><strong>Post ID:</strong> {report.post_id}</p>
+                      <p><strong>Post Author:</strong> {report.post_user}</p>
+                      <p><strong>Reported By:</strong> {report.reported_by}</p>
+                      <p><strong>Reason:</strong> <span className="reason-tag">{report.reason}</span></p>
+                      {report.description && (
+                        <p><strong>Description:</strong> {report.description}</p>
+                      )}
+                    </div>
+                    
+                    {report.admin_notes && (
+                      <div className="admin-notes">
+                        <strong>Admin Notes:</strong> {report.admin_notes}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="report-actions">
+                    <button 
+                      className="action-btn investigate"
+                      onClick={() => handleReportAction(report)}
+                      disabled={report.status === 'resolved'}
+                    >
+                      {report.status === 'resolved' ? '✅ Resolved' : '🔍 Take Action'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Report Action Modal */}
+          {selectedReport && (
+            <div className="modal-overlay" onClick={() => setSelectedReport(null)}>
+              <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h3>Take Action on Report</h3>
+                  <button 
+                    className="close-btn" 
+                    onClick={() => setSelectedReport(null)}
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <div className="modal-body">
+                  <div className="report-summary">
+                    <h4>Reported Post: "{selectedReport.post_title}"</h4>
+                    <p><strong>Post ID:</strong> {selectedReport.post_id}</p>
+                    <p><strong>Reported for:</strong> {selectedReport.reason}</p>
+                    {selectedReport.description && (
+                      <p><strong>Details:</strong> {selectedReport.description}</p>
+                    )}
+                  </div>
+                  
+                  <form onSubmit={handleUpdateReport}>
+                    <div className="form-group">
+                      <label>Action:</label>
+                      <select 
+                        value={reportAction} 
+                        onChange={(e) => setReportAction(e.target.value)}
+                      >
+                        <option value="">Select Action</option>
+                        <option value="investigating">Mark as Investigating</option>
+                        <option value="resolved">Mark as Resolved</option>
+                        <option value="dismissed">Dismiss Report</option>
+                      </select>
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Admin Notes:</label>
+                      <textarea
+                        value={adminNotes}
+                        onChange={(e) => setAdminNotes(e.target.value)}
+                        placeholder="Add your investigation notes or actions taken..."
+                        rows="4"
+                      />
+                    </div>
+                    
+                    <div className="form-actions">
+                      <button 
+                        type="button" 
+                        className="cancel-btn"
+                        onClick={() => setSelectedReport(null)}
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        type="submit" 
+                        className="submit-btn"
+                        disabled={updateReportMutation.isPending}
+                      >
+                        {updateReportMutation.isPending ? 'Updating...' : 'Update Report'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
