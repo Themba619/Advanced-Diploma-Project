@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import loginSignUpFpBackground from '../../../core-collective/public/loginSignUpFpBackground.jpeg';
-import LogoTransbarentBlueOrange from '../../.../../../core-collective/public/LogoTransbarentBlueOrange.png';
+import whiteTransparentLogo from '../../../core-collective/public/whiteTransparentLogo.png';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -36,9 +35,9 @@ const Signup = () => {
         password
       });
       
-  console.log('Registration success:', response.data);
+      console.log('Registration success:', response.data);
       
-  setUserId(response.data?.user?.id ?? response.data?.userId);
+      setUserId(response.data?.user?.id ?? response.data?.userId);
       setVerificationSent(true);
     } catch (err) {
       console.error('Registration error:', err.response?.data);
@@ -97,187 +96,178 @@ const Signup = () => {
 
   if (verificationSent) {
     return (
-      <div className="login-container slide-in">
-        <img src={LogoTransbarentBlueOrange} alt="VirtualAssist Logo" className="hero-logo" />
-             
-
-       
-        <div className="login-form-container">
-          <div className="login-form">
-            <h2>Verify Your Email</h2>
-            <p style={{ textAlign: 'center', marginBottom: '20px', color: '#666' }}>
-              We've sent a 6-digit verification code to <strong>{email}</strong>
-            </p>
-            
-            {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-            
-            <div>
-              <input
-                type="text"
-                placeholder="Enter 6-digit code"
-                value={verificationCode}
-                onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                maxLength={6}
-                style={{ textAlign: 'center', letterSpacing: '2px', fontSize: '18px' }}
-                required
-              />
+      <div className="outer-wrapper">
+        <div className="main-container">        
+          <div className="login-overlay"> 
+            <img src={whiteTransparentLogo} alt="VirtualAssist Logo" className="hero-logo" />
+            <div className="login-card">
+              <h2>Verify Your Email</h2>
+              <p style={{ textAlign: 'center', marginBottom: '20px', color: '#666' }}>
+                We've sent a 6-digit verification code to <strong>{email}</strong>
+              </p>
+              
+              {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+              
+              <div className="input-group">
+                <input
+                  type="text"
+                  placeholder="Enter 6-digit code"
+                  value={verificationCode}
+                  onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  maxLength={6}
+                  className="login-input"
+                  style={{ textAlign: 'center', letterSpacing: '2px', fontSize: '18px' }}
+                  required
+                />
+              </div>
+              
+              <button 
+                type="button" 
+                className="login-button" 
+                onClick={handleVerification}
+                disabled={isLoading || verificationCode.length !== 6}
+              >
+                {isLoading ? 'Verifying...' : 'Verify Email'}
+              </button>
+              
+              <div className="form-links">
+                <button 
+                  onClick={resendVerificationCode}
+                  disabled={isLoading}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#007bff', 
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Resend Code
+                </button>
+              </div>
+              
+              <div className="form-links">
+                <button 
+                  onClick={() => {
+                    setVerificationSent(false);
+                    setError('');
+                  }}
+                  style={{ 
+                    background: 'none', 
+                    border: 'none', 
+                    color: '#666', 
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                >
+                  Back to Sign Up
+                </button>
+              </div>
             </div>
-            
-            <button 
-              type="button" 
-              className="sign-in-btn" 
-              onClick={handleVerification}
-              disabled={isLoading || verificationCode.length !== 6}
-            >
-              {isLoading ? 'Verifying...' : 'Verify Email'}
-            </button>
-            
-            <p style={{ textAlign: 'center', marginTop: '20px' }}>
-              Didn't receive the code?{' '}
-              <button 
-                onClick={resendVerificationCode}
-                disabled={isLoading}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#007bff', 
-                  textDecoration: 'underline',
-                  cursor: 'pointer'
-                }}
-              >
-                Resend Code
-              </button>
-            </p>
-            
-            <p style={{ textAlign: 'center', marginTop: '20px' }}>
-              <button 
-                onClick={() => {
-                  setVerificationSent(false);
-                  setError('');
-                }}
-                style={{ 
-                  background: 'none', 
-                  border: 'none', 
-                  color: '#666', 
-                  textDecoration: 'underline',
-                  cursor: 'pointer'
-                }}
-              >
-                Back to Sign Up
-              </button>
-            </p>
           </div>
         </div>
       </div>
     );
   }
 
-
   return (
-    <div className="new-login-container">     
-      <div className="login-background">
-        <img src={loginSignUpFpBackground} alt="Background" className="background-image" />
-      </div>
-
-      
-
-      {/* Foreground */}
-      <div className="login-overlay">
-    
-        <img src={LogoTransbarentBlueOrange} alt="VirtualAssist Logo" className="hero-logo" />
-
-        <div className="login-card">
-          {/* Heading */}
-          <div className="welcome-section">
-            <div className="welcome-header">
-              <h1 className="welcome-title">
-                <span className="welcome-line-1">Create your</span>
-                <span className="welcome-line-2">VirtualAssist account</span>
-              </h1>
+    <div className="outer-wrapper">
+      <div className="main-container">        
+        <div className="login-overlay"> 
+          <img src={whiteTransparentLogo} alt="VirtualAssist Logo" className="hero-logo" />        
+          <div className="login-card">         
+            <div className="welcome-section">
+              <div className="welcome-header">
+                <h1 className="welcome-title">
+                  <span className="welcome-line-1">Create your</span>
+                  <span className="welcome-line-2">VirtualAssist account</span>
+                </h1>
+              </div>
             </div>
-          </div>
+            
+            <form className="login-form-new" onSubmit={(e) => { e.preventDefault(); handleSignup(); }}>
+              {error && <div className="error-message">{error}</div>}
 
-          {/* Signup Form (same look as Login) */}
-          <form className="signup-form-new" onSubmit={(e) => { e.preventDefault(); handleSignup(); }}>
-            {error && <div className="error-message">{error}</div>}
-
-            <div className="input-group">
-              <label htmlFor="username" className="input-label">USERNAME</label>
-              <input
-                id="username"
-                type="text"
-                placeholder="Choose a unique username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="login-input"
-                required
-              />
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="fullName" className="input-label">FULL NAME</label>
-              <input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className="login-input"
-                required
-              />
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="email" className="input-label">EMAIL</label>
-              <input
-                id="email"
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="login-input"
-                required
-              />
-            </div>
-
-            <div className="input-group">
-              <label htmlFor="password" className="input-label">PASSWORD</label>
-              <div className="password-input-wrapper">
+              <div className="input-group">
+                <label htmlFor="username" className="input-label">USERNAME</label>
                 <input
-                  id="password"
-                  type="password"
-                  placeholder="Set a strong password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="username"
+                  type="text"
+                  placeholder="Choose a unique username"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                   className="login-input"
                   required
                 />
               </div>
-              <small style={{ color: '#666', fontSize: '12px', display: 'block', marginTop: '6px' }}>
-                Must contain uppercase, lowercase, number, and special character (@$!%*?&#)
-              </small>
-            </div>
 
-            <button type="submit" className="login-button" disabled={isLoading || !fullName || !email || !password || !username}>
-              {isLoading ? 'Creating...' : 'SIGN UP'}
+              <div className="input-group">
+                <label htmlFor="fullName" className="input-label">FULL NAME</label>
+                <input
+                  id="fullName"
+                  type="text"
+                  placeholder="Enter your full name"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="login-input"
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="email" className="input-label">EMAIL</label>
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="login-input"
+                  required
+                />
+              </div>
+
+              <div className="input-group">
+                <label htmlFor="password" className="input-label">PASSWORD</label>
+                <div className="password-input-wrapper">
+                  <input
+                    id="password"
+                    type="password"
+                    placeholder="Set a strong password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="login-input"
+                    required
+                  />
+                </div>
+                <small style={{ color: '#666', fontSize: '12px', display: 'block', marginTop: '6px' }}>
+                  Must contain uppercase, lowercase, number, and special character (@$!%*?&#)
+                </small>
+              </div>
+
+              <button type="submit" className="login-button" disabled={isLoading || !fullName || !email || !password || !username}>
+                {isLoading ? 'Creating...' : 'SIGN UP'}
+              </button>
+
+              <div className="form-links">
+                <a href="/login" className="signup-link-new">Already have an account? Sign in</a>
+              </div>
+            </form>
+
+            <button
+              type="button"
+              className="waitlist-back-btn"
+              onClick={() => navigate(-1)}
+              style={{position: 'absolute', top: 24, right: 32, zIndex: 1001}}
+            >
+              <span className="waitlist-back-border"></span>
+              <span className="waitlist-back-text">Back</span>
             </button>
-
-            <div className="form-links">
-              <a href="/login" className="signup-link-new">Already have an account? Sign in</a>
-            </div>
-          </form>
-          <button
-            type="button"
-            className="waitlist-back-btn"
-            onClick={() => navigate(-1)}
-            style={{position: 'absolute', top: 24, right: 32, zIndex: 1001}}
-          >
-            <span className="waitlist-back-border"></span>
-            <span className="waitlist-back-text">Back</span>
-          </button>
-        </div>
+          </div>
+        </div> 
       </div>
-      
     </div>
   );
 };

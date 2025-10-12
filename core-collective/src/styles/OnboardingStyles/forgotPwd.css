@@ -1,146 +1,396 @@
-/* Container for the form */
-.login-overlay {
+.forgotpwd-outer-wrapper {
   position: relative;
-  z-index: 2;
-  width: 100%;
-  max-width: 450px;
-  background: rgba(255,255,255,0.95);
-  border-radius: 15px;
-  padding: 40px 30px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  margin: 20px auto;
+  width: calc(100vw - 40px);
+  min-height: calc(100vh - 40px);
+  border-radius: 20px;
+  overflow: hidden;
   display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align everything to the left */
+  isolation: isolate;               
+  background: #0a051a url('/loginSignUpFpBackground.jpeg') no-repeat center center/cover;
+ 
+  /* Ultra distinct white glow with strong edges */
+  box-shadow:
+    /* Strong white edge glow */
+    0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 0 30px rgba(4, 7, 17, 0.76),
+    0 0 60px rgba(8, 15, 48, 0.95),
+    
+    /* Blue-purple mid glow */
+    0 0 90px rgba(4, 8, 54, 0.4),
+    0 0 140px rgba(13, 17, 78, 0.3),
+    
+    /* Outer vibrant glow */
+    0 0 200px rgba(1, 1, 13, 0.5),
+    0 0 280px rgba(61, 71, 114, 0.4),
+    
+    /* Deep background glow */
+    0 0 350px rgba(80, 90, 200, 0.3);
+  
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Hero Logo */
-.hero-logo {
-  width: clamp(80px, 20vw, 150px);
+/* Enhanced pseudo-element for stronger glow */
+.forgotpwd-outer-wrapper::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  border-radius: 35px;
+  background: 
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.25) 0%,
+      rgba(255, 255, 255, 0.15) 20%,
+      rgba(255, 255, 255, 0.05) 40%,
+      transparent 70%
+    );
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(10px);
+}
+.forgotpwd-main-container {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  z-index: 3;
+}
+
+.forgotpwd-overlay {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 60px;
+  z-index: 4;
+}
+
+.forgotpwd-hero-logo {
+  position: absolute; 
+  left: 1620px !important;
+  top: 30px !important;
+  width: clamp(100px, 18vw, 220px);
   height: auto;
   object-fit: contain;
-  margin-bottom: 20px;
-  align-self: center; /* Keep logo centered */
+  z-index: 1000;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
 }
 
-/* Welcome Title */
-.welcome-title {
-  font-size: clamp(22px, 4vw, 32px);
+.forgotpwd-card {
+  position: relative;
+  top: 220px;   
+  left: 420px; 
+  background: rgba(255,255,255,0);
+  border-radius: 0;
+  padding: 0 10px;
+  width: clamp(420px, 36vw, 640px);
+  transform: translateX(0);
+  z-index: 4;
+}
+
+.forgotpwd-welcome-section {
+  text-align: left;
+  margin-bottom: clamp(20px, 3vh, 35px);
+  position: relative;
+  left: 15px;
+  bottom: 25px;
+}
+
+.forgotpwd-welcome-header {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(12px, 2vw, 20px);
+  position: relative;
+  left: 132px;
+}
+
+.forgotpwd-welcome-title {
+  font-size: clamp(44px, 1vw, 14px) !important;
+  position: relative !important;
+  bottom: 100px !important;
+  right: 270px !important;
   font-weight: 700;
   color: #0b1954;
-  margin-bottom: 15px;
-  text-align: left; /* Ensure title aligns left */
-  width: 100%;
+  line-height: 1.15;
+  margin: 0 0 clamp(8px, 1.5vh, 12px) 0;
 }
 
-.fgt-description {
-  margin-bottom: 25px;
-  position: relative !important;
-  left: 10px !important;
-  width: 100%;
-}
-
-/* Form */
-.login-form-new {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Align inputs and labels left */
-}
-
-/* Input Group */
-.input-group {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.input-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #0d1b55;
-  margin-bottom: 6px;
+.forgotpwd-welcome-title .forgotpwd-welcome-line-1,
+.forgotpwd-welcome-title .forgotpwd-welcome-line-2 {
   display: block;
-  text-align: left; /* Label aligns left */
 }
 
-.login-input {
+.forgotpwd-form-new {
   width: 100%;
-  padding: 10px 15px;
-  border-radius: 25px;
-  border: 1px solid #ccc;
+  position: relative;
+  bottom: 120px;
+  right: 120px;
+}
+
+.forgotpwd-description {
+  margin-bottom: 25px;
+  color: #666;
   font-size: 14px;
-  outline: none;
-  text-align: left; /* Placeholder and input text aligned left */
-}
-
-.login-input::placeholder {
-  color: #aaa;
+  line-height: 1.4;
   text-align: left;
+  width: 100%;
 }
 
-/* Submit Button */
-.login-button {
+.forgotpwd-error-message {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  padding: clamp(10px, 2vw, 14px);
+  border-radius: 8px;
+  border-left: 3px solid #ef4444;
+  margin-bottom: clamp(15px, 2.5vh, 22px);
+  font-size: clamp(12px, 1.5vw, 15px);
+}
+
+.forgotpwd-success-message {
+  background: rgba(34, 197, 94, 0.1);
+  color: #16a34a;
+  padding: clamp(10px, 2vw, 14px);
+  border-radius: 8px;
+  border-left: 3px solid #22c55e;
+  margin-bottom: clamp(15px, 2.5vh, 22px);
+  font-size: clamp(12px, 1.5vw, 15px);
+}
+
+.forgotpwd-input-group {
+  margin-bottom: clamp(15px, 2.5vh, 22px);
+}
+
+.forgotpwd-input-label {
+  display: block;
+  font-size: clamp(11px, 1.2vw, 14px);
+  font-weight: 700;
+  color: #0d1b55;
+  margin-bottom: clamp(6px, 1vh, 10px);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.forgotpwd-login-input {
   width: 100%;
-  padding: 12px;
-  border-radius: 25px;
+  padding: clamp(5px, 1vh, 8px) 0;
   border: none;
+  border-bottom: 2px solid rgba(13,27,85,0.25);
+  background: transparent;
+  font-size: clamp(14px, 1.8vw, 17px);
+  color: #0d1b55;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.forgotpwd-login-input::placeholder {
+  color: rgba(13,27,85,0.55);
+  font-size: clamp(14px, 1.8vw, 17px);
+  font-weight: 400;
+}
+
+.forgotpwd-login-input:focus {
+  border-bottom-color: #0d1b55;
+  border-bottom-width: 2px;
+}
+
+.forgotpwd-login-button {
+  width: clamp(140px, 20vw, 200px);
   background: linear-gradient(90deg, #3a2c8d 0%, #b0377c 100%);
   color: #fff;
-  font-size: 16px;
+  border: none;
+  border-radius: 10px;
+  padding: clamp(10px, 2vh, 14px) clamp(15px, 2vw, 22px);
+  font-size: clamp(14px, 1.8vw, 18px);
   font-weight: 600;
   cursor: pointer;
-  margin-bottom: 15px;
+  margin: clamp(18px, 3vh, 25px) 0 clamp(8px, 1.5vh, 12px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-/* Form Links */
-.form-links {
-  width: 100%;
-  text-align: left; /* Links aligned left */
+.forgotpwd-login-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
-.signup-link-new {
+.forgotpwd-login-button:active {
+  transform: translateY(0);
+}
+
+.forgotpwd-form-links {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.forgotpwd-signup-link-new {
   color: #6366F1;
   text-decoration: none;
-  font-size: 14px;
+  font-size: clamp(18px, 1.4vw, 16px);
+  font-weight: 500;
+  transition: color 0.3s ease;
+  white-space: nowrap;
 }
 
-.signup-link-new:hover {
+.forgotpwd-signup-link-new:hover {
   color: #4F46E5;
   text-decoration: underline;
-  cursor: pointer;
 }
 
+.forgotpwd-waitlist-back-btn {
+  position: absolute;
+  top: -215px !important;
+  right: 920px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(233, 124, 70);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 32px;
+  padding: 0 38px;
+  height: 54px;
+  min-width: 160px;
+  cursor: pointer;
+  box-shadow: 0 6px 24px rgba(233,124,70,0.18), 0 1.5px 8px rgba(0,0,0,0.08);
+  overflow: hidden;
+  transition: background 0.2s, box-shadow 0.2s, filter 0.2s;
+  z-index: 1001;
+}
 
+.forgotpwd-waitlist-back-btn:hover {
+  background: linear-gradient(90deg, #2a2eec 0%, #a82e7c 100%);
+  filter: brightness(1.15) drop-shadow(0 0 8px #a82e7c);
+  box-shadow: 0 8px 32px rgba(168,46,124,0.22), 0 2px 12px rgba(0,0,0,0.10);
+}
 
-/* Responsive Adjustments */
-@media (max-width: 768px) {
-  .login-overlay {
-    padding: 30px 20px;
+.forgotpwd-waitlist-back-border {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  border-radius: 32px;
+  border: 2px solid rgba(255,255,255,0.7);
+  pointer-events: none;
+  transition: border-color 0.3s;
+}
+
+.forgotpwd-waitlist-back-btn:active .forgotpwd-waitlist-back-border {
+  border-color: #fff;
+}
+
+.forgotpwd-waitlist-back-text {
+  position: relative;
+  z-index: 2;
+  font-family: 'Segoe UI', 'Roboto', sans-serif;
+  letter-spacing: 0.08em;
+  font-size: 1.1rem;
+}
+
+/* Responsive styles matching your Login page */
+@media (max-width: 1440px) {
+  .forgotpwd-card {
+    left: 280px;
+    top: 70px;
+  }
+  
+  .forgotpwd-hero-logo {
+    position: relative;
+    right: 162px !important;
+    left: auto;
+    width: 120px !important;
+    height: 120px !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .forgotpwd-card {
+    left: 240px;
+    top: 60px; 
+    width: clamp(380px, 40vw, 600px);
   }
 
-  .hero-logo {
-    width: clamp(60px, 25vw, 120px);
+  .forgotpwd-hero-logo {
+    position: absolute;
+    top: 24px;
+    right: 32px;
+    left: auto;
+    width: 188px;
+    height: auto;
+    object-fit: contain;
+    z-index: 1000;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+  }
+}
+
+@media (max-width: 867px) {
+  .forgotpwd-overlay {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 40px 20px;
+  }
+  
+  .forgotpwd-card {
+    width: 90%;
+    max-width: 400px;
+    margin: 20px 0;
+    text-align: center;
+    position: relative;
+    left: 10px !important;
+    top: auto;
+  }
+  
+  .forgotpwd-hero-logo {
+    position: relative;
+    width: 150px;
+    margin-bottom: 20px;
+    object-fit: contain;
+  }
+  
+  .forgotpwd-welcome-section {
+    text-align: center;
+    padding: 0 10px;
   }
 
-  .welcome-title {
-    font-size: clamp(20px, 6vw, 28px);
-  }
-
-  .fgt-description {
-    font-size: 13px;
+  .forgotpwd-form-new {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    right: auto;
+    bottom: auto;
   }
 }
 
 @media (max-width: 480px) {
-  .login-overlay {
-    padding: 20px 15px;
+  .forgotpwd-card {
+    max-width: 95%;
   }
 
-  .login-button {
-    font-size: 14px;
+  .forgotpwd-welcome-title {
+    font-size: 20px;
   }
 
-  .social-icon svg {
-    width: 28px;
-    height: 28px;
+  .forgotpwd-login-input {
+    font-size: 16px;
+  }
+
+  .forgotpwd-login-button {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .forgotpwd-form-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
 }

@@ -6,33 +6,57 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.6;
-  background: #0a051a url('your-image-path.jpg') no-repeat center center/cover;
-  margin: 0;
-  padding: 0;
-  border: 10px solid rgba(0, 0, 0, 0); 
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3); 
-  min-height: 100vh; 
-  box-sizing: border-box; 
+   background: #050216;
+   color: #0a051a ;
+  overflow-x: hidden;
 }
 
-
-.new-login-container {
+.outer-wrapper {
   position: relative;
-  width: 100vw;
-  min-height: 100vh;
+  margin: 20px auto;
+  width: calc(100vw - 40px);
+  min-height: calc(100vh - 40px);
+  border-radius: 20px;
   overflow: hidden;
+  display: flex;
+  isolation: isolate;               
+  background: #0a051a url('/loginSignUpFpBackground.jpeg') no-repeat center center/cover;
+ 
+  box-shadow:
+    /* Strong white edge glow */
+    0 0 0 1px rgba(255, 255, 255, 0.45),
+    0 0 30px rgba(4, 7, 17, 0.76),
+    0 0 60px rgba(8, 15, 48, 0.95),
+    
+    /* Blue-purple mid glow */
+    0 0 90px rgba(4, 8, 54, 0.4),
+    0 0 140px rgba(13, 17, 78, 0.3),
+    
+    /* Outer vibrant glow */
+    0 0 200px rgba(1, 1, 13, 0.5),
+    0 0 280px rgba(61, 71, 114, 0.4),
+    
+    /* Deep background glow */
+    0 0 350px rgba(80, 90, 200, 0.3);
+  
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+.main-container {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  z-index: 3;
+}
 
 .login-background {
-  position: fixed;
-  top: 0;
-  left: 0;
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   z-index: 1;
+  pointer-events: none;
+  background: transparent;
 }
 
 .background-image {
@@ -43,15 +67,14 @@ body {
 }
 
 .login-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
   width: 100%;
-  height: 100%;
+  min-height: 100%;
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  z-index: 2;
+  padding: 60px;
+  z-index: 4;
 }
 
 
@@ -59,7 +82,7 @@ body {
   position: absolute; 
   left: 1620px!important;
   top: 30px !important;
-   width: clamp(100px, 18vw, 220px);
+  width: clamp(100px, 18vw, 220px);
   height: auto;
   object-fit: contain;
   z-index: 1000;
@@ -67,18 +90,17 @@ body {
 }
 
 
-
 .login-card {
   position: relative;
-  top: 100px;   
+  top:x;   
   left: 320px; 
-  background: transparent;
+  background: rgba(255,255,255,0); 
   border-radius: 0;
   padding: 0 10px;
   width: clamp(420px, 36vw, 640px);
   transform: translateX(0);
+  z-index: 4; 
 }
-
 
 .welcome-section {
   text-align: left;
@@ -113,7 +135,8 @@ body {
 .welcome-title {
   font-size: clamp(44px, 1vw, 14px) !important;
   position:relative !important;
-  bottom:40px !important;
+  bottom:90px !important;
+  right:140px !important;
   font-weight: 700;
   color: #0b1954;
   line-height: 1.15;
@@ -130,8 +153,8 @@ body {
 .login-form-new {
   width: 100%;
   position: relative;
-  bottom:10px;
-  left:20px;
+  bottom:120px;
+  right:120px;
 }
 
 .error-message {
@@ -276,8 +299,8 @@ input.login-input:-webkit-autofill:focus {
 
 .waitlist-back-btn {
   position: absolute;
-  top: -55px!important;
-  right: 820px !important;
+  top: -115px!important;
+  right: 870px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -369,92 +392,46 @@ input.login-input:-webkit-autofill:focus {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 867px) {
   .login-overlay {
-    justify-content: center;
-    align-items: flex-start;
-    padding-top: 60px; /* Reduced padding to move content up */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 40px 20px;
   }
   .signup-form-new{
   position:relative;
   right:310px;
-}
 
+  }
   .login-card {
-    position: relative;
-    top: 0;
-    left: 0;
     width: 90%;
-    max-width: 500px;
-    margin: 0 auto;
+    max-width: 400px;
+    margin: 20px 0;
     text-align: center;
+    position: relative;
+    left: 10px !important;
+    top: auto;
   }
   
   .hero-logo {
-  position: absolute;
-  top: 24px;
-  right: 32px;
-  left: auto;
-  width: 188px;
-  height: auto;
-  object-fit: contain;
-  z-index: 1000;
-  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12));
+  position: relative;
+    width: 150px;
+    margin-bottom: 20px;
+    object-fit: contain;
 }
   
   .welcome-section {
-    text-align: center;
+   text-align: center;
+    padding: 0 10px;
   }
-  
-  .social-login-section {
+
+   .signup-form-new {
+    width: 100%;
+    margin: 0 auto;
     position: relative;
-    bottom: auto;
-    margin-top: 30px;
-    padding: 20px 0;
-  }
-}
-
-@media (max-width: 480px) {
-  .top-navigation {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px 20px;
-  }
-  .signup-form-new{
-  position:relative;
-  right:310px;
-}
-
-  .nav-tabs {
-    gap: 15px;
-  }
-  
-  .nav-tab {
-    padding: 6px 10px;
-    font-size: 14px;
-  }
-  
-  .login-card {
-    max-width: 95vw;
-    top: 0;
-  }
-  
-  .welcome-title {
-    font-size: 22px;
-  }
-  
-  .form-links {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .social-icons {
-    gap: 12px;
-  }
-  
-  .social-icon {
-    width: 45px;
-    height: 45px;
+    right: auto;
   }
   
   .social-login-section {
@@ -462,6 +439,32 @@ input.login-input:-webkit-autofill:focus {
     padding: 15px 0;
   }
 }
+
+@media (max-width: 480px) {
+  .login-card {
+    max-width: 95%;
+  }
+
+  .welcome-title {
+    font-size: 20px;
+  }
+
+  .login-input {
+    font-size: 16px;
+  }
+
+  .login-button {
+    width: 100%;
+    max-width: 250px;
+  }
+
+  .form-links {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
 
 @media (max-width: 320px) {
   .login-overlay {
@@ -486,30 +489,29 @@ input.login-input:-webkit-autofill:focus {
   }
   
   .login-card {
-    margin-top: clamp(20px, 6vh, 40px); /* Reduced margin to move up */
+    margin-top: clamp(20px, 6vh, 40px); 
   }
   
   .hero-logo {
     width: clamp(80px, 15vw, 120px);
-    top: clamp(15px, 4vh, 30px); /* Moved higher */
+    top: clamp(15px, 4vh, 30px);
   }
   
   .social-login-section {
-    display: none; /* Hide social section in landscape to save space */
+    display: none; 
   }
 }
 
-/* High-resolution screens */
 @media (min-width: 1920px) {
   .login-card {
     max-width: 700px;
-    left: 360px; /* Adjusted for larger screens */
-    top: 100px; /* Adjusted for larger screens */
+    left: 360px; 
+    top: 100px; 
   }
   
   .hero-logo {
-    left: 160px; /* Adjusted for larger screens */
-    top: 100px; /* Adjusted for larger screens */
+    left: 160px; 
+    top: 100px; 
   }
   
   .welcome-title {
@@ -525,7 +527,6 @@ input.login-input:-webkit-autofill:focus {
   }
 }
 
-/* Extra positioning for very large screens */
 @media (min-width: 2560px) {
   .login-card {
     left: 420px;

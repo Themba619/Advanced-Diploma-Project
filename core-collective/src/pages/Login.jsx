@@ -34,13 +34,10 @@ const Login = () => {
   };
 
   return (
-    <div className="new-login-container">
-      <div className="login-background">
-        <img src="/loginSignUpFpBackground.jpeg" alt="Login Background" className="background-image" />
-      </div>
-      <img src={whiteTransparentLogo} alt="VirtualAssist Logo" className="hero-logo" />
-      <div className="login-overlay">          
-          
+    <div className="outer-wrapper">
+       <div className="main-container">        
+      <div className="login-overlay"> 
+        <img src={whiteTransparentLogo} alt="VirtualAssist Logo" className="hero-logo" />        
         <div className="login-card">         
             <div className="welcome-section">
               <div className="welcome-header">
@@ -50,8 +47,7 @@ const Login = () => {
                 </h1>
               </div>
             </div>
-
-          {/* Login Form */}
+            
           <form className="login-form-new" onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
             {error && <div className="error-message">{error}</div>}
             
@@ -103,8 +99,10 @@ const Login = () => {
             <span className="waitlist-back-text">Back</span>
           </button>
         </div>
-      </div> */}
+      </div> 
     </div>
+    </div>
+  
   );
 };
 
