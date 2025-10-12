@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import BackgroundImage from '../assets/login background.png';
+import loginSignUpFpBackground from '../../../core-collective/public/loginSignUpFpBackground.jpeg';
 import LogoMark from '../assets/VA-3.png';
 
 function ForgotPwd() {
@@ -37,7 +37,6 @@ function ForgotPwd() {
 
       if (response.ok) {
         setMessage('OTP sent successfully! Redirecting to password reset...');
-        // Navigate to OTP page with email as state
         setTimeout(() => {
           navigate('/otp', { state: { email } });
         }, 2000);
@@ -54,16 +53,11 @@ function ForgotPwd() {
 
   return (
     <div className="new-login-container">
-      {/* Background Image */}
       <div className="login-background">
-        <img src={BackgroundImage} alt="Background" className="background-image" />
+        <img src={loginSignUpFpBackground} alt="Background" className="background-image" />
       </div>
-
-      {/* Foreground Overlay */}
       <div className="login-overlay">
-        {/* Hero logo in the white space */}
         <img src={LogoMark} alt="VirtualAssist Logo" className="hero-logo" />
-
         <div className="login-card">
           <div className="welcome-section">
             <div className="welcome-header">
@@ -74,9 +68,10 @@ function ForgotPwd() {
             </div>
           </div>
 
-          <p style={{ color: '#666', marginTop: '4px' }}>
-            Please enter your email address to receive an OTP. You'll then be able to set a new password.
+          <p className='fgt-description' style={{ position: 'relative', top: '-80px', left: '20px' }}>
+          Please enter your email address to receive an OTP. You'll then be able to set a new password.
           </p>
+
 
           <form className="login-form-new" onSubmit={handleSubmit}>
             {error && <div className="error-message">{error}</div>}
@@ -126,6 +121,15 @@ function ForgotPwd() {
               <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
             </svg>
           </div>
+          {/* <button
+            type="button"
+            className="waitlist-back-btn"
+            onClick={() => navigate(-1)}
+            style={{position: 'absolute', top: 24, right: 32, zIndex: 1001}}
+          >
+            <span className="waitlist-back-border"></span>
+            <span className="waitlist-back-text">Back</span>
+          </button> */}
         </div>
       </div>
     </div>

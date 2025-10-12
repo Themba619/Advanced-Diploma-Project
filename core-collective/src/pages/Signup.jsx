@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import BackgroundImage from '../assets/login background.png';
-import LogoMark from '../assets/VA-3.png';
+import loginSignUpFpBackground from '../../../core-collective/public/loginSignUpFpBackground.jpeg';
+import LogoTransbarentBlueOrange from '../../.../../../core-collective/public/LogoTransbarentBlueOrange.png';
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -22,7 +22,6 @@ const Signup = () => {
     setIsLoading(true);
     setError('');
 
-    // Password validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
     if (!passwordRegex.test(password)) {
       setError('Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)');
@@ -30,10 +29,7 @@ const Signup = () => {
       return;
     }
 
-    try {
-      // Use the correct endpoint path - note it's under /api/private/register
-      // Keeping the payload to expected fields to avoid backend errors.
-      // TODO: Include `username` when backend supports it.
+    try {      
       const response = await axios.post('http://localhost:3001/api/private/register', {
         fullName,
         email,
@@ -42,7 +38,6 @@ const Signup = () => {
       
   console.log('Registration success:', response.data);
       
-  // Store user ID for verification (support both shapes)
   setUserId(response.data?.user?.id ?? response.data?.userId);
       setVerificationSent(true);
     } catch (err) {
@@ -90,7 +85,7 @@ const Signup = () => {
         userId
       });
       
-      setError(''); // Clear any previous errors
+      setError('');
       alert('Verification code has been resent to your email.');
     } catch (err) {
       console.error('Resend verification error:', err.response?.data);
@@ -100,16 +95,13 @@ const Signup = () => {
     }
   };
 
-  // If verification is sent, show verification form
   if (verificationSent) {
     return (
       <div className="login-container slide-in">
-        {/* Left half - Image Placeholder */}
-        <div className="image-placeholder">
-          <img src={LogoMark} alt="Logo image" width={500} />
-        </div>
+        <img src={LogoTransbarentBlueOrange} alt="VirtualAssist Logo" className="hero-logo" />
+             
 
-        {/* Right half - Verification Form */}
+       
         <div className="login-form-container">
           <div className="login-form">
             <h2>Verify Your Email</h2>
@@ -180,20 +172,19 @@ const Signup = () => {
     );
   }
 
-  // Regular signup form with the same UI as Login (plus Username field)
+
   return (
-    <div className="new-login-container">
-      {/* Background Image */}
+    <div className="new-login-container">     
       <div className="login-background">
-        <img src={BackgroundImage} alt="Background" className="background-image" />
+        <img src={loginSignUpFpBackground} alt="Background" className="background-image" />
       </div>
 
       
 
       {/* Foreground */}
       <div className="login-overlay">
-        {/* Hero logo in the white space */}
-        <img src={LogoMark} alt="VirtualAssist Logo" className="hero-logo" />
+    
+        <img src={LogoTransbarentBlueOrange} alt="VirtualAssist Logo" className="hero-logo" />
 
         <div className="login-card">
           {/* Heading */}
@@ -207,7 +198,7 @@ const Signup = () => {
           </div>
 
           {/* Signup Form (same look as Login) */}
-          <form className="login-form-new" onSubmit={(e) => { e.preventDefault(); handleSignup(); }}>
+          <form className="signup-form-new" onSubmit={(e) => { e.preventDefault(); handleSignup(); }}>
             {error && <div className="error-message">{error}</div>}
 
             <div className="input-group">
@@ -275,30 +266,18 @@ const Signup = () => {
               <a href="/login" className="signup-link-new">Already have an account? Sign in</a>
             </div>
           </form>
+          <button
+            type="button"
+            className="waitlist-back-btn"
+            onClick={() => navigate(-1)}
+            style={{position: 'absolute', top: 24, right: 32, zIndex: 1001}}
+          >
+            <span className="waitlist-back-border"></span>
+            <span className="waitlist-back-text">Back</span>
+          </button>
         </div>
       </div>
-
-      {/* Social Login Section */}
-      <div className="social-login-section">
-        <p className="social-login-text">Sign up with</p>
-        <div className="social-icons">
-          <div className="social-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" fill="none"/>
-            </svg>
-          </div>
-          <div className="social-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
-            </svg>
-          </div>
-          <div className="social-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
-            </svg>
-          </div>
-        </div>
-      </div>
+      
     </div>
   );
 };

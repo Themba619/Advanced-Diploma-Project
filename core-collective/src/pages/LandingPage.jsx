@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { MessageCircle, Mic, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import LogoTransbarentBlueOrange from '../../public/LogoTransbarentBlueOrange.png';
 const features = [
   {
     id: 'chat',
     title: 'Smart Chat',
-    description: 'Get instant answers about courses, schedules, and campus life',
+    description: 'Get instant answers about courses, ujenuis ,sports and campus life',
     icon: MessageCircle,
     color: 'linear-gradient(135deg, #60a5fa 0%, #2563eb 100%)',
     detail: 'AI-powered conversations'
@@ -36,26 +36,40 @@ const styles = `
   }
 
   .landing-page-wrapper {
-    min-height: 100vh;
+    min-height: 0;
+    height: calc(100vh - 32px);
+    width: calc(100vw - 32px);
     background: #130c25;
-    position: relative;
+    position: absolute;
+    top: 15px;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
     overflow: hidden;
+
+    box-shadow:
+      0 25px 50px -12px rgba(0, 0, 0, 0.35),
+      0 0 0 2px rgba(255,255,255,0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    border-radius: 24px;
+    border: 1.5px solid rgba(255,255,255,0.12);
+    z-index: 10;
   }
 
   .landing-page-wrapper::before {
+    /* Enhance the glow and depth for visibility */
     content: '';
     position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background: 
-      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.03) 0%, transparent 25%),
-      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.02) 0%, transparent 25%);
-    border-radius: 50%;
-    animation: float 20s ease-in-out infinite;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
     pointer-events: none;
-    z-index: 1;
+    z-index: 2;
+    box-shadow:
+      0 0 80px 10px rgba(96,165,250,0.08),
+      0 0 120px 30px rgba(96,165,250,0.04);
   }
 
   .landing-page-wrapper::after {
@@ -80,14 +94,16 @@ const styles = `
 
   .feature-container {
     width: 100%;
-    max-width: 1280px;
+    max-width: 1600px;
     margin: 0 auto;
-    padding: 48px 16px;
-    min-height: 100vh;
+    padding: 64px 32px;
+    min-height: 90vh;
     display: flex;
     align-items: center;
     position: relative;
     z-index: 2;
+    top: 72px; 
+    left:20px;
   }
 
   .feature-grid {
@@ -96,15 +112,17 @@ const styles = `
     gap: 48px;
     align-items: center;
     width: 100%;
-    background: rgba(255, 255, 255, 0.05);
+    background: #130c25;
     backdrop-filter: blur(20px);
     border: none;
     border-radius: 24px;
     padding: 60px;
     position: relative;
     box-shadow: 
-      0 25px 50px -12px rgba(0, 0, 0, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      0 25px 50px -12px rgba(0, 0, 0, 0.35),
+      0 0 0 2px rgba(251, 251, 251, 0.18),
+      0 4px 24px 0 rgba(96,165,250,0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
   }
 
   .feature-grid::before {
@@ -116,12 +134,7 @@ const styles = `
     bottom: 0;
     border-radius: 24px;
     padding: 2px;
-    background: 
-      radial-gradient(circle at top left, rgba(255, 255, 255, 0.3) 0%, transparent 30%),
-      radial-gradient(circle at top right, rgba(255, 255, 255, 0.2) 0%, transparent 30%),
-      radial-gradient(circle at bottom left, rgba(255, 255, 255, 0.2) 0%, transparent 30%),
-      radial-gradient(circle at bottom right, rgba(255, 255, 255, 0.3) 0%, transparent 30%),
-      linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.1) 100%);
+    background: none;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: xor;
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -137,10 +150,7 @@ const styles = `
     right: -1px;
     bottom: -1px;
     border-radius: 24px;
-    background: 
-      radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at center, rgba(19, 12, 37, 0.8) 40%, #130c25 70%);
+    background: none;
     filter: blur(1px);
     z-index: -2;
   }
@@ -267,7 +277,7 @@ const styles = `
   }
 
   .indicator.active {
-    width: 48px;
+    width: 2px;
     background: #60a5fa;
   }
 
@@ -335,7 +345,7 @@ const styles = `
 
   .feature-item.active::before {
     background: 
-      radial-gradient(circle at top left, rgba(96, 165, 250, 0.4) 0%, transparent 40%),
+      radial-gradient(circle at top left, rgba(37, 12, 75, 0.4) 0%, transparent 40%),
       radial-gradient(circle at bottom right, rgba(96, 165, 250, 0.3) 0%, transparent 40%),
       linear-gradient(135deg, rgba(96, 165, 250, 0.2) 0%, rgba(96, 165, 250, 0.1) 50%, rgba(96, 165, 250, 0.2) 100%);
     opacity: 1;
@@ -367,25 +377,27 @@ const styles = `
   }
 
   .active-dot {
-    width: 8px;
-    height: 8px;
+    width: 22px;
+    height: 10px;
     background: #2563eb;
     border-radius: 50%;
   }
 
   .cta-button {
-    background: #3b82f6;
+    background: rgb(233, 124, 70);
     color: white;
     border: none;
-    border-radius: 8px;
-    padding: 14px 28px;
+    border-radius: 24px;
+    padding: 10px 32px;
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    margin-top: 24px;
+    width: auto;
+    margin: 32px auto 42px 16px;
+    display: block;
+    
   }
 
   .cta-button:hover {
@@ -398,6 +410,8 @@ const styles = `
     .feature-grid {
       grid-template-columns: 1fr;
       gap: 24px;
+      position: relative;
+      right: 40px;
     }
     
     .icon-section {
@@ -407,6 +421,17 @@ const styles = `
     .feature-title {
       font-size: 36px;
     }
+  }
+
+  .landing-page-logo {
+    height: 200px;
+    width: auto;
+    border-radius: 36px;
+    
+    position: relative;
+    left: -16px; /* Move logo to the left */
+    top: 0;
+    background: none;
   }
 `;
 
@@ -438,6 +463,10 @@ const LandingPage = () => {
     <>
       <style>{styles}</style>
       <div className="landing-page-wrapper">
+        {/* Logo at the top left, updated version */}
+        <div style={{ position: 'absolute', top: 24, left: 32, zIndex: 200 }}>
+          <img src={LogoTransbarentBlueOrange} alt="VirtualAssist Logo" className="landing-page-logo" />
+        </div>
         <div className="feature-container">
           <div className="feature-grid">
           {/* Left side - Rotating icons */}
@@ -533,47 +562,8 @@ const LandingPage = () => {
                 ))}
               </div>
             </div>
-
-            {/* Welcome text */}
-            {/* <div className="welcome-section">
-              <h3 style={{
-                fontSize: '24px',
-                fontWeight: '600',
-                color: '#f1f5f9',
-                marginBottom: '16px'
-              }}>
-                Welcome to UniJourney
-              </h3>
-              <p style={{
-                fontSize: '16px',
-                color: '#cbd5e1',
-                lineHeight: '1.6',
-                marginBottom: '20px'
-              }}>
-                Your intelligent campus companion designed to make university life easier and more connected. 
-                Discover courses, navigate campus, and get instant help whenever you need it.
-              </p>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.05)',
-                backdropFilter: 'blur(10px)',
-                borderRadius: '12px',
-                padding: '20px',
-                border: '1px solid rgba(255, 255, 255, 0.1)'
-              }}>
-                <p style={{
-                  fontSize: '14px',
-                  color: '#94a3b8',
-                  fontStyle: 'italic',
-                  margin: '0'
-                }}>
-                  "Empowering students with AI-driven assistance for a seamless university experience"
-                </p>
-              </div>
-            </div> */}
-            
-            {/* Get Started Button */}
             <button className="cta-button" onClick={handleRouteToHome}>
-              Get Started →
+              Get Started 
             </button>
           </div>
         </div>

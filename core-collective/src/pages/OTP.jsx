@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../styles/OnboardingStyles/LoginAndSignup.css';
-import BackgroundImage from '../assets/login background.png';
+import loginSignUpFpBackground from '../../../core-collective/public/loginSignUpFpBackground.jpeg';
 import LogoMark from '../assets/VA-3.png';
 
 function OTP() {
@@ -149,7 +149,7 @@ function OTP() {
     <div className="new-login-container otp-page">
       {/* Background Image */}
       <div className="login-background">
-        <img src={BackgroundImage} alt="Background" className="background-image" />
+        <img src={loginSignUpFpBackground} alt="Background" className="background-image" />
       </div>
 
       {/* Foreground Overlay */}
@@ -167,10 +167,16 @@ function OTP() {
             </div>
           </div>
 
-          <p style={{ color: '#666', marginTop: '4px' }}>We've sent a 6-digit verification code to:</p>
-          <p style={{ fontWeight: 'bold', color: '#666', marginBottom: '20px' }}>{email}</p>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', bottom: '80px' }}>
+  <p style={{ color: '#666', marginLeft: 20 }}>
+    We've sent a 6-digit verification code to:
+  </p>
+  <p style={{ fontWeight: 'bold', color: '#666', position: 'relative', right: 110 }}>
+    {email}
+  </p>
+</div>
 
-          <form className="login-form-new" onSubmit={handleSubmit}>
+          <form style={{ position: 'relative', bottom: '50px' }}  className="login-form-new" onSubmit={handleSubmit}>
             <div className="input-group">
               <label htmlFor="otp" className="input-label">ENTER 6-DIGIT OTP</label>
               <input
@@ -237,11 +243,11 @@ function OTP() {
                 type="button"
                 onClick={handleResendOTP}
                 disabled={loading}
-                style={{ background: 'none', border: 'none', color: '#646cff', textDecoration: 'underline', cursor: 'pointer' }}
+                style={{ background: 'none', border: 'none', color: '#0d1b55', fontWeight: 'bold', textDecoration: 'underline', cursor: 'pointer', position: 'relative', bottom: '10px' }}  
               >
                 {timeLeft === 0 ? 'Resend OTP' : "Didn't receive OTP? Resend"}
               </button>
-              <a href="/login" className="backToLogin">Back to Login</a>
+              <a style={{ backgroundColor:'#e97c46', borderRadius: '20px', position: 'relative', bottom: '680px', right: '800px', padding: '12px 12px', color: '#FFFFFF', textDecoration: 'none' }} href="/login" className="backToLogin">Back to Login</a>
             </div>
           </form>
         </div>

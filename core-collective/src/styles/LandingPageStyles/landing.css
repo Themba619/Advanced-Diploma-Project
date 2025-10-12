@@ -257,21 +257,24 @@
 }
 
 .cta-button {
-  background: #3b82f6;
-  color: white;
+  background: linear-gradient(90deg, #3a2c8d 0%, #b0377c 100%);
+  color: #fff;
   border: none;
-  border-radius: 8px;
-  padding: 14px 28px;
-  font-size: 1rem;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: clamp(10px, 2vh, 14px) clamp(15px, 2vw, 22px);
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  margin: clamp(18px, 3vh, 25px) 0 clamp(8px, 1.5vh, 12px);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .cta-button:hover {
-  background: #2563eb;
+  background: linear-gradient(90deg, #2a2eec 0%, #a82e7c 100%);
   transform: translateY(-1px);
   box-shadow: 0 6px 12px -1px rgba(0, 0, 0, 0.15);
 }
