@@ -154,8 +154,8 @@ const DrawerNavigation = () => {
             onClick={() => setIsOpen(false)}
             title="Home Landing"
           >
-            <FaRocket size={20} />
-            <span className="nav-text">Home Landing</span>
+            <FaHome size={20} />
+            <span className="nav-text">Home</span>
           </Link>
           <Link
             to="/home"
@@ -163,8 +163,8 @@ const DrawerNavigation = () => {
             onClick={() => setIsOpen(false)}
             title="Home"
           >
-            <FaHome size={20} />
-            <span className="nav-text">Home</span>
+            <FaRocket size={20} />
+            <span className="nav-text">AI Chat</span>
           </Link>
           
           <Link

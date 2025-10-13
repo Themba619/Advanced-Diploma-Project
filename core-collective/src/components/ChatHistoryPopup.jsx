@@ -44,9 +44,15 @@ const ChatHistoryPopup = ({ isOpen, chats, activeChat, onSelectChat, onDeleteCha
       }}
     >
       <div className="virtualassist-history-popup">
-        <div className="virtualassist-history-header">
+        <div className="virtualassist-history-header" style={{
+    background: '#475569',
+    color: 'white'
+  }}>
           <span>Chat History</span>
-          <button onClick={onClose} className="virtualassist-close-btn" aria-label="Close history">&times;</button>
+          <button onClick={onClose} className="virtualassist-close-btn" aria-label="Close history"style={{
+      background: '#475569',
+      color: 'white'
+    }}>&times;</button>
         </div>
         <ul className="virtualassist-history-list">
           {chats.length === 0 ? (

@@ -21,14 +21,14 @@
   right: 0;
   display: flex;
   align-items: center;
-  background: #91a3c2;
+  background: #475569;
   padding: 0.75rem 1rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   z-index: 50;
 }
 
 .drawer-container.dark-mode .top-nav {
-  background: #91a3c2;
+  background:rgb(33, 43, 57);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
@@ -58,7 +58,7 @@
   margin-left: 1rem;
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1f2937;
+  color:white;
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
 }
 
@@ -92,6 +92,7 @@
   transform: scale(1.1);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
+
 
 /* Notification Badge */
 .notification-btn {
@@ -142,7 +143,7 @@
   left: 0;
   height: 100vh;
   width: 250px;
-  background: #91a3c2;
+  background: #475569;
   color: #fff;
   box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
   z-index: 1001;

@@ -891,7 +891,7 @@ const Home = () => {
       </div>
 
       {/* Main Chat Area */}
-      <main className={`flex-1 w-full max-w-4xl mx-auto px-4 pb-4 overflow-y-auto ${showHistory ? "virtualassist-blur" : ""}`}>
+      <main className={`flex-1 w-full max-w-4xl mx-auto px-8 pb-4 overflow-y-auto ${showHistory ? "virtualassist-blur" : ""}`}>
         <div className="space-y-6">
           {messages.map((msg, idx) => (
             <div key={idx} className={`chat-message ${msg.sender === "user" ? "chat-message-user" : "chat-message-ai"}`}>
