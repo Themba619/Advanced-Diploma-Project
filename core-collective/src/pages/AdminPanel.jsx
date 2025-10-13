@@ -500,7 +500,7 @@ const AdminPanel = () => {
               className="warning-button"
               disabled={warningMutation.isPending}
             >
-              {warningMutation.isPending ? 'Sending...' : '📧 Send Warning Email'}
+              {warningMutation.isPending ? 'Sending...' : '📧 Send Warning to user'}
             </button>
           </div>
         </div>

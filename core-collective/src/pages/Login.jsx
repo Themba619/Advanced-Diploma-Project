@@ -24,7 +24,7 @@ const Login = () => {
       
       
       setTimeout(() => {
-        navigate('/home');
+        navigate('/homeLanding');
       }, 100);
       
     } catch (err) {
