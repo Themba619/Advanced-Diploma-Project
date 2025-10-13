@@ -7,48 +7,48 @@ import FAQPageComp from '../components/FAQPageComp';
 
 const faqData = [
   {
-    question: "When do applications open and close?",
-    answer: "Applications open on April 1 and close on October 31 each year. No late applications are accepted."
+    question: "How do I access my student email and online portals?",
+    answer: "Use your student number and password to log into ULink for academic records, Blackboard for course materials, and Gmail with your UJ email address."
   },
   {
-    question: "How long until I hear back after applying?",
-    answer: "You'll receive an email with your student number immediately. Final decisions can take up to 15 working days."
+    question: "Where can I get my student card and what services does it provide?",
+    answer: "Visit the Student Enrolment Centre with your ID and registration proof. Your card provides library access, meal plan payments, and building entry."
   },
   {
-    question: "How many programmes can I apply to?",
-    answer: "You may apply for up to two undergraduate (or postgraduate) programmes. You can't change choices later."
+    question: "What academic support services are available on campus?",
+    answer: "UJ offers tutoring at the Academic Development Centre, writing support at the Writing Centre, and subject-specific help through faculty mentoring programs."
   },
   {
-    question: "Do I need to pay to apply?",
-    answer: "No, UJ's online application is free."
+    question: "How do I join student societies and clubs?",
+    answer: "Visit the Student Life Centre or attend O-Week activities. Popular options include academic societies, sports clubs, cultural groups, and the SRC student government."
   },
   {
-    question: "What documents are required with my application?",
-    answer: "If you're a Grade 12 student, no documents are needed. Transfers must upload certified transcripts."
+    question: "What library resources and study spaces are available?",
+    answer: "Each campus has libraries with study rooms, computer labs, and group spaces. Book online or visit in person. Libraries also provide research assistance and printing services."
   },
   {
-    question: "When is first-year registration?",
-    answer: "It usually takes place between mid-January and early February (depending on matric results)."
+    question: "How does campus transportation and parking work?",
+    answer: "UJ shuttles run between campuses. Student parking permits are available through Campus Control. Use Rea Vaya buses for off-campus transport with student discounts."
   },
   {
-    question: "How is registration secured?",
-    answer: "UJ uses facial-recognition via SMS link to confirm your identity during registration."
+    question: "Where can I get food on campus and how do meal plans work?",
+    answer: "Campus dining halls, cafeterias, and food courts accept cash, card, or meal plan credits. Load money onto your student card for convenient campus purchases."
   },
   {
-    question: "How can I navigate between campuses?",
-    answer: "UJ provides a shuttle service between campuses. Rea Vaya buses also serve most UJ locations."
+    question: "What health and wellness services are available?",
+    answer: "Campus Health provides medical services, counseling, and wellness programs. Emergency contacts and mental health support are available 24/7 through Student Affairs."
   },
   {
-    question: "What student accommodation is available?",
-    answer: "UJ offers male, female, and mixed-gender residences like Kilimanjaro, Horizon, and Mayine."
+    question: "How do I add/drop courses or change my academic program?",
+    answer: "Contact your faculty's Student Academic Services during add/drop periods. Changes may affect financial aid and graduation timeline, so consult your academic advisor first."
   },
   {
-    question: "How do I pay for tuition or apply for bursaries?",
-    answer: "Visit Student Finance or use the Finance portal. NSFAS, SRC Trust, and merit bursaries are available."
+    question: "What career services and internship opportunities exist?",
+    answer: "The Career Centre offers job placement assistance, CV workshops, interview prep, and connects you with internship partners and graduate employment opportunities."
   },
   {
-    question: "How do I avoid scams during registration?",
-    answer: "UJ is a cashless campus. Never pay anyone privately—use only official platforms. Report scams immediately."
+    question: "How do I resolve academic or administrative issues?",
+    answer: "Start with your lecturer or faculty office. For complex issues, contact Student Affairs or use the official UJ complaint process. Keep records of all communications."
   },
 ];
 
