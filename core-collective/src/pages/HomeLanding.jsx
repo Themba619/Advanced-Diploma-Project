@@ -459,10 +459,7 @@ const HomeLanding = () => {
 
   return (
     <div style={styles.container}>
-      {/* Logo at the top left, same as Login */}
-      <div style={{ position: 'absolute', top: 24, left: 32, zIndex: 200 }}>
-        <img src={Logo} alt="VirtualAssist Logo" style={{ height: 64, width: 'auto', borderRadius: 16, boxShadow: '0 2px 12px rgba(108,99,255,0.15)' }} />
-      </div>
+     
 
       {/* Expanded Background Content */}
       <div style={styles.expandedBackground} />

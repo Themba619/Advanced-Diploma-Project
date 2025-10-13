@@ -68,7 +68,7 @@
 .topic-select:focus {
   outline: none;
   background: linear-gradient(#ffffff, #ffffff) padding-box,
-    linear-gradient(135deg, #6a5af9, #7c3aed) border-box; /* gradient border on focus */
+    linear-gradient(135deg,rgb(35, 27, 101),rgb(61, 45, 88)) border-box; /* gradient border on focus */
   box-shadow: 0 14px 32px rgba(124, 58, 237, 0.18);
 }
 
@@ -77,7 +77,7 @@
   /* light grey fill and border on hover */
   background: linear-gradient(#f3f4f6, #f3f4f6) padding-box,
     linear-gradient(135deg, #d1d5db, #d1d5db) border-box;
-  box-shadow: 0 12px 28px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 12px 28px rgba(56, 70, 99, 0.43);
 }
 
 /* Custom arrow */
@@ -89,7 +89,7 @@
   width: 34px;
   height: 34px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #6a5af9 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, #6a5af9 0%,rgb(103, 76, 151) 100%);
   box-shadow: 0 8px 18px rgba(124, 58, 237, 0.28);
   transform: translateY(-50%);
   pointer-events: none;
